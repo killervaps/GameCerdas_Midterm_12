@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81106d3fe3ec4effb0f0e5e6a6457279, type: 3}
+  m_Name: DefaultPersonality
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyPersonality
+  displayName: Default
+  visionRange: 10
+  visionAngle: 90
+  attackRange: 2
+  attackExitRange: 2.75
+  attackCooldown: 1.5
+  attackDamage: 10
+  fleeStartHealthRatio: 0.3
+  safeDistance: 12
+  searchScanDuration: 4
+  patrolSpeed: 2
+  chaseSpeed: 4
+  fleeSpeed: 5
