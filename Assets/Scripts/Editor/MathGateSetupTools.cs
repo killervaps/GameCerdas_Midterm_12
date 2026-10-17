@@ -12,6 +12,7 @@ public static class MathGateSetupTools
     private const string FloorsRoot = "floors";
     private const string WallsRoot = "walls";
     private const string ObstaclesRoot = "obstacles";
+    private const string SafezoneRoot = "Safezone";
 
     // Tebal minimum collider lantai supaya CharacterController tidak tembus tile yang sangat tipis.
     private const float MinColliderThickness = 0.1f;
@@ -56,6 +57,7 @@ public static class MathGateSetupTools
         int floors = SetupRoot(FloorsRoot, LayerMask.NameToLayer(GameLayers.Ground));
         int walls = SetupRoot(WallsRoot, LayerMask.NameToLayer(GameLayers.NavBlock));
         int obstacles = SetupRoot(ObstaclesRoot, LayerMask.NameToLayer(GameLayers.NavBlock));
+        int safezone = SetupMixedRoot(SafezoneRoot);
 
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
 
@@ -63,6 +65,7 @@ public static class MathGateSetupTools
             "MathGate: collider ditambahkan. floors " + floors +
             ", walls " + walls +
             ", obstacles " + obstacles +
+            ", Safezone " + safezone +
             ". Simpan scene (Ctrl+S)."
         );
     }
@@ -187,30 +190,72 @@ public static class MathGateSetupTools
 
         foreach (Transform child in root.transform)
         {
-            SetLayerRecursive(child.gameObject, layer);
-
-            if (child.GetComponentInChildren<Collider>() != null)
-                continue;
-
-            if (!TryGetLocalBounds(child, out Bounds bounds))
-                continue;
-
-            if (layer == LayerMask.NameToLayer(GameLayers.Ground) && bounds.size.y < MinColliderThickness)
-            {
-                // Tebalkan ke bawah, permukaan atas tetap.
-                float top = bounds.max.y;
-                bounds.size = new Vector3(bounds.size.x, MinColliderThickness, bounds.size.z);
-                bounds.center = new Vector3(bounds.center.x, top - MinColliderThickness * 0.5f, bounds.center.z);
-            }
-
-            BoxCollider box = Undo.AddComponent<BoxCollider>(child.gameObject);
-            box.center = bounds.center;
-            box.size = bounds.size;
-
-            added++;
+            if (SetupTile(child, layer))
+                added++;
         }
 
         return added;
+    }
+
+    // Root berisi campuran lantai dan dinding (mis. Safezone). Layer ditentukan dari awalan nama anak.
+    // Anak lain (portal gate, spawn point, label) dilewati supaya tidak ikut diberi collider.
+    private static int SetupMixedRoot(string rootName)
+    {
+        GameObject root = GameObject.Find(rootName);
+
+        if (root == null)
+        {
+            Debug.LogWarning("MathGate: objek '" + rootName + "' tidak ditemukan di scene.");
+            return 0;
+        }
+
+        int ground = LayerMask.NameToLayer(GameLayers.Ground);
+        int navBlock = LayerMask.NameToLayer(GameLayers.NavBlock);
+        int added = 0;
+
+        foreach (Transform child in root.transform)
+        {
+            string childName = child.name.ToLowerInvariant();
+
+            if (childName.StartsWith("floor"))
+            {
+                if (SetupTile(child, ground))
+                    added++;
+            }
+            else if (childName.StartsWith("wall") || childName.StartsWith("border") || childName.StartsWith("column"))
+            {
+                if (SetupTile(child, navBlock))
+                    added++;
+            }
+        }
+
+        return added;
+    }
+
+    // Mengembalikan true jika collider baru ditambahkan.
+    private static bool SetupTile(Transform tile, int layer)
+    {
+        SetLayerRecursive(tile.gameObject, layer);
+
+        if (tile.GetComponentInChildren<Collider>() != null)
+            return false;
+
+        if (!TryGetLocalBounds(tile, out Bounds bounds))
+            return false;
+
+        if (layer == LayerMask.NameToLayer(GameLayers.Ground) && bounds.size.y < MinColliderThickness)
+        {
+            // Tebalkan ke bawah, permukaan atas tetap.
+            float top = bounds.max.y;
+            bounds.size = new Vector3(bounds.size.x, MinColliderThickness, bounds.size.z);
+            bounds.center = new Vector3(bounds.center.x, top - MinColliderThickness * 0.5f, bounds.center.z);
+        }
+
+        BoxCollider box = Undo.AddComponent<BoxCollider>(tile.gameObject);
+        box.center = bounds.center;
+        box.size = bounds.size;
+
+        return true;
     }
 
     private static void SetLayerRecursive(GameObject go, int layer)

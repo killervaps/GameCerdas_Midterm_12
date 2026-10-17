@@ -1,0 +1,263 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+// Mengatur pemilihan gate di Safezone. Tiga GatePortal diisi hasil GateGenerator,
+// MC berdiri di depan salah satu gate lalu menahan tombol Interact, kemudian diteleport ke arena.
+public class GateSelectionRoom : MonoBehaviour
+{
+    [Header("References")]
+    [SerializeField] private PlayerStats playerStats;
+    [SerializeField] private PlayerMotor playerMotor;
+    [SerializeField] private GateGenerator generator;
+    [SerializeField] private GatePortal[] portals;
+    // Opsional. Jika diisi, kamera langsung pindah tanpa meluncur melintasi peta setelah teleport.
+    [SerializeField] private TopDownCameraFollow cameraFollow;
+
+    [Header("Spawn Points")]
+    [SerializeField] private Transform safezoneSpawn;
+    [SerializeField] private Transform arenaSpawn;
+
+    [Header("Input")]
+    // Action Interact memakai interaction Hold, jadi perlu ditahan sebentar. Mencegah salah pilih saat lewat.
+    [SerializeField] private string confirmActionName = "Player/Interact";
+
+    [Header("Rules")]
+    // TODO(M3): batas gate per run dan alur ronde akan diatur RunManager.
+    [SerializeField] private int maxGatesPerRun = 3;
+    [SerializeField] private bool startInSafezone = true;
+
+    [Header("Debug")]
+    [SerializeField] private bool logEvents = true;
+    // Sementara sebelum ada RunManager. Tombol R di arena mengembalikan MC ke Safezone.
+    [SerializeField] private bool debugReturnKey = true;
+
+    private readonly List<MathGateData> offer = new List<MathGateData>();
+
+    private InputAction confirmAction;
+    private GatePortal activePortal;
+
+    public bool IsSelecting { get; private set; }
+
+    public GatePortal ActivePortal => activePortal;
+
+    // Dikirim setelah gate dipilih dan MC sudah berada di arena. RunManager nanti memulai ronde dari sini.
+    public event Action<MathGateData> GateChosen;
+
+    // Dikirim setelah MC kembali ke Safezone dan pilihan baru sudah dibuka.
+    public event Action SelectionOpened;
+
+    private void Awake()
+    {
+        confirmAction = InputSystem.actions != null
+            ? InputSystem.actions.FindAction(confirmActionName)
+            : null;
+
+        if (confirmAction == null)
+            Debug.LogError("GateSelectionRoom: action '" + confirmActionName + "' tidak ditemukan.", this);
+
+        foreach (GatePortal portal in portals)
+        {
+            if (portal != null)
+                portal.Bind(this);
+        }
+    }
+
+    private void OnEnable()
+    {
+        confirmAction?.Enable();
+    }
+
+    private void Start()
+    {
+        if (playerStats == null || playerMotor == null || generator == null)
+        {
+            Debug.LogError("GateSelectionRoom: isi Player Stats, Player Motor, dan Generator di Inspector.", this);
+            enabled = false;
+            return;
+        }
+
+        if (startInSafezone)
+            ReturnToSafezone();
+        else
+            OpenSelection();
+    }
+
+    private void Update()
+    {
+        if (IsSelecting &&
+            activePortal != null &&
+            activePortal.IsOpen &&
+            confirmAction != null &&
+            confirmAction.WasPerformedThisFrame())
+        {
+            Choose(activePortal);
+            return;
+        }
+
+        if (debugReturnKey &&
+            !IsSelecting &&
+            Keyboard.current != null &&
+            Keyboard.current.rKey.wasPressedThisFrame)
+        {
+            ReturnToSafezone();
+        }
+    }
+
+    public void ReturnToSafezone()
+    {
+        TeleportPlayer(safezoneSpawn);
+        OpenSelection();
+    }
+
+    public void OpenSelection()
+    {
+        ClearActivePortal();
+
+        if (playerStats.SelectedGates.Count >= maxGatesPerRun)
+        {
+            CloseAllPortals();
+            IsSelecting = false;
+
+            Log("build sudah penuh (" + maxGatesPerRun + " gate), semua gate ditutup");
+            return;
+        }
+
+        generator.Roll(portals.Length, offer);
+
+        for (int i = 0; i < portals.Length; i++)
+        {
+            if (portals[i] == null)
+                continue;
+
+            if (i < offer.Count)
+                portals[i].Open(offer[i], GateTextFormatter.BuildCard(offer[i], playerStats));
+            else
+                portals[i].Close();
+        }
+
+        IsSelecting = true;
+
+        Log("pilihan dibuka, " + offer.Count + " gate");
+
+        SelectionOpened?.Invoke();
+    }
+
+    // Dipanggil saat run baru. Build kembali ke base dan riwayat roll dibersihkan.
+    // Saat Play bisa dipanggil dari menu titik tiga komponen ini.
+    [ContextMenu("Reset Run")]
+    public void ResetRun()
+    {
+        if (!Application.isPlaying)
+            return;
+
+        generator.ClearHistory();
+        playerStats.ResetBuild();
+        ReturnToSafezone();
+    }
+
+    private void Choose(GatePortal portal)
+    {
+        MathGateData gate = portal.Gate;
+
+        IsSelecting = false;
+
+        playerStats.ApplyGate(gate);
+
+        CloseAllPortals();
+        ClearActivePortal();
+
+        Log("memilih " + gate.DisplayName + ", teleport ke arena");
+
+        TeleportPlayer(arenaSpawn);
+
+        GateChosen?.Invoke(gate);
+    }
+
+    public void NotifyPortalEnter(GatePortal portal, Collider other)
+    {
+        if (!IsPlayer(other))
+            return;
+
+        // Gate bersebelahan. Yang terakhir dimasuki yang aktif.
+        if (activePortal != null && activePortal != portal)
+            activePortal.SetHighlighted(false);
+
+        activePortal = portal;
+        portal.SetHighlighted(true);
+    }
+
+    public void NotifyPortalExit(GatePortal portal, Collider other)
+    {
+        if (!IsPlayer(other) || activePortal != portal)
+            return;
+
+        ClearActivePortal();
+    }
+
+    private void ClearActivePortal()
+    {
+        if (activePortal != null)
+            activePortal.SetHighlighted(false);
+
+        activePortal = null;
+    }
+
+    private void CloseAllPortals()
+    {
+        foreach (GatePortal portal in portals)
+        {
+            if (portal != null)
+                portal.Close();
+        }
+    }
+
+    private bool IsPlayer(Collider other)
+    {
+        return playerMotor != null &&
+               other.GetComponentInParent<PlayerMotor>() == playerMotor;
+    }
+
+    private void TeleportPlayer(Transform point)
+    {
+        if (point == null)
+        {
+            Debug.LogWarning("GateSelectionRoom: spawn point belum diisi, teleport dilewati.", this);
+            return;
+        }
+
+        playerMotor.Teleport(point.position, point.rotation);
+
+        if (cameraFollow != null)
+            cameraFollow.SnapToTarget();
+    }
+
+    private void Log(string message)
+    {
+        if (logEvents)
+            Debug.Log("GateSelectionRoom: " + message, this);
+    }
+
+    private void OnDrawGizmos()
+    {
+        DrawSpawnGizmo(safezoneSpawn, Color.cyan);
+        DrawSpawnGizmo(arenaSpawn, new Color(1f, 0.5f, 0f));
+
+        if (safezoneSpawn != null && arenaSpawn != null)
+        {
+            Gizmos.color = new Color(1f, 1f, 1f, 0.3f);
+            Gizmos.DrawLine(safezoneSpawn.position, arenaSpawn.position);
+        }
+    }
+
+    private static void DrawSpawnGizmo(Transform point, Color color)
+    {
+        if (point == null)
+            return;
+
+        Gizmos.color = color;
+        Gizmos.DrawWireSphere(point.position + Vector3.up * 0.1f, 0.4f);
+        Gizmos.DrawLine(point.position + Vector3.up * 0.1f, point.position + Vector3.up * 0.1f + point.forward);
+    }
+}

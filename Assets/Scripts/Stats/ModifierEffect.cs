@@ -54,7 +54,7 @@ public struct ModifierEffect
             switch (op)
             {
                 case ModifierOp.Add: return "+";
-                case ModifierOp.Subtract: return "−";
+                case ModifierOp.Subtract: return "-";
                 case ModifierOp.Multiply: return "×";
                 case ModifierOp.Divide: return "÷";
                 default: return "?";

@@ -92,6 +92,17 @@ public class PlayerMotor : MonoBehaviour
         SetMoveSpeed(stats.Get(StatType.MoveSpeed));
     }
 
+    // CharacterController harus dimatikan sementara, kalau tidak posisi baru ditimpa kembali.
+    public void Teleport(Vector3 position, Quaternion rotation)
+    {
+        controller.enabled = false;
+        transform.SetPositionAndRotation(position, rotation);
+        controller.enabled = true;
+
+        verticalVelocity = 0f;
+        MoveDirection = Vector3.zero;
+    }
+
     public void SetMoveSpeed(float speed)
     {
         MoveSpeed = Mathf.Max(0f, speed);
