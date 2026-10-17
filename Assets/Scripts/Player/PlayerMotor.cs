@@ -15,7 +15,7 @@ public class PlayerMotor : MonoBehaviour
     [SerializeField] private string moveActionName = "Player/Move";
 
     [Header("Movement")]
-    // TODO(M1): nilai ini akan ditimpa PlayerStats (StatType.MoveSpeed) lewat SetMoveSpeed.
+    // Dipakai hanya jika objek tidak punya PlayerStats. Jika ada, speed diambil dari StatType.MoveSpeed.
     [SerializeField] private float baseMoveSpeed = 5f;
     [SerializeField] private float gravity = -20f;
     // Kecepatan berputar menghadap arah gerak atau target, derajat per detik.
@@ -27,6 +27,7 @@ public class PlayerMotor : MonoBehaviour
 
     private CharacterController controller;
     private PlayerHealth health;
+    private PlayerStats stats;
     private InputAction moveAction;
 
     private float verticalVelocity;
@@ -45,6 +46,7 @@ public class PlayerMotor : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         health = GetComponent<PlayerHealth>();
+        stats = GetComponent<PlayerStats>();
 
         MoveSpeed = baseMoveSpeed;
 
@@ -68,6 +70,26 @@ public class PlayerMotor : MonoBehaviour
     private void OnEnable()
     {
         moveAction?.Enable();
+
+        if (stats != null)
+            stats.StatsChanged += HandleStatsChanged;
+    }
+
+    private void OnDisable()
+    {
+        if (stats != null)
+            stats.StatsChanged -= HandleStatsChanged;
+    }
+
+    private void Start()
+    {
+        if (stats != null)
+            HandleStatsChanged();
+    }
+
+    private void HandleStatsChanged()
+    {
+        SetMoveSpeed(stats.Get(StatType.MoveSpeed));
     }
 
     public void SetMoveSpeed(float speed)
