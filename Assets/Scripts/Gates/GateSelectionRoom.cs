@@ -24,19 +24,21 @@ public class GateSelectionRoom : MonoBehaviour
     [SerializeField] private string confirmActionName = "Player/Interact";
 
     [Header("Rules")]
-    // TODO(M3): batas gate per run dan alur ronde akan diatur RunManager.
+    // Jika ada RunManager, nilai ini ditimpa jumlah ronde.
     [SerializeField] private int maxGatesPerRun = 3;
+    // Dipakai hanya tanpa RunManager. Dengan RunManager, alur dimulai dari RunManager.
     [SerializeField] private bool startInSafezone = true;
 
     [Header("Debug")]
     [SerializeField] private bool logEvents = true;
-    // Sementara sebelum ada RunManager. Tombol R di arena mengembalikan MC ke Safezone.
+    // Hanya tanpa RunManager. Tombol R di arena mengembalikan MC ke Safezone.
     [SerializeField] private bool debugReturnKey = true;
 
     private readonly List<MathGateData> offer = new List<MathGateData>();
 
     private InputAction confirmAction;
     private GatePortal activePortal;
+    private bool drivenExternally;
 
     public bool IsSelecting { get; private set; }
 
@@ -69,6 +71,13 @@ public class GateSelectionRoom : MonoBehaviour
         confirmAction?.Enable();
     }
 
+    // Dipanggil RunManager di Awake. Room tidak memulai sendiri dan tombol debug R dimatikan.
+    public void UseExternalDriver(int maxGates)
+    {
+        drivenExternally = true;
+        maxGatesPerRun = Mathf.Max(1, maxGates);
+    }
+
     private void Start()
     {
         if (playerStats == null || playerMotor == null || generator == null)
@@ -77,6 +86,9 @@ public class GateSelectionRoom : MonoBehaviour
             enabled = false;
             return;
         }
+
+        if (drivenExternally)
+            return;
 
         if (startInSafezone)
             ReturnToSafezone();
@@ -97,6 +109,7 @@ public class GateSelectionRoom : MonoBehaviour
         }
 
         if (debugReturnKey &&
+            !drivenExternally &&
             !IsSelecting &&
             Keyboard.current != null &&
             Keyboard.current.rKey.wasPressedThisFrame)

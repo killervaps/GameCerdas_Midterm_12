@@ -110,9 +110,42 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         return finalDamage;
     }
 
-    // Untuk awal run baru atau heal penuh antar ronde.
+    // Untuk awal run baru atau heal penuh antar ronde. Juga menghidupkan kembali MC yang sudah mati.
     public void RestoreFull()
     {
         CurrentHealth = MaxHealth;
+    }
+
+    // Uji sementara selama musuh belum bisa menyerang. Klik titik tiga di komponen saat Play.
+    // Damage melewati rumus Defense, jadi 25 mentah dengan Defense 10 menjadi sekitar 22,7.
+    [ContextMenu("Debug/Test Damage 25")]
+    private void DebugDamage25()
+    {
+        if (Application.isPlaying)
+            TakeDamage(new DamageInfo(25f, null, AimPoint, DamageKind.Generic));
+    }
+
+    // Langsung ke HP 0 tanpa Defense, untuk menguji alur kalah.
+    [ContextMenu("Debug/Kill")]
+    private void DebugKill()
+    {
+        if (!Application.isPlaying || IsDead)
+            return;
+
+        CurrentHealth = 0f;
+
+        if (logDamage)
+            Debug.Log("Player Dead (debug)", this);
+
+        Died?.Invoke();
+    }
+
+    // Heal sebagian. Tidak berlaku untuk MC yang sudah mati.
+    public void Heal(float amount)
+    {
+        if (IsDead || amount <= 0f)
+            return;
+
+        CurrentHealth = Mathf.Min(CurrentHealth + amount, MaxHealth);
     }
 }
