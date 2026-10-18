@@ -176,12 +176,20 @@ public class PlayerStats : MonoBehaviour
 
     private void OnValidate()
     {
-        // Perubahan base di Inspector saat Play langsung terlihat.
-        if (!Application.isPlaying || !initialized)
+        // Perubahan base di Inspector langsung terlihat, baik saat Play maupun di gizmo Edit Mode.
+        if (!initialized)
             return;
 
         BuildLookup();
-        Recalculate();
+
+        if (Application.isPlaying)
+        {
+            Recalculate();
+            return;
+        }
+
+        for (int i = 0; i < StatTypes.Count; i++)
+            current[i] = Mathf.Max(baseValues[i], clampMins[i]);
     }
 
     // Klik kanan judul komponen > Reset untuk kembali ke nilai awal desain.

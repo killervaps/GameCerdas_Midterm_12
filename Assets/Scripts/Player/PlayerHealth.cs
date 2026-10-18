@@ -1,51 +1,52 @@
+using System;
 using UnityEngine;
 
-public class PlayerHealth : MonoBehaviour
+// Menyimpan HP saat ini. MaxHP dan Defense selalu dibaca dari PlayerStats, tidak disimpan di sini.
+[RequireComponent(typeof(PlayerStats))]
+public class PlayerHealth : MonoBehaviour, IDamageable
 {
-    // Dipakai hanya jika objek tidak punya PlayerStats. Jika ada, MaxHP diambil dari PlayerStats.
-    [SerializeField] private float maxHealth = 100f;
-
     [Header("Debug")]
     [SerializeField] private bool logDamage = false;
 
     private PlayerStats stats;
+    private CharacterController controller;
 
     public float CurrentHealth { get; private set; }
 
+    // Salinan MaxHP terakhir, dibutuhkan untuk menjaga rasio HP saat MaxHP berubah.
     public float MaxHealth { get; private set; }
+
+    public float Defense => stats.Get(StatType.Defense);
 
     public bool IsDead =>
         CurrentHealth <= 0f;
 
-    public event System.Action Died;
+    public Vector3 AimPoint => controller != null
+        ? transform.TransformPoint(controller.center)
+        : transform.position + Vector3.up;
+
+    public event Action Died;
+
+    // Damage akhir setelah Defense beserta paket aslinya.
+    public event Action<float, DamageInfo> Damaged;
 
     private void Awake()
     {
         stats = GetComponent<PlayerStats>();
+        controller = GetComponent<CharacterController>();
 
-        MaxHealth = maxHealth;
+        MaxHealth = stats.Get(StatType.MaxHP);
         CurrentHealth = MaxHealth;
     }
 
     private void OnEnable()
     {
-        if (stats != null)
-            stats.StatsChanged += HandleStatsChanged;
+        stats.StatsChanged += HandleStatsChanged;
     }
 
     private void OnDisable()
     {
-        if (stats != null)
-            stats.StatsChanged -= HandleStatsChanged;
-    }
-
-    private void Start()
-    {
-        if (stats == null)
-            return;
-
-        MaxHealth = stats.Get(StatType.MaxHP);
-        CurrentHealth = MaxHealth;
+        stats.StatsChanged -= HandleStatsChanged;
     }
 
     // Saat MaxHP berubah karena gate, rasio HP saat ini dipertahankan.
@@ -67,15 +68,21 @@ public class PlayerHealth : MonoBehaviour
             CurrentHealth = Mathf.Clamp(ratio * MaxHealth, 0f, MaxHealth);
     }
 
+    // Dipertahankan untuk script musuh praktikum yang memberi damage langsung.
     public void TakeDamage(float damage)
     {
-        if (IsDead)
-            return;
+        TakeDamage(new DamageInfo(damage));
+    }
 
-        CurrentHealth -= damage;
+    public float TakeDamage(DamageInfo info)
+    {
+        if (IsDead)
+            return 0f;
+
+        float finalDamage = DamageCalculator.Apply(info.rawAmount, Defense);
 
         CurrentHealth = Mathf.Clamp(
-            CurrentHealth,
+            CurrentHealth - finalDamage,
             0f,
             MaxHealth
         );
@@ -83,17 +90,24 @@ public class PlayerHealth : MonoBehaviour
         if (logDamage)
         {
             Debug.Log(
-                "Player HP: " + CurrentHealth
+                "Player kena " + info.kind + " " + info.rawAmount.ToString("0.#") +
+                " -> " + finalDamage.ToString("0.#") + " (Def " + Defense.ToString("0") + "), HP " +
+                CurrentHealth.ToString("0.#"),
+                this
             );
         }
+
+        Damaged?.Invoke(finalDamage, info);
 
         if (CurrentHealth <= 0f)
         {
             if (logDamage)
-                Debug.Log("Player Dead");
+                Debug.Log("Player Dead", this);
 
             Died?.Invoke();
         }
+
+        return finalDamage;
     }
 
     // Untuk awal run baru atau heal penuh antar ronde.

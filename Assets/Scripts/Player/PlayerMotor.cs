@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 // Gerak MC berbasis Input System (pengganti SimplePlayerController yang memakai API Input lama).
 // Gerak di bidang XZ relatif terhadap yaw kamera yang tetap, sehingga WASD selalu sesuai arah layar.
 [RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(PlayerStats))]
 public class PlayerMotor : MonoBehaviour
 {
     [Header("References")]
@@ -15,8 +16,7 @@ public class PlayerMotor : MonoBehaviour
     [SerializeField] private string moveActionName = "Player/Move";
 
     [Header("Movement")]
-    // Dipakai hanya jika objek tidak punya PlayerStats. Jika ada, speed diambil dari StatType.MoveSpeed.
-    [SerializeField] private float baseMoveSpeed = 5f;
+    // Kecepatan dasar diambil dari PlayerStats (StatType.MoveSpeed).
     [SerializeField] private float gravity = -20f;
     // Kecepatan berputar menghadap arah gerak atau target, derajat per detik.
     [SerializeField] private float turnSpeed = 720f;
@@ -32,14 +32,21 @@ public class PlayerMotor : MonoBehaviour
 
     private float verticalVelocity;
 
+    // Kecepatan dari stat build, belum termasuk pengali sementara.
     public float MoveSpeed { get; private set; }
+
+    // Pengali sementara, mis. melambat saat menembak. 1 berarti normal.
+    public float SpeedMultiplier { get; private set; } = 1f;
+
+    // Kecepatan yang benar-benar dipakai saat bergerak.
+    public float EffectiveMoveSpeed => MoveSpeed * SpeedMultiplier;
 
     // Arah gerak terakhir di dunia (sudah dinormalisasi, nol saat diam).
     public Vector3 MoveDirection { get; private set; }
 
     public Vector3 Velocity => controller != null ? controller.velocity : Vector3.zero;
 
-    // Diisi TargetSelector (M2). Jika ada, MC menghadap target, bukan arah gerak.
+    // Diisi TargetSelector. Jika ada, MC menghadap target, bukan arah gerak.
     public Transform FacingTarget { get; set; }
 
     private void Awake()
@@ -48,7 +55,7 @@ public class PlayerMotor : MonoBehaviour
         health = GetComponent<PlayerHealth>();
         stats = GetComponent<PlayerStats>();
 
-        MoveSpeed = baseMoveSpeed;
+        MoveSpeed = stats.Get(StatType.MoveSpeed);
 
         if (cameraTransform == null && Camera.main != null)
             cameraTransform = Camera.main.transform;
@@ -71,20 +78,12 @@ public class PlayerMotor : MonoBehaviour
     {
         moveAction?.Enable();
 
-        if (stats != null)
-            stats.StatsChanged += HandleStatsChanged;
+        stats.StatsChanged += HandleStatsChanged;
     }
 
     private void OnDisable()
     {
-        if (stats != null)
-            stats.StatsChanged -= HandleStatsChanged;
-    }
-
-    private void Start()
-    {
-        if (stats != null)
-            HandleStatsChanged();
+        stats.StatsChanged -= HandleStatsChanged;
     }
 
     private void HandleStatsChanged()
@@ -108,6 +107,11 @@ public class PlayerMotor : MonoBehaviour
         MoveSpeed = Mathf.Max(0f, speed);
     }
 
+    public void SetSpeedMultiplier(float multiplier)
+    {
+        SpeedMultiplier = Mathf.Max(0f, multiplier);
+    }
+
     private void Update()
     {
         if (health != null && health.IsDead)
@@ -128,7 +132,7 @@ public class PlayerMotor : MonoBehaviour
         verticalVelocity += gravity * Time.deltaTime;
 
         Vector3 velocity =
-            MoveDirection * MoveSpeed +
+            MoveDirection * EffectiveMoveSpeed +
             Vector3.up * verticalVelocity;
 
         controller.Move(velocity * Time.deltaTime);
