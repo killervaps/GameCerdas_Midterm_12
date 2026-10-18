@@ -25,6 +25,9 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         ? transform.TransformPoint(controller.center)
         : transform.position + Vector3.up;
 
+    // MC yang sedang aktif di scene. Dibaca perception musuh supaya tidak perlu mencari objek setiap tick.
+    public static PlayerHealth Current { get; private set; }
+
     public event Action Died;
 
     // Damage akhir setelah Defense beserta paket aslinya.
@@ -41,11 +44,15 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
     private void OnEnable()
     {
+        Current = this;
         stats.StatsChanged += HandleStatsChanged;
     }
 
     private void OnDisable()
     {
+        if (Current == this)
+            Current = null;
+
         stats.StatsChanged -= HandleStatsChanged;
     }
 

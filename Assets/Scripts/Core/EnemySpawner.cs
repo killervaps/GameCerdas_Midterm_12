@@ -14,7 +14,7 @@ public class EnemySpawner : MonoBehaviour
     }
 
     [Header("Prefabs")]
-    // TODO(M4): prefab dan stat per role akan dipindah ke EnemyRoleData.
+    // Stat per role dibaca dari EnemyRoleData di EnemyController pada prefab masing-masing.
     [SerializeField] private RolePrefab[] rolePrefabs;
 
     [Header("Spawn Points")]
@@ -45,6 +45,33 @@ public class EnemySpawner : MonoBehaviour
 
         if (spawnPoints.Length == 0)
             Debug.LogWarning("EnemySpawner: belum ada SpawnPoint. Musuh akan muncul di posisi spawner.", this);
+
+        DisableSceneTemplates();
+    }
+
+    // Prefab boleh berupa objek di scene (template), bukan hanya asset di Project.
+    // Template yang aktif ikut dihitung sebagai musuh, bisa ditembak, dan menjalankan AI, jadi dimatikan di awal.
+    private void DisableSceneTemplates()
+    {
+        if (rolePrefabs == null)
+            return;
+
+        foreach (RolePrefab entry in rolePrefabs)
+        {
+            if (entry.prefab == null || !entry.prefab.gameObject.scene.IsValid())
+                continue;
+
+            if (entry.prefab.gameObject.activeSelf)
+            {
+                entry.prefab.gameObject.SetActive(false);
+
+                Debug.Log(
+                    "EnemySpawner: template " + entry.prefab.name + " (" + entry.role + ") ada di scene dan dinonaktifkan. " +
+                    "Bisa juga dijadikan prefab asset supaya tidak perlu ada di scene.",
+                    entry.prefab
+                );
+            }
+        }
     }
 
     public bool TryGetRole(EnemyHealth enemy, out EnemyRole role)
@@ -114,6 +141,10 @@ public class EnemySpawner : MonoBehaviour
 
         counter++;
         enemy.name = role + "_" + counter;
+
+        // Salinan dari template scene yang nonaktif ikut nonaktif, jadi dihidupkan di sini.
+        if (!enemy.gameObject.activeSelf)
+            enemy.gameObject.SetActive(true);
 
         spawned.Add(enemy);
         roles[enemy] = role;
