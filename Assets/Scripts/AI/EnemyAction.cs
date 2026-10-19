@@ -24,5 +24,8 @@ public enum EnemyAction
     // Guardian
     Guard = 13,
     Return = 14,
-    Enraged = 15
+    Enraged = 15,
+
+    // Bergerak ke atau menunggu di slot dari TacticalCoordinator (tanpa token).
+    Flank = 16
 }

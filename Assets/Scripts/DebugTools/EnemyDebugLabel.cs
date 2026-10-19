@@ -60,6 +60,33 @@ public class EnemyDebugLabel : MonoBehaviour
         label.text = BuildText();
     }
 
+    // Token dan slot dari TacticalCoordinator. Kosong jika tidak ada coordinator di scene.
+    private void AppendTactical()
+    {
+        TacticalCoordinator coordinator = TacticalCoordinator.Current;
+
+        if (coordinator == null)
+            return;
+
+        bool hasToken = controller.HasAttackToken;
+        int queue = hasToken ? 0 : coordinator.Tokens.QueuePosition(controller);
+
+        if (!hasToken && queue == 0 && !controller.HasSlot)
+            return;
+
+        builder.Append("\n<size=70%>");
+
+        if (hasToken)
+            builder.Append("<color=#ffee55>TOKEN ").Append(coordinator.Tokens.HeldFor(controller).ToString("0.0")).Append("s</color>  ");
+        else if (queue > 0)
+            builder.Append("<color=#cccccc>antre #").Append(queue).Append("</color>  ");
+
+        if (controller.HasSlot)
+            builder.Append("slot ").Append(controller.SlotAngle.ToString("0")).Append('°');
+
+        builder.Append("</size>");
+    }
+
     private string BuildText()
     {
         EnemyBlackboard bb = controller.Blackboard;
@@ -98,6 +125,8 @@ public class EnemyDebugLabel : MonoBehaviour
             builder.Append("<color=#888888>tidak tahu</color>");
 
         builder.Append("</size>");
+
+        AppendTactical();
 
         return builder.ToString();
     }

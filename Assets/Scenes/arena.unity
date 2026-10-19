@@ -1343,6 +1343,77 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0000002, y: 0.1, z: 1.0000002}
   m_Center: {x: 0.00000059604645, y: -0.05, z: -0.00000047683716}
+--- !u!1 &125193465
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 125193467}
+  - component: {fileID: 125193466}
+  m_Layer: 0
+  m_Name: TacticalCoordinator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &125193466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 125193465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 402f42072bba81c42b1d70f8c5609f1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TacticalCoordinator
+  spawner: {fileID: 501934855}
+  tickInterval: 0.25
+  tokens:
+    maxTokens: 2
+    maxChargerTokens: 1
+    maxShooterTokens: 1
+    maxGuardianTokens: 1
+    timeout: 3
+    revokeCooldown: 1
+    requestExpiry: 0.5
+    distanceWeight: 1
+    waitWeight: 0.5
+    chargerWeight: 1
+    shooterWeight: 0.8
+    guardianWeight: 1.2
+    logTokens: 1
+  slots:
+    angleStep: 30
+    chargerRingFactor: 0.5
+    sampleRadiusFactor: 0.25
+    pincerAngle: 120
+    pincerBonus: 0.5
+    travelWeight: 1
+    shooterLineOfSightBonus: 0.5
+  pairGuardianWithShooter: 1
+  drawGizmos: 1
+  logEvents: 1
+--- !u!4 &125193467
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 125193465}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -7.60133, y: -0, z: 10.64729}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &146067433
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2966,6 +3037,10 @@ PrefabInstance:
     - target: {fileID: 8185965692925662831, guid: 3e36c275c8686b043a4521bad0d52e97, type: 3}
       propertyPath: m_Name
       value: AuraProjectile
+      objectReference: {fileID: 0}
+    - target: {fileID: 8185965692925662831, guid: 3e36c275c8686b043a4521bad0d52e97, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6174,6 +6249,10 @@ PrefabInstance:
     - target: {fileID: 1468598581209214611, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
       propertyPath: m_Name
       value: EnemyBolt
+      objectReference: {fileID: 0}
+    - target: {fileID: 1468598581209214611, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8686706470367347945, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -27710,3 +27789,4 @@ SceneRoots:
   - {fileID: 1447630697}
   - {fileID: 501934856}
   - {fileID: 1303698173}
+  - {fileID: 125193467}

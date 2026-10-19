@@ -55,9 +55,6 @@ public class GuardianBrain : EnemyBrain
             if (returning)
                 text += " pulang";
 
-            if (Controller.HasAttackToken)
-                text += " [token]";
-
             return text;
         }
     }

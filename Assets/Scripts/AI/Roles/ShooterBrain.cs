@@ -88,9 +88,6 @@ public class ShooterBrain : EnemyBrain
             AppendScore("S", searchAction);
             builder.Append("  mob ").Append(mobility.ToString("0.00"));
 
-            if (Controller.HasAttackToken)
-                builder.Append(" [token]");
-
             return builder.ToString();
         }
     }
@@ -371,8 +368,13 @@ public class ShooterBrain : EnemyBrain
 
         Vector3 playerPosition = Blackboard.Player.transform.position;
 
+        // Dengan coordinator, posisi tahan adalah slot di ring Shooter (dibagi supaya tidak bertumpuk dengan rekan).
+        if (Controller.HasSlot)
+        {
+            Motor.MoveTo(Controller.SlotPosition, 1f, 0.2f);
+        }
         // Terlalu jauh untuk menekan MC, maju sampai jarak ideal.
-        if (Blackboard.DistanceToPlayer > idealDistance + 1.5f)
+        else if (Blackboard.DistanceToPlayer > idealDistance + 1.5f)
         {
             Vector3 toShooter = transform.position - playerPosition;
             toShooter.y = 0f;

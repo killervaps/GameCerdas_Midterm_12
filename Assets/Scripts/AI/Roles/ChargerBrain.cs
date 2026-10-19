@@ -57,7 +57,7 @@ public class ChargerBrain : EnemyBrain
         get
         {
             if (phase != LockedPhase.None)
-                return (Time.time - phaseStartTime).ToString("0.00") + "s" + (Controller.HasAttackToken ? " [token]" : "");
+                return (Time.time - phaseStartTime).ToString("0.00") + "s";
 
             if (search != null && search.IsActive)
                 return search.CurrentPhase == SearchRoutine.Phase.Scan ? "scan" : "ke LKP";
@@ -162,11 +162,29 @@ public class ChargerBrain : EnemyBrain
     private NodeState Chase()
     {
         search.Cancel();
+
+        Vector3 playerPosition = Blackboard.Player.transform.position;
+
+        // Tanpa token, Charger ke slot dari coordinator dan menunggu giliran di sana (pincer muncul dari sini).
+        if (Controller.HasSlot && !Controller.HasAttackToken)
+        {
+            SetAction(EnemyAction.Flank);
+
+            Motor.MoveTo(Controller.SlotPosition, 1f, 0.1f);
+
+            if (Motor.HasArrived)
+                Motor.FacePosition(playerPosition);
+            else
+                Motor.ClearFacing();
+
+            return NodeState.Running;
+        }
+
         SetAction(EnemyAction.Chase);
 
         Motor.ClearFacing();
         // Berhenti sedikit di dalam lungeRange supaya cabang lunge bisa terpicu.
-        Motor.MoveTo(Blackboard.Player.transform.position, 1f, Data.LungeRange * 0.7f);
+        Motor.MoveTo(playerPosition, 1f, Data.LungeRange * 0.7f);
 
         return NodeState.Running;
     }

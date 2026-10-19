@@ -49,6 +49,26 @@ public class EnemyController : MonoBehaviour
 
     public bool LogStateChanges => logStateChanges;
 
+    // Slot posisi dari TacticalCoordinator. Kosong jika tidak ada coordinator atau musuh tidak butuh slot.
+    public bool HasSlot { get; private set; }
+
+    public Vector3 SlotPosition { get; private set; }
+
+    // Sudut slot di sekitar MC, 0 = utara dunia.
+    public float SlotAngle { get; private set; }
+
+    public void AssignSlot(Vector3 position, float angle)
+    {
+        HasSlot = true;
+        SlotPosition = position;
+        SlotAngle = angle;
+    }
+
+    public void ClearSlot()
+    {
+        HasSlot = false;
+    }
+
     // Token menyerang. Dengan TacticalCoordinator, token bisa dicabut dari luar (timeout), jadi selalu ditanya ke penyedia.
     public bool HasAttackToken => AttackTokens.Provider != null ? AttackTokens.Provider.Holds(this) : localToken;
 
@@ -168,6 +188,7 @@ public class EnemyController : MonoBehaviour
     private void HandleDied(EnemyHealth health)
     {
         ReleaseAttackToken();
+        ClearSlot();
 
         Motor.Stop();
         Motor.SetAgentEnabled(false);
