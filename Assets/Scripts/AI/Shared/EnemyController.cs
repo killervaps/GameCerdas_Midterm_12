@@ -31,6 +31,7 @@ public class EnemyController : MonoBehaviour
 
     private float nextTickTime;
     private float lastTickTime;
+    private bool localToken;
 
     public EnemyRoleData RoleData => roleData;
 
@@ -47,6 +48,29 @@ public class EnemyController : MonoBehaviour
     public EnemyBrain Brain { get; private set; }
 
     public bool LogStateChanges => logStateChanges;
+
+    // Token menyerang. Dengan TacticalCoordinator, token bisa dicabut dari luar (timeout), jadi selalu ditanya ke penyedia.
+    public bool HasAttackToken => AttackTokens.Provider != null ? AttackTokens.Provider.Holds(this) : localToken;
+
+    public bool RequestAttackToken()
+    {
+        if (HasAttackToken)
+            return true;
+
+        if (AttackTokens.Provider == null)
+        {
+            localToken = true;
+            return true;
+        }
+
+        return AttackTokens.Provider.Request(this);
+    }
+
+    public void ReleaseAttackToken()
+    {
+        localToken = false;
+        AttackTokens.Provider?.Release(this);
+    }
 
     private void Awake()
     {
@@ -89,6 +113,7 @@ public class EnemyController : MonoBehaviour
     private void OnDisable()
     {
         active.Remove(this);
+        ReleaseAttackToken();
 
         if (Health != null)
         {
@@ -142,6 +167,8 @@ public class EnemyController : MonoBehaviour
 
     private void HandleDied(EnemyHealth health)
     {
+        ReleaseAttackToken();
+
         Motor.Stop();
         Motor.SetAgentEnabled(false);
 

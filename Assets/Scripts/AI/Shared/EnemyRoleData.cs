@@ -45,6 +45,48 @@ public class EnemyRoleData : ScriptableObject
     [SerializeField] private float searchTimeout = 10f;
     [SerializeField] private float navMeshSampleDistance = 2f;
 
+    // Bagian di bawah hanya dibaca brain role yang bersangkutan.
+
+    [Header("Charger (lunge)")]
+    [SerializeField] private float lungeRange = 4f;
+    [SerializeField] private float windupDuration = 0.6f;
+    // Jumlah isyarat "tung tung tung" selama windup.
+    [SerializeField] private int windupBeats = 3;
+    [SerializeField] private float lungeDuration = 0.35f;
+    [SerializeField] private float lungeSpeed = 12f;
+    [SerializeField] private float lungeHitRadius = 1f;
+    [SerializeField] private float recoverDuration = 1f;
+
+    [Header("Shooter (utility)")]
+    // Jarak ideal = Range MC + nilai ini, tepat di luar jangkauan tembak MC.
+    [SerializeField] private float idealDistanceOffset = 1.5f;
+    // Skor Flee terhadap rasio HP (0-1). Tinggi di bawah 30%.
+    [SerializeField] private AnimationCurve fleeByHealth = new AnimationCurve(
+        new Keyframe(0f, 1f),
+        new Keyframe(0.3f, 0.8f),
+        new Keyframe(0.45f, 0f),
+        new Keyframe(1f, 0f));
+    [SerializeField] private float fleeDistance = 6f;
+    [SerializeField, Range(0f, 1f)] private float holdScore = 0.2f;
+    // Bonus skor Reposition jika titik tujuan dekat Guardian kawan.
+    [SerializeField, Range(0f, 1f)] private float guardianProximityBonus = 0.2f;
+    [SerializeField] private float guardianBonusRadius = 3f;
+    [SerializeField] private float utilityDecisionInterval = 0.25f;
+    [SerializeField] private float utilityInertia = 0.1f;
+
+    [Header("Guardian (anchor)")]
+    // MC masuk radius ini (diukur dari anchor), Guardian bereaksi.
+    [SerializeField] private float aggroRadius = 5f;
+    // Jarak maksimal Guardian dari anchor.
+    [SerializeField] private float leashRadius = 8f;
+    // Hysteresis: setelah keluar leash, baru boleh mengejar lagi jika sudah sedekat ini ke anchor.
+    [SerializeField] private float returnThreshold = 1f;
+    // Jarak titik jaga dari Shooter ke arah MC (mode bodyguard).
+    [SerializeField] private float guardDistance = 2f;
+    [SerializeField] private float enrageSpeedMultiplier = 1.4f;
+    // Diserang MC di luar aggro radius tetapi masih dalam leash, Guardian boleh mengejar selama sekian detik.
+    [SerializeField] private float damageAggroDuration = 3f;
+
     public EnemyRole Role => role;
     public string DisplayName => string.IsNullOrEmpty(displayName) ? role.ToString() : displayName;
     public Color Tint => tint;
@@ -71,6 +113,30 @@ public class EnemyRoleData : ScriptableObject
     public float SearchScanAngle => searchScanAngle;
     public float SearchTimeout => searchTimeout;
     public float NavMeshSampleDistance => navMeshSampleDistance;
+
+    public float LungeRange => lungeRange;
+    public float WindupDuration => windupDuration;
+    public int WindupBeats => Mathf.Max(1, windupBeats);
+    public float LungeDuration => lungeDuration;
+    public float LungeSpeed => lungeSpeed;
+    public float LungeHitRadius => lungeHitRadius;
+    public float RecoverDuration => recoverDuration;
+
+    public float IdealDistanceOffset => idealDistanceOffset;
+    public AnimationCurve FleeByHealth => fleeByHealth;
+    public float FleeDistance => fleeDistance;
+    public float HoldScore => holdScore;
+    public float GuardianProximityBonus => guardianProximityBonus;
+    public float GuardianBonusRadius => guardianBonusRadius;
+    public float UtilityDecisionInterval => utilityDecisionInterval;
+    public float UtilityInertia => utilityInertia;
+
+    public float AggroRadius => aggroRadius;
+    public float LeashRadius => leashRadius;
+    public float ReturnThreshold => returnThreshold;
+    public float GuardDistance => guardDistance;
+    public float EnrageSpeedMultiplier => enrageSpeedMultiplier;
+    public float DamageAggroDuration => damageAggroDuration;
 
     // Dipakai threat estimation: DPS = damage / cooldown.
     public float DPS => damage / Mathf.Max(0.01f, attackCooldown);

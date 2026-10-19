@@ -33,3 +33,65 @@ MonoBehaviour:
   searchScanAngle: 70
   searchTimeout: 10
   navMeshSampleDistance: 2
+  lungeRange: 4
+  windupDuration: 0.6
+  windupBeats: 3
+  lungeDuration: 0.35
+  lungeSpeed: 12
+  lungeHitRadius: 1
+  recoverDuration: 1
+  idealDistanceOffset: 1.5
+  fleeByHealth:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.3
+      value: 0.8
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.45
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  fleeDistance: 6
+  holdScore: 0.2
+  guardianProximityBonus: 0.2
+  guardianBonusRadius: 3
+  utilityDecisionInterval: 0.25
+  utilityInertia: 0.1
+  aggroRadius: 5
+  leashRadius: 8
+  returnThreshold: 1
+  guardDistance: 2
+  enrageSpeedMultiplier: 1.4
+  damageAggroDuration: 3

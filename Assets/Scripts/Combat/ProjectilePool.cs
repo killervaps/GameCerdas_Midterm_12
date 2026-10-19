@@ -6,6 +6,10 @@ using UnityEngine.Pool;
 // Proyektil diletakkan di objek root tersendiri, jadi pool aman dipasang di objek yang bergerak (mis. MC).
 public class ProjectilePool : MonoBehaviour
 {
+    private static readonly Dictionary<string, ProjectilePool> registry = new Dictionary<string, ProjectilePool>();
+
+    // Nama pool, dipakai untuk mencari pool tanpa referensi Inspector (mis. dari prefab musuh). Kosongkan jika tidak perlu.
+    [SerializeField] private string poolId;
     [SerializeField] private Projectile prefab;
     [SerializeField] private int defaultCapacity = 16;
     [SerializeField] private int maxSize = 64;
@@ -18,6 +22,29 @@ public class ProjectilePool : MonoBehaviour
     public int CountActive => pool != null ? pool.CountActive : 0;
 
     public int CountInactive => pool != null ? pool.CountInactive : 0;
+
+    public static bool TryGet(string id, out ProjectilePool found)
+    {
+        found = null;
+        return !string.IsNullOrEmpty(id) && registry.TryGetValue(id, out found) && found != null;
+    }
+
+    private void OnEnable()
+    {
+        if (string.IsNullOrEmpty(poolId))
+            return;
+
+        if (registry.TryGetValue(poolId, out ProjectilePool other) && other != null && other != this)
+            Debug.LogWarning("ProjectilePool: ID '" + poolId + "' dipakai dua pool, yang terakhir aktif dipakai.", this);
+
+        registry[poolId] = this;
+    }
+
+    private void OnDisable()
+    {
+        if (!string.IsNullOrEmpty(poolId) && registry.TryGetValue(poolId, out ProjectilePool current) && current == this)
+            registry.Remove(poolId);
+    }
 
     private void Awake()
     {

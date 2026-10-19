@@ -67,6 +67,82 @@ public static class MathGateAITools
         Debug.Log("MathGate: " + done + " musuh diberi komponen AI. Jika objek di scene, simpan scene (Ctrl+S).");
     }
 
+    // Mengganti DummyChaseBrain dengan brain sesuai role (ChargerBrain, ShooterBrain, GuardianBrain).
+    // Objek harus sudah punya komponen AI dari menu 4.
+    [MenuItem("MathGate/Setup/5. Role Brains (objek terpilih)")]
+    public static void SetupRoleBrains()
+    {
+        GameObject[] selection = Selection.gameObjects;
+
+        if (selection.Length == 0)
+        {
+            EditorUtility.DisplayDialog("MathGate", "Pilih dulu objek atau prefab musuh, lalu jalankan menu ini lagi.", "OK");
+            return;
+        }
+
+        int done = 0;
+
+        foreach (GameObject go in selection)
+        {
+            if (!TryResolveRole(go, out EnemyRole role))
+                continue;
+
+            if (EditorUtility.IsPersistent(go))
+            {
+                string path = AssetDatabase.GetAssetPath(go);
+                GameObject root = PrefabUtility.LoadPrefabContents(path);
+
+                try
+                {
+                    ReplaceBrain(root, role, false);
+                    PrefabUtility.SaveAsPrefabAsset(root, path);
+                }
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(root);
+                }
+            }
+            else
+            {
+                ReplaceBrain(go, role, true);
+                EditorUtility.SetDirty(go);
+                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(go.scene);
+            }
+
+            done++;
+        }
+
+        AssetDatabase.SaveAssets();
+
+        Debug.Log("MathGate: " + done + " musuh memakai brain role. Jika objek di scene, simpan scene (Ctrl+S).");
+    }
+
+    private static void ReplaceBrain(GameObject root, EnemyRole role, bool useUndo)
+    {
+        System.Type wanted = role == EnemyRole.Shooter ? typeof(ShooterBrain)
+            : role == EnemyRole.Guardian ? typeof(GuardianBrain)
+            : typeof(ChargerBrain);
+
+        foreach (EnemyBrain brain in root.GetComponents<EnemyBrain>())
+        {
+            if (brain.GetType() == wanted)
+                continue;
+
+            if (useUndo)
+                Undo.DestroyObjectImmediate(brain);
+            else
+                Object.DestroyImmediate(brain, true);
+        }
+
+        if (root.GetComponent(wanted) == null)
+        {
+            if (useUndo)
+                Undo.AddComponent(root, wanted);
+            else
+                root.AddComponent(wanted);
+        }
+    }
+
     // Versi lama untuk prefab hasil menu Dummy Role Prefabs.
     [MenuItem("MathGate/Setup/4b. Enemy AI Components (prefab Dummy_*)")]
     public static void UpgradeDummyPrefabs()

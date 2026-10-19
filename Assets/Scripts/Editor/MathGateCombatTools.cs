@@ -50,6 +50,55 @@ public static class MathGateCombatTools
         Debug.Log("MathGate: prefab proyektil dibuat di " + ProjectilePrefabPath);
     }
 
+    // Peluru Shooter. Lurus tanpa homing supaya bisa dihindari, di layer EnemyProjectile (menabrak Player dan NavBlock).
+    [MenuItem("MathGate/Create/Enemy Projectile Prefab")]
+    public static void CreateEnemyProjectilePrefab()
+    {
+        const string path = PrefabFolder + "/EnemyBolt.prefab";
+
+        if (AssetDatabase.LoadAssetAtPath<GameObject>(path) != null)
+        {
+            Debug.Log("MathGate: " + path + " sudah ada, tidak ditimpa.");
+            return;
+        }
+
+        int layer = LayerMask.NameToLayer(GameLayers.EnemyProjectile);
+
+        if (layer < 0)
+        {
+            Debug.LogError("MathGate: layer EnemyProjectile belum ada. Jalankan MathGate > Setup > 1 dulu.");
+            return;
+        }
+
+        EnsureFolder(PrefabFolder);
+        EnsureFolder(MaterialFolder);
+
+        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        go.name = "EnemyBolt";
+        go.layer = layer;
+        go.transform.localScale = Vector3.one * 0.15f;
+
+        Object.DestroyImmediate(go.GetComponent<Collider>());
+
+        go.GetComponent<MeshRenderer>().sharedMaterial =
+            CreateMaterial(MaterialFolder + "/EnemyBolt.mat", new Color(1f, 0.25f, 0.2f), 2f);
+
+        Projectile projectile = go.AddComponent<Projectile>();
+
+        // Ukuran dan kecepatan disesuaikan dengan arena yang diperkecil. Ubah di prefab jika perlu.
+        SerializedObject so = new SerializedObject(projectile);
+        so.FindProperty("speed").floatValue = 7f;
+        so.FindProperty("lifetime").floatValue = 2.5f;
+        so.FindProperty("homingTurnRate").floatValue = 0f;
+        so.FindProperty("radius").floatValue = 0.08f;
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        PrefabUtility.SaveAsPrefabAsset(go, path);
+        Object.DestroyImmediate(go);
+
+        Debug.Log("MathGate: prefab peluru musuh dibuat di " + path + ". Pasang di ProjectilePool dengan Pool Id 'EnemyBolt'.");
+    }
+
     [MenuItem("MathGate/Create/Target Markers (scene terbuka)")]
     public static void CreateTargetMarkers()
     {

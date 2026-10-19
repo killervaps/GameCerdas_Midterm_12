@@ -2706,19 +2706,6 @@ MonoBehaviour:
   heightAboveHead: 0.4
   fontSize: 2.5
   refreshInterval: 0.2
---- !u!114 &273725256
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 273725248}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 141cfc130b88f5d4dafabb94127125d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DummyChaseBrain
-  enableMeleeAttack: 1
 --- !u!114 &273725257
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2819,6 +2806,20 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &273725263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 273725248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2494f7c826fa4984e98b614641fce57e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GuardianBrain
+  initialAnchor: {fileID: 0}
+  drawGizmos: 1
 --- !u!1001 &278432656
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6062,10 +6063,10 @@ PrefabInstance:
       addedObject: {fileID: 1942694859}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6baab976e37badd41a3dbb035103cac3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1942694858}
+      addedObject: {fileID: 1942694857}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6baab976e37badd41a3dbb035103cac3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1942694857}
+      addedObject: {fileID: 1942694865}
   m_SourcePrefab: {fileID: 100100000, guid: 6baab976e37badd41a3dbb035103cac3, type: 3}
 --- !u!1001 &585236238
 PrefabInstance:
@@ -6162,6 +6163,79 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0.5, z: 1}
   m_Center: {x: 0, y: 0.25, z: 0}
+--- !u!1001 &589030500
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1447630697}
+    m_Modifications:
+    - target: {fileID: 1468598581209214611, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
+      propertyPath: m_Name
+      value: EnemyBolt
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686706470367347945, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.26207995
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686706470367347945, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686706470367347945, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.029821396
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686706470367347945, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686706470367347945, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686706470367347945, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686706470367347945, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686706470367347945, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686706470367347945, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686706470367347945, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
+--- !u!114 &589030501 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5892483390560506562, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
+  m_PrefabInstance: {fileID: 589030500}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae7420040fc46754eb5d947329149ca6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Projectile
+--- !u!4 &589030502 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8686706470367347945, guid: 5727ca02a462c604998adcc8931aaf7b, type: 3}
+  m_PrefabInstance: {fileID: 589030500}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &601900824
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9302,10 +9376,10 @@ PrefabInstance:
       addedObject: {fileID: 273725257}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6baab976e37badd41a3dbb035103cac3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 273725256}
+      addedObject: {fileID: 273725255}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6baab976e37badd41a3dbb035103cac3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 273725255}
+      addedObject: {fileID: 273725263}
   m_SourcePrefab: {fileID: 100100000, guid: 6baab976e37badd41a3dbb035103cac3, type: 3}
 --- !u!1001 &820340520
 PrefabInstance:
@@ -14238,10 +14312,10 @@ PrefabInstance:
       addedObject: {fileID: 1171026612}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6baab976e37badd41a3dbb035103cac3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1171026611}
+      addedObject: {fileID: 1171026610}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6baab976e37badd41a3dbb035103cac3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1171026610}
+      addedObject: {fileID: 1171026620}
   m_SourcePrefab: {fileID: 100100000, guid: 6baab976e37badd41a3dbb035103cac3, type: 3}
 --- !u!1 &1171026607 stripped
 GameObject:
@@ -14303,19 +14377,6 @@ MonoBehaviour:
   heightAboveHead: 0.4
   fontSize: 2.5
   refreshInterval: 0.2
---- !u!114 &1171026611
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1171026607}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 141cfc130b88f5d4dafabb94127125d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DummyChaseBrain
-  enableMeleeAttack: 1
 --- !u!114 &1171026612
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14416,6 +14477,24 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &1171026620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1171026607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad85b195ba772f745bb2982da7800853, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShooterBrain
+  projectilePoolId: EnemyBolt
+  muzzleOffset: {x: 0, y: 1.5, z: 0.6}
+  candidateCount: 12
+  maxTravelDistance: 6
+  navMeshSampleRadius: 1
+  drawGizmos: 1
 --- !u!1001 &1176195653
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17178,6 +17257,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1447630697}
   - component: {fileID: 1447630696}
+  - component: {fileID: 1447630698}
   m_Layer: 0
   m_Name: Pools
   m_TagString: Untagged
@@ -17197,6 +17277,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59a21c07bd9d2294da79f69d7462d153, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectilePool
+  poolId: 
   prefab: {fileID: 296422772}
   defaultCapacity: 16
   maxSize: 64
@@ -17215,8 +17296,26 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 296422774}
+  - {fileID: 589030502}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1447630698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1447630695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59a21c07bd9d2294da79f69d7462d153, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectilePool
+  poolId: EnemyBolt
+  prefab: {fileID: 589030501}
+  defaultCapacity: 16
+  maxSize: 64
+  prewarmCount: 8
 --- !u!1001 &1457691439
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23413,19 +23512,6 @@ MonoBehaviour:
   heightAboveHead: 0.4
   fontSize: 2.5
   refreshInterval: 0.2
---- !u!114 &1942694858
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1942694850}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 141cfc130b88f5d4dafabb94127125d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DummyChaseBrain
-  enableMeleeAttack: 1
 --- !u!114 &1942694859
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23526,6 +23612,20 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &1942694865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942694850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25c4fc41f5a80e84f8a473275343e629, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ChargerBrain
+  windupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  drawGizmos: 1
 --- !u!1001 &1953519615
 PrefabInstance:
   m_ObjectHideFlags: 0
