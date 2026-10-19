@@ -73,6 +73,13 @@ public class ShooterBrain : EnemyBrain
 
     public float IdealDistance => idealDistance;
 
+    // Dibaca AI Debug overlay.
+    public bool HasRepositionPoint => hasRepositionPoint;
+
+    public Vector3 RepositionPoint => repositionPoint;
+
+    public Vector3 FleePoint => fleePoint;
+
     public override string DebugDetail
     {
         get

@@ -5754,6 +5754,83 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0000002, y: 0.1, z: 1.0000002}
   m_Center: {x: -0.000000059604645, y: -0.05, z: 0.0000002682209}
+--- !u!1 &571928375
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 571928378}
+  - component: {fileID: 571928377}
+  - component: {fileID: 571928376}
+  m_Layer: 0
+  m_Name: AIDebug
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &571928376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 571928375}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 560a6a4e59a561d44a16e53348d77d17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIDebugPanel
+  runManager: {fileID: 1303698171}
+  overlay: {fileID: 571928377}
+  width: 560
+  margin: 10
+  uiScale: 1.4
+  showLegend: 1
+  refreshInterval: 0.1
+--- !u!114 &571928377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 571928375}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d253b73c17821944acd6b5f5bddfc66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIDebugOverlay
+  toggleActionName: Player/ToggleAIDebug
+  slowMotionHotkey: 1
+  slowMotionScale: 0.3
+  startEnabled: 1
+  drawPerception: 1
+  drawMemory: 1
+  drawPaths: 1
+  drawRoleShapes: 1
+  drawTactical: 1
+  drawPlayer: 1
+  showEnemyLabels: 1
+  drawThroughWalls: 1
+  groundOffset: 0.05
+--- !u!4 &571928378
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 571928375}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -7.13206, y: 0.4157, z: 18.29105}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &575141738
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -28025,3 +28102,4 @@ SceneRoots:
   - {fileID: 501934856}
   - {fileID: 1303698173}
   - {fileID: 125193467}
+  - {fileID: 571928378}

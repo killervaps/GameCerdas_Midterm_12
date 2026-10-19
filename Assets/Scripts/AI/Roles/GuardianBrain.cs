@@ -353,12 +353,19 @@ public class GuardianBrain : EnemyBrain
         Motor.MoveTo(player.transform.position, speedMultiplier, Data.AttackRange * 0.8f);
     }
 
-    private Vector3 AnchorPosition => anchor != null ? anchor.position : transform.position;
+    public Vector3 AnchorPosition => anchor != null ? anchor.position : transform.position;
 
     // Ketahanan MC tinggi, Guardian jadi garis depan dengan leash dan aggro lebih longgar.
-    private float LeashRadius => Data.LeashRadius * Reactions.GuardianLeashMultiplier(Build);
+    public float LeashRadius => Data.LeashRadius * Reactions.GuardianLeashMultiplier(Build);
 
-    private float AggroRadius => Data.AggroRadius * Reactions.GuardianAggroMultiplier(Build);
+    public float AggroRadius => Data.AggroRadius * Reactions.GuardianAggroMultiplier(Build);
+
+    // Dibaca AI Debug overlay.
+    public bool IsReturning => returning;
+
+    public bool HasInterposePoint => hasInterposePoint;
+
+    public Vector3 InterposePoint => interposePoint;
 
     private float DistanceToAnchor()
     {

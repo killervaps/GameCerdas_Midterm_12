@@ -1,6 +1,27 @@
-// Pengaturan global AI Debug Mode. Toggle F1 dan overlay lengkap menyusul di M8.
+using System;
+
+// Pengaturan global AI Debug Mode. Dinyalakan atau dimatikan lewat F1 (AIDebugOverlay).
 public static class AIDebugSettings
 {
-    // Label in-game di atas kepala musuh.
-    public static bool ShowLabels = true;
+    private static bool enabled = true;
+
+    public static bool Enabled
+    {
+        get => enabled;
+        set
+        {
+            if (enabled == value)
+                return;
+
+            enabled = value;
+            Changed?.Invoke(enabled);
+        }
+    }
+
+    // Label in-game di atas kepala musuh. Mengikuti Enabled, tetapi bisa dimatikan sendiri dari Inspector overlay.
+    public static bool ShowLabels => enabled && LabelsAllowed;
+
+    public static bool LabelsAllowed = true;
+
+    public static event Action<bool> Changed;
 }

@@ -52,6 +52,17 @@ public class ChargerBrain : EnemyBrain
 
     public bool IsLocked => phase != LockedPhase.None;
 
+    // Dibaca AI Debug overlay.
+    public bool IsWindingUp => phase == LockedPhase.Windup;
+
+    public bool IsLunging => phase == LockedPhase.Lunge || phase == LockedPhase.Recover;
+
+    public Vector3 LungeStart => lungeStart;
+
+    public Vector3 LungeDirection => lungeDirection;
+
+    public bool LungeHit => lungeHit;
+
     // Nomor ketukan (1, 2, 3) selama windup. Hook untuk SFX "tung" dan animasi.
     public event Action<int> WindupBeat;
 

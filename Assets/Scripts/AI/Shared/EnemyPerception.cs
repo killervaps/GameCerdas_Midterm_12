@@ -28,6 +28,7 @@ public class EnemyPerception : MonoBehaviour
 
     public float VisionRange => visionRange;
     public float VisionAngle => visionAngle;
+    public float ProximityRadius => proximityRadius;
 
     public Vector3 EyePosition => transform.position + Vector3.up * eyeHeight * transform.lossyScale.y;
 
