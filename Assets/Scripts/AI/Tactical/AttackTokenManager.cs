@@ -149,10 +149,12 @@ public class AttackTokenManager : IAttackTokenProvider
     }
 
     // Dipanggil TacticalCoordinator setiap loop.
-    public void Tick(Vector3 currentPlayerPosition)
+    // timeoutMultiplier < 1 membuat penyerang lebih cepat bergantian (reaksi terhadap build).
+    public void Tick(Vector3 currentPlayerPosition, float timeoutMultiplier = 1f)
     {
         playerPosition = currentPlayerPosition;
         float now = Time.time;
+        float currentTimeout = timeout * timeoutMultiplier;
 
         for (int i = holders.Count - 1; i >= 0; i--)
         {
@@ -164,9 +166,9 @@ public class AttackTokenManager : IAttackTokenProvider
                 continue;
             }
 
-            if (now - holder.since > timeout)
+            if (now - holder.since > currentTimeout)
             {
-                Log(holder.enemy.name + " token dicabut (timeout " + timeout.ToString("0.#") + " s)");
+                Log(holder.enemy.name + " token dicabut (timeout " + currentTimeout.ToString("0.#") + " s)");
 
                 cooldownUntil[holder.enemy] = now + revokeCooldown;
                 holders.RemoveAt(i);

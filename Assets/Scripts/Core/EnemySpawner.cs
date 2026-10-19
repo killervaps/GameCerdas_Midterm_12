@@ -79,6 +79,16 @@ public class EnemySpawner : MonoBehaviour
         return roles.TryGetValue(enemy, out role);
     }
 
+    // Role Data dari prefab atau template role ini. Dipakai ThreatEstimator untuk preview wave.
+    public bool TryGetRoleData(EnemyRole role, out EnemyRoleData data)
+    {
+        EnemyHealth prefab = GetPrefab(role);
+        EnemyController controller = prefab != null ? prefab.GetComponent<EnemyController>() : null;
+
+        data = controller != null ? controller.RoleData : null;
+        return data != null;
+    }
+
     public IReadOnlyList<EnemyHealth> SpawnWave(WaveData wave)
     {
         ClearWave();

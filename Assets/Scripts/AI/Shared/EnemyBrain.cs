@@ -13,6 +13,13 @@ public abstract class EnemyBrain : MonoBehaviour, IEnemyBrain
 
     protected EnemyRoleData Data => Controller.RoleData;
 
+    // Build MC menurut GroupBlackboard. Netral (semua 1) jika tidak ada TacticalCoordinator.
+    protected BuildIndicators Build =>
+        TacticalCoordinator.Current != null ? TacticalCoordinator.Current.Group.Indicators : BuildIndicators.Neutral;
+
+    protected BuildReactions Reactions =>
+        TacticalCoordinator.Current != null ? TacticalCoordinator.Current.Reactions : BuildReactions.Disabled;
+
     public abstract string BrainName { get; }
 
     public EnemyAction CurrentAction { get; private set; } = EnemyAction.Idle;

@@ -240,6 +240,7 @@ public static class MathGateAITools
             Add<DummyChaseBrain>(root, useUndo);
 
         GetOrAdd<EnemyDebugLabel>(root, useUndo);
+        GetOrAdd<EnemyRoleBadge>(root, useUndo);
     }
 
     private static bool TryResolveRole(GameObject go, out EnemyRole role)

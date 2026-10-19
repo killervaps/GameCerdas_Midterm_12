@@ -13,6 +13,12 @@ public static class GateTextFormatter
 
     public static string BuildCard(MathGateData gate, PlayerStats stats)
     {
+        return BuildCard(gate, stats, null);
+    }
+
+    // Dengan threat, kartu menampilkan label risiko wave berikutnya jika gate ini dipilih.
+    public static string BuildCard(MathGateData gate, PlayerStats stats, ThreatResult? threat)
+    {
         builder.Clear();
 
         builder.Append("<b>").Append(gate.DisplayName).Append("</b>\n");
@@ -27,6 +33,13 @@ public static class GateTextFormatter
         {
             string color = effect.IsBuff ? BuffColor : effect.IsTradeOff ? TradeOffColor : MutedColor;
             builder.Append("<color=").Append(color).Append('>').Append(effect).Append("</color>\n");
+        }
+
+        if (threat.HasValue)
+        {
+            ThreatResult t = threat.Value;
+            builder.Append("<b>Ancaman <color=").Append(t.ColorHex).Append('>').Append(t.Label)
+                .Append("</color></b> <size=70%>(").Append(t.ratio.ToString("0.00")).Append(")</size>\n");
         }
 
         if (stats != null)

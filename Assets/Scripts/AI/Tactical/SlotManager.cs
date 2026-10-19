@@ -56,6 +56,7 @@ public class SlotManager
     private readonly List<Request> requests = new List<Request>();
     private readonly List<Assignment> assignments = new List<Assignment>();
     private int requestCount;
+    private float currentPincerMultiplier = 1f;
     private int obstacleMask = -1;
 
     public IReadOnlyList<Assignment> Assignments => assignments;
@@ -83,8 +84,10 @@ public class SlotManager
         return false;
     }
 
-    public void Compute(IReadOnlyList<EnemyController> enemies, GroupBlackboard group)
+    public void Compute(IReadOnlyList<EnemyController> enemies, GroupBlackboard group, float pincerMultiplier = 1f)
     {
+        currentPincerMultiplier = pincerMultiplier;
+
         if (obstacleMask < 0)
             obstacleMask = GameLayers.ObstacleMask;
 
@@ -217,7 +220,7 @@ public class SlotManager
             foreach (Assignment other in assignments)
                 minDifference = Mathf.Min(minDifference, Mathf.Abs(Mathf.DeltaAngle(other.angle, candidate.angle)));
 
-            score += pincerBonus * Mathf.Clamp01(minDifference / pincerAngle);
+            score += pincerBonus * currentPincerMultiplier * Mathf.Clamp01(minDifference / pincerAngle);
         }
 
         return score;

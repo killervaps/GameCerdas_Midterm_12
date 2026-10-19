@@ -1,7 +1,7 @@
 using UnityEngine;
 
 // Pengetahuan bersama kelompok musuh, diperbarui TacticalCoordinator setiap loop.
-// Indikator build MC (Mobilitas, Ketahanan, DayaSerang, Jangkauan) ditambahkan di M7.
+// Termasuk indikator build MC dan ancaman live, yang dibaca semua brain lewat TacticalCoordinator.
 public class GroupBlackboard
 {
     public PlayerHealth Player { get; private set; }
@@ -17,6 +17,21 @@ public class GroupBlackboard
 
     // Ada minimal satu musuh yang tahu posisi MC.
     public bool AnyAware { get; private set; }
+
+    public BuildIndicators Indicators { get; private set; } = BuildIndicators.Neutral;
+
+    public PlayerStats Stats => stats;
+
+    // Ancaman musuh yang masih hidup terhadap build MC sekarang. Rumus sama dengan label di kartu gate.
+    public bool HasThreat { get; private set; }
+
+    public ThreatResult Threat { get; private set; }
+
+    public void SetThreat(ThreatResult threat)
+    {
+        Threat = threat;
+        HasThreat = true;
+    }
 
     private PlayerMotor motor;
     private PlayerStats stats;
@@ -41,5 +56,6 @@ public class GroupBlackboard
         PlayerVelocity = motor != null ? motor.Velocity : Vector3.zero;
         PlayerRange = stats != null ? stats.Get(StatType.Range) : 8f;
         PlayerLockedTarget = targetSelector != null ? targetSelector.LockedTarget : null;
+        Indicators = BuildIndicators.From(stats);
     }
 }

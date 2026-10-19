@@ -144,17 +144,20 @@ public class ShooterBrain : EnemyBrain
         }
 
         float playerRange = playerStats != null ? playerStats.Get(StatType.Range) : 8f;
-        idealDistance = playerRange + Data.IdealDistanceOffset;
+
+        // DayaSerang MC tinggi membuat Shooter menjaga jarak lebih jauh.
+        idealDistance = playerRange + Data.IdealDistanceOffset * Reactions.ShooterIdealOffsetMultiplier(Build);
 
         float distance = Blackboard.DistanceToPlayer;
-        tooClose = Blackboard.IsAware ? Mathf.Clamp01((idealDistance - distance) / idealDistance) : 0f;
+        tooClose = Blackboard.IsAware ? TooClose(distance, idealDistance) : 0f;
 
-        // TODO(M7): Mobilitas akan dibaca dari indikator build di GroupBlackboard.
-        mobility = playerStats != null && playerStats.GetBase(StatType.MoveSpeed) > 0f
-            ? playerStats.Get(StatType.MoveSpeed) / playerStats.GetBase(StatType.MoveSpeed)
-            : 1f;
+        // Mobilitas dari indikator build di GroupBlackboard. Tanpa coordinator, dihitung langsung dari stat.
+        if (TacticalCoordinator.Current != null)
+            mobility = Build.mobility;
+        else
+            mobility = BuildIndicators.From(playerStats).mobility;
 
-        kiteEffect = Mathf.Clamp01(1.5f - mobility);
+        kiteEffect = KiteEffect(mobility);
 
         if (Blackboard.CanSeePlayer && tooClose > 0f)
             EvaluateRepositionPoints(player.transform.position);
@@ -239,17 +242,41 @@ public class ShooterBrain : EnemyBrain
 
     // ---------- Skor ----------
 
+    // Rumus dibuat static supaya bisa diuji di Editor terhadap contoh di dokumen desain.
+    public static float TooClose(float distance, float ideal)
+    {
+        return ideal > 0f ? Mathf.Clamp01((ideal - distance) / ideal) : 0f;
+    }
+
+    public static float KiteEffect(float mobility)
+    {
+        return Mathf.Clamp01(1.5f - mobility);
+    }
+
+    public static float KiteScore(float tooClose, float mobility)
+    {
+        return tooClose * KiteEffect(mobility);
+    }
+
+    public static float RepositionScore(float tooClose, float mobility, float coverValue)
+    {
+        return tooClose * (1f - KiteEffect(mobility)) * coverValue;
+    }
+
     private float ScoreFlee()
     {
         if (!Blackboard.IsAware)
             return 0f;
 
-        return Data.FleeByHealth.Evaluate(Controller.Health.HealthRatio);
+        // Melawan DayaSerang tinggi Shooter lebih cepat kabur, melawan DayaSerang rendah lebih sabar.
+        float shiftedHealth = Mathf.Clamp01(Controller.Health.HealthRatio - Reactions.ShooterFleeShift(Build));
+
+        return Data.FleeByHealth.Evaluate(shiftedHealth);
     }
 
     private float ScoreKite()
     {
-        return Blackboard.CanSeePlayer ? tooClose * kiteEffect : 0f;
+        return Blackboard.CanSeePlayer ? KiteScore(tooClose, mobility) : 0f;
     }
 
     private float ScoreReposition()
@@ -259,7 +286,7 @@ public class ShooterBrain : EnemyBrain
 
         float bonus = nearGuardian && tooClose > 0f ? Data.GuardianProximityBonus : 0f;
 
-        return tooClose * (1f - kiteEffect) * coverValue + bonus;
+        return RepositionScore(tooClose, mobility, coverValue) + bonus;
     }
 
     private float ScoreHold()

@@ -50,7 +50,13 @@ public class GuardianBrain : EnemyBrain
                 return string.Empty;
 
             string anchorName = IsBodyguard ? anchor.name : "titik";
-            string text = "anchor " + anchorName + "  leash " + DistanceToAnchor().ToString("0.0") + "/" + Data.LeashRadius.ToString("0.#");
+            string text = "anchor " + anchorName + "  leash " + DistanceToAnchor().ToString("0.0") + "/" + LeashRadius.ToString("0.#");
+
+            if (Reactions.IsDurable(Build))
+                text += " longgar";
+
+            if (Reactions.IsHighOffense(Build))
+                text += " maju";
 
             if (returning)
                 text += " pulang";
@@ -180,7 +186,7 @@ public class GuardianBrain : EnemyBrain
             return returning;
         }
 
-        if (distance > Data.LeashRadius)
+        if (distance > LeashRadius)
             returning = true;
 
         return returning;
@@ -195,13 +201,13 @@ public class GuardianBrain : EnemyBrain
 
         float playerToAnchor = FlatDistance(player.transform.position, AnchorPosition);
 
-        if (Blackboard.CanSeePlayer && playerToAnchor <= Data.AggroRadius)
+        if (Blackboard.CanSeePlayer && playerToAnchor <= AggroRadius)
             return true;
 
         // Diserang MC dari luar aggro radius tetapi masih dalam leash, Guardian boleh mengejar sebentar.
         return Blackboard.WasDamagedWithin(Data.DamageAggroDuration) &&
                Blackboard.HasLastKnownPosition &&
-               FlatDistance(Blackboard.LastKnownPosition, AnchorPosition) <= Data.LeashRadius;
+               FlatDistance(Blackboard.LastKnownPosition, AnchorPosition) <= LeashRadius;
     }
 
     // ---------- Aksi ----------
@@ -309,7 +315,9 @@ public class GuardianBrain : EnemyBrain
         if (direction.sqrMagnitude < 0.0001f)
             direction = transform.forward;
 
-        Vector3 point = anchorPosition + direction.normalized * Data.GuardDistance;
+        // DayaSerang MC tinggi, Guardian berdiri lebih maju sebagai tameng Shooter.
+        float guardDistance = Data.GuardDistance * Reactions.GuardianGuardDistanceMultiplier(Build);
+        Vector3 point = anchorPosition + direction.normalized * guardDistance;
 
         if (NavMesh.SamplePosition(point, out NavMeshHit hit, Data.NavMeshSampleDistance, NavMesh.AllAreas))
         {
@@ -347,6 +355,11 @@ public class GuardianBrain : EnemyBrain
 
     private Vector3 AnchorPosition => anchor != null ? anchor.position : transform.position;
 
+    // Ketahanan MC tinggi, Guardian jadi garis depan dengan leash dan aggro lebih longgar.
+    private float LeashRadius => Data.LeashRadius * Reactions.GuardianLeashMultiplier(Build);
+
+    private float AggroRadius => Data.AggroRadius * Reactions.GuardianAggroMultiplier(Build);
+
     private float DistanceToAnchor()
     {
         return FlatDistance(transform.position, AnchorPosition);
@@ -374,10 +387,10 @@ public class GuardianBrain : EnemyBrain
 
         // Aggro (oranye) dan leash (biru, merah saat pulang) diukur dari anchor.
         Gizmos.color = new Color(1f, 0.6f, 0.2f, 0.8f);
-        GizmoShapes.Circle(center, data.AggroRadius);
+        GizmoShapes.Circle(center, Application.isPlaying && Controller != null ? AggroRadius : data.AggroRadius);
 
         Gizmos.color = returning ? Color.red : new Color(0.3f, 0.6f, 1f, 0.8f);
-        GizmoShapes.Circle(center, data.LeashRadius);
+        GizmoShapes.Circle(center, Application.isPlaying && Controller != null ? LeashRadius : data.LeashRadius);
 
         Gizmos.color = new Color(1f, 1f, 1f, 0.5f);
         GizmoShapes.Circle(center, data.ReturnThreshold, 16);

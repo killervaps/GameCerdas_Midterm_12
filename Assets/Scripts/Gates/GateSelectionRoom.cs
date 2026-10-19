@@ -14,6 +14,8 @@ public class GateSelectionRoom : MonoBehaviour
     [SerializeField] private GatePortal[] portals;
     // Opsional. Jika diisi, kamera langsung pindah tanpa meluncur melintasi peta setelah teleport.
     [SerializeField] private TopDownCameraFollow cameraFollow;
+    // Opsional. Jika diisi, tiap kartu menampilkan label risiko wave berikutnya.
+    [SerializeField] private ThreatEstimator threatEstimator;
 
     [Header("Spawn Points")]
     [SerializeField] private Transform safezoneSpawn;
@@ -39,6 +41,7 @@ public class GateSelectionRoom : MonoBehaviour
     private InputAction confirmAction;
     private GatePortal activePortal;
     private bool drivenExternally;
+    private WaveData upcomingWave;
 
     public bool IsSelecting { get; private set; }
 
@@ -70,6 +73,14 @@ public class GateSelectionRoom : MonoBehaviour
     {
         confirmAction?.Enable();
     }
+
+    // Wave yang akan dihadapi setelah memilih gate. Dipanggil RunManager sebelum pilihan dibuka.
+    public void SetUpcomingWave(WaveData wave)
+    {
+        upcomingWave = wave;
+    }
+
+    public WaveData UpcomingWave => upcomingWave;
 
     // Dipanggil RunManager di Awake. Room tidak memulai sendiri dan tombol debug R dimatikan.
     public void UseExternalDriver(int maxGates)
@@ -145,7 +156,7 @@ public class GateSelectionRoom : MonoBehaviour
                 continue;
 
             if (i < offer.Count)
-                portals[i].Open(offer[i], GateTextFormatter.BuildCard(offer[i], playerStats));
+                portals[i].Open(offer[i], GateTextFormatter.BuildCard(offer[i], playerStats, EvaluateThreat(offer[i])));
             else
                 portals[i].Close();
         }
@@ -155,6 +166,18 @@ public class GateSelectionRoom : MonoBehaviour
         Log("pilihan dibuka, " + offer.Count + " gate");
 
         SelectionOpened?.Invoke();
+    }
+
+    private ThreatResult? EvaluateThreat(MathGateData gate)
+    {
+        if (threatEstimator == null || upcomingWave == null)
+            return null;
+
+        ThreatResult result = threatEstimator.Evaluate(upcomingWave, playerStats.Preview(gate));
+
+        Log(gate.DisplayName + " -> ancaman " + result.Label + " (" + result.ratio.ToString("0.00") + ")");
+
+        return result;
     }
 
     // Dipanggil saat run baru. Build kembali ke base dan riwayat roll dibersihkan.

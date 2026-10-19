@@ -23,6 +23,9 @@ public class TacticalCoordinator : MonoBehaviour
     [Header("Pairing")]
     [SerializeField] private bool pairGuardianWithShooter = true;
 
+    [Header("Build Reactions")]
+    [SerializeField] private BuildReactions reactions = new BuildReactions();
+
     [Header("Debug")]
     [SerializeField] private bool drawGizmos = true;
     [SerializeField] private bool logEvents = true;
@@ -39,6 +42,8 @@ public class TacticalCoordinator : MonoBehaviour
     public SlotManager Slots => slots;
 
     public GroupBlackboard Group => group;
+
+    public BuildReactions Reactions => reactions;
 
     public IReadOnlyList<EnemyController> Registry => registry;
 
@@ -122,13 +127,19 @@ public class TacticalCoordinator : MonoBehaviour
 
         group.Update(PlayerHealth.Current, anyAware);
 
+        // Ancaman live memakai rumus yang sama dengan label kartu gate.
+        if (ThreatEstimator.Current != null && group.Stats != null)
+            group.SetThreat(ThreatEstimator.Current.EvaluateLive(registry, group.Stats.GetSnapshot()));
+
         if (pairGuardianWithShooter)
             PairGuardians();
 
-        slots.Compute(registry, group);
+        BuildIndicators build = group.Indicators;
+
+        slots.Compute(registry, group, reactions.PincerBonusMultiplier(build));
         PushSlots();
 
-        tokens.Tick(group.PlayerPosition);
+        tokens.Tick(group.PlayerPosition, reactions.TokenTimeoutMultiplier(build));
     }
 
     private void RebuildRegistry()

@@ -140,6 +140,9 @@ public class RunManager : MonoBehaviour
         RunStartTime = Time.time;
         RunEndTime = 0f;
 
+        // Wave diberikan dulu supaya kartu gate bisa menghitung ancaman.
+        gateRoom.SetUpcomingWave(CurrentWave);
+
         // Build kembali ke base dulu, baru HP dipulihkan supaya penuh terhadap MaxHP dasar.
         gateRoom.ResetRun();
         playerHealth.RestoreFull();
@@ -201,6 +204,7 @@ public class RunManager : MonoBehaviour
 
         CurrentRound++;
         spawner.ClearWave();
+        gateRoom.SetUpcomingWave(CurrentWave);
         gateRoom.ReturnToSafezone();
 
         SetState(RunState.Preparing);

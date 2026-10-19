@@ -42,6 +42,9 @@ public class ChargerBrain : EnemyBrain
     private Vector3 lungeDirection;
     private Vector3 lungeStart;
     private bool lungeHit;
+    private bool waitingForAlly;
+    private float waitStartTime = -1f;
+    private float recoverDuration;
 
     public override string BrainName => "BT/Charger";
 
@@ -61,6 +64,13 @@ public class ChargerBrain : EnemyBrain
 
             if (search != null && search.IsActive)
                 return search.CurrentPhase == SearchRoutine.Phase.Scan ? "scan" : "ke LKP";
+
+            // Alasan reaksi build, supaya terlihat kenapa Charger tidak langsung menyerbu.
+            if (waitingForAlly)
+                return "tunggu rekan";
+
+            if (Reactions.ChargerPredictionTime(Build) > 0f && CurrentAction == EnemyAction.Chase)
+                return "mencegat";
 
             return string.Empty;
         }
@@ -125,8 +135,27 @@ public class ChargerBrain : EnemyBrain
 
     private bool CanStartLunge()
     {
+        waitingForAlly = false;
+
         if (!Blackboard.CanSeePlayer || Blackboard.DistanceToPlayer > Data.LungeRange)
+        {
+            waitStartTime = -1f;
             return false;
+        }
+
+        // MC dengan DayaSerang tinggi berbahaya dihadapi sendirian. Charger menunggu sampai rekan sedang menyerang.
+        // Jika terlalu lama menunggu, Charger maju sendiri sebagai umpan.
+        if (Reactions.ChargerWaitsForAlly(Build) && HasLivingAlly() && !AnyAllyAttacking())
+        {
+            if (waitStartTime < 0f)
+                waitStartTime = Time.time;
+
+            if (Time.time - waitStartTime < Reactions.ChargerMaxAllyWait)
+            {
+                waitingForAlly = true;
+                return false;
+            }
+        }
 
         // Token diminta paling akhir. Tanpa token, Charger jatuh ke cabang Chase (M6: menunggu di slot).
         return Controller.RequestAttackToken();
@@ -153,6 +182,7 @@ public class ChargerBrain : EnemyBrain
         Motor.Stop();
         Motor.FacePosition(Blackboard.Player.transform.position);
 
+        waitStartTime = -1f;
         EnterPhase(LockedPhase.Windup);
         beatsFired = 0;
 
@@ -184,7 +214,8 @@ public class ChargerBrain : EnemyBrain
 
         Motor.ClearFacing();
         // Berhenti sedikit di dalam lungeRange supaya cabang lunge bisa terpicu.
-        Motor.MoveTo(playerPosition, 1f, Data.LungeRange * 0.7f);
+        // MC cepat dicegat di posisi prediksinya, bukan dikejar dari belakang.
+        Motor.MoveTo(PredictPlayerPosition(), 1f, Data.LungeRange * 0.7f);
 
         return NodeState.Running;
     }
@@ -238,7 +269,7 @@ public class ChargerBrain : EnemyBrain
                 UpdateLunge(elapsed);
                 break;
             case LockedPhase.Recover:
-                if (elapsed >= Data.RecoverDuration)
+                if (elapsed >= recoverDuration)
                     FinishRecover();
                 break;
         }
@@ -276,7 +307,7 @@ public class ChargerBrain : EnemyBrain
         RestoreTint();
 
         PlayerHealth player = Blackboard.Player;
-        Vector3 direction = player != null ? player.transform.position - transform.position : transform.forward;
+        Vector3 direction = player != null ? PredictPlayerPosition() - transform.position : transform.forward;
         direction.y = 0f;
 
         lungeDirection = direction.sqrMagnitude > 0.0001f ? direction.normalized : transform.forward;
@@ -330,6 +361,9 @@ public class ChargerBrain : EnemyBrain
 
     private void EndLunge()
     {
+        // MC dengan DayaSerang rendah tidak menghukum, Charger cepat bangkit (hit-and-run).
+        recoverDuration = Data.RecoverDuration * Reactions.ChargerRecoverMultiplier(Build);
+
         Motor.SetAgentEnabled(true);
         Motor.Stop();
         Motor.ClearFacing();
@@ -343,6 +377,40 @@ public class ChargerBrain : EnemyBrain
 
         // Token dilepas di akhir Recover, memberi giliran ke musuh lain.
         Controller.ReleaseAttackToken();
+    }
+
+    private Vector3 PredictPlayerPosition()
+    {
+        PlayerHealth player = Blackboard.Player;
+
+        if (player == null)
+            return Blackboard.LastKnownPosition;
+
+        float lead = Reactions.ChargerPredictionTime(Build);
+
+        return player.transform.position + Blackboard.LastKnownVelocity * lead;
+    }
+
+    private bool HasLivingAlly()
+    {
+        foreach (EnemyController ally in EnemyController.Active)
+        {
+            if (ally != Controller && !ally.Health.IsDead)
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool AnyAllyAttacking()
+    {
+        foreach (EnemyController ally in EnemyController.Active)
+        {
+            if (ally != Controller && !ally.Health.IsDead && ally.HasAttackToken)
+                return true;
+        }
+
+        return false;
     }
 
     private void EnterPhase(LockedPhase next)
