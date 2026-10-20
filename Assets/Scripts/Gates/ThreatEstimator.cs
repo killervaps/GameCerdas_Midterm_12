@@ -46,6 +46,11 @@ public class ThreatEstimator : MonoBehaviour
 
     public static ThreatEstimator Current { get; private set; }
 
+    // Batas rasio untuk label Aman / Bahaya. Dibaca meter ancaman di UI.
+    public float SafeBelow => safeBelow;
+
+    public float DangerAbove => dangerAbove;
+
     private void OnEnable()
     {
         Current = this;

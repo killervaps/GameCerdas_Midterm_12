@@ -70,6 +70,13 @@ public class RunManager : MonoBehaviour
     // Arena ronde saat ini. Null jika tidak memakai ArenaSelector.
     public Arena CurrentArena => arenaSelector != null ? arenaSelector.Current : null;
 
+    // Dimatikan GameUI saat menu utama dipakai, supaya run baru dimulai dari tombol "Mulai".
+    public bool StartOnPlay
+    {
+        get => startOnPlay;
+        set => startOnPlay = value;
+    }
+
     public float RunStartTime { get; private set; }
 
     public float RunEndTime { get; private set; }
@@ -163,6 +170,22 @@ public class RunManager : MonoBehaviour
         Log("run baru, " + TotalRounds + " ronde");
 
         SetState(RunState.Preparing);
+    }
+
+    // Menghentikan run tanpa hasil (kembali ke menu utama). Musuh dibersihkan dan state kembali Idle.
+    public void StopRun()
+    {
+        if (!Application.isPlaying)
+            return;
+
+        CancelPendingReturn();
+
+        battle.EndBattle();
+        spawner.ClearWave();
+
+        Log("run dihentikan");
+
+        SetState(RunState.Idle);
     }
 
     private void HandleGateChosen(MathGateData gate)

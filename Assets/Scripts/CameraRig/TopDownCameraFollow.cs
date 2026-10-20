@@ -34,6 +34,13 @@ public class TopDownCameraFollow : MonoBehaviour
         }
     }
 
+    // Pose yang dituju kamera saat ini. Dipakai MenuCameraShowcase untuk transisi halus kembali ke gameplay.
+    public Vector3 DesiredPosition => target != null ? GetDesiredPosition() : transform.position;
+
+    public Quaternion DesiredRotation => GetRotation();
+
+    public float FieldOfView => fieldOfView;
+
     private void Start()
     {
         ApplyLens();
