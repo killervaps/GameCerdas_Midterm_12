@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -15,6 +17,19 @@ public class EnemyMotor : MonoBehaviour
     // Tujuan baru diabaikan jika bedanya kurang dari ini, supaya path tidak dihitung ulang setiap tick.
     [SerializeField] private float repathThreshold = 0.25f;
 
+    [Header("Jump Links")]
+    // Nama area NavMesh untuk link lompat (Navigation > Areas). Hanya role di bawah yang boleh melewatinya,
+    // role lain otomatis dikeluarkan dari Area Mask agent-nya.
+    [SerializeField] private string jumpAreaName = "archer_jump";
+    [SerializeField] private EnemyRole[] rolesAllowedToJump = { EnemyRole.Shooter };
+    // Biaya area lompat saat jalan biasa. Tinggi supaya lompatan hanya dipakai jika diminta (mis. kabur dari menara).
+    [SerializeField] private float jumpAreaCost = 20f;
+    [SerializeField] private float jumpHeight = 1.2f;
+    // Kecepatan sepanjang lintasan lompat. Durasi = panjang link / kecepatan, minimal 0,35 s.
+    [SerializeField] private float jumpSpeed = 7f;
+    // Jeda setelah mendarat, musuh diam dan tidak menyerang. Membuat lompatan bukan kabur gratis.
+    [SerializeField] private float landingRecovery = 0.5f;
+
     [Header("Debug")]
     [SerializeField] private bool drawGizmos = true;
 
@@ -23,6 +38,21 @@ public class EnemyMotor : MonoBehaviour
     private Vector3 facingDirection;
     private Vector3 lastDestination;
     private bool hasDestination;
+
+    private int jumpArea = -1;
+    private bool canJump;
+    private Coroutine jumpRoutine;
+    private Vector3 jumpEnd;
+    private float recoverUntil;
+    private bool stoppedForRecovery;
+
+    // Perintah gerak yang datang saat sedang melompat, dijalankan setelah mendarat.
+    private bool hasPendingMove;
+    private bool hasPendingStop;
+    private Vector3 pendingDestination;
+    private float pendingSpeedMultiplier;
+    private float pendingStoppingDistance;
+    private bool pendingPreferJump;
 
     public NavMeshAgent Agent => agent;
 
@@ -35,6 +65,22 @@ public class EnemyMotor : MonoBehaviour
     public Vector3 Velocity => agent != null && agent.enabled ? agent.velocity : Vector3.zero;
 
     public bool IsReady => agent != null && agent.enabled && agent.isOnNavMesh;
+
+    // Musuh ini boleh memakai link lompat dan area-nya sudah dibuat.
+    public bool CanUseJumpLinks => canJump;
+
+    public int JumpArea => jumpArea;
+
+    public bool IsJumping => jumpRoutine != null;
+
+    public bool IsRecoveringFromJump => Time.time < recoverUntil;
+
+    // Sedang melompat atau baru mendarat. Brain sebaiknya tidak menyerang selama ini.
+    public bool IsBusyJumping => IsJumping || IsRecoveringFromJump;
+
+    public event Action JumpStarted;
+
+    public event Action Landed;
 
     public bool HasArrived
     {
@@ -67,18 +113,56 @@ public class EnemyMotor : MonoBehaviour
         agent.speed = baseSpeed;
         agent.angularSpeed = turnSpeed;
         agent.acceleration = data.Acceleration;
+
+        ConfigureJumpArea(data.Role);
+    }
+
+    private void ConfigureJumpArea(EnemyRole role)
+    {
+        jumpArea = NavMesh.GetAreaFromName(jumpAreaName);
+        canJump = false;
+
+        if (jumpArea < 0)
+            return;
+
+        if (Array.IndexOf(rolesAllowedToJump, role) >= 0)
+        {
+            canJump = true;
+            // Lompatan digerakkan sendiri (lintasan melengkung), bukan meluncur bawaan agent.
+            agent.autoTraverseOffMeshLink = false;
+            agent.SetAreaCost(jumpArea, jumpAreaCost);
+        }
+        else
+        {
+            agent.areaMask &= ~(1 << jumpArea);
+        }
     }
 
     // speedMultiplier relatif ke Move Speed role, mis. 0,7 saat Search.
-    public bool MoveTo(Vector3 destination, float speedMultiplier = 1f, float stoppingDistance = 0.1f)
+    // preferJumpLinks: link lompat dibuat murah untuk path ini, dipakai saat kabur dari tempat tinggi.
+    public bool MoveTo(Vector3 destination, float speedMultiplier = 1f, float stoppingDistance = 0.1f, bool preferJumpLinks = false)
     {
+        if (IsJumping)
+        {
+            hasPendingMove = true;
+            hasPendingStop = false;
+            pendingDestination = destination;
+            pendingSpeedMultiplier = speedMultiplier;
+            pendingStoppingDistance = stoppingDistance;
+            pendingPreferJump = preferJumpLinks;
+            return true;
+        }
+
         if (!IsReady)
             return false;
+
+        if (canJump)
+            agent.SetAreaCost(jumpArea, preferJumpLinks ? 1f : jumpAreaCost);
 
         SpeedMultiplier = speedMultiplier;
         agent.speed = baseSpeed * speedMultiplier;
         agent.stoppingDistance = stoppingDistance;
-        agent.isStopped = false;
+        agent.isStopped = IsRecoveringFromJump;
 
         if (!hasFacing)
             agent.updateRotation = true;
@@ -95,6 +179,13 @@ public class EnemyMotor : MonoBehaviour
     public void Stop()
     {
         hasDestination = false;
+
+        if (IsJumping)
+        {
+            hasPendingMove = false;
+            hasPendingStop = true;
+            return;
+        }
 
         if (!IsReady)
             return;
@@ -146,6 +237,7 @@ public class EnemyMotor : MonoBehaviour
         }
         else
         {
+            CancelJump();
             Stop();
             agent.enabled = false;
         }
@@ -153,6 +245,17 @@ public class EnemyMotor : MonoBehaviour
 
     private void Update()
     {
+        if (canJump && jumpRoutine == null && agent.enabled && agent.isOnOffMeshLink)
+            jumpRoutine = StartCoroutine(TraverseLink());
+
+        if (stoppedForRecovery && !IsRecoveringFromJump)
+        {
+            stoppedForRecovery = false;
+
+            if (hasDestination && IsReady)
+                agent.isStopped = false;
+        }
+
         if (!hasFacing)
             return;
 
@@ -163,6 +266,83 @@ public class EnemyMotor : MonoBehaviour
             target,
             turnSpeed * Time.deltaTime
         );
+    }
+
+    // Lintasan parabola dari ujung awal ke ujung akhir link, lalu agent dikembalikan ke NavMesh.
+    private IEnumerator TraverseLink()
+    {
+        OffMeshLinkData data = agent.currentOffMeshLinkData;
+
+        Vector3 start = transform.position;
+        jumpEnd = data.endPos + Vector3.up * agent.baseOffset;
+
+        Vector3 flat = jumpEnd - start;
+        flat.y = 0f;
+
+        if (!hasFacing && flat.sqrMagnitude > 0.0001f)
+            transform.rotation = Quaternion.LookRotation(flat);
+
+        float duration = Mathf.Max(0.35f, Vector3.Distance(start, jumpEnd) / Mathf.Max(0.1f, jumpSpeed));
+        float t = 0f;
+
+        JumpStarted?.Invoke();
+
+        while (t < 1f)
+        {
+            t = Mathf.Min(1f, t + Time.deltaTime / duration);
+
+            Vector3 position = Vector3.Lerp(start, jumpEnd, t);
+            position.y += jumpHeight * 4f * t * (1f - t);
+            transform.position = position;
+
+            yield return null;
+        }
+
+        FinishJump();
+    }
+
+    private void FinishJump()
+    {
+        jumpRoutine = null;
+
+        if (agent.enabled && agent.isOnOffMeshLink)
+            agent.CompleteOffMeshLink();
+
+        recoverUntil = Time.time + landingRecovery;
+
+        if (landingRecovery > 0f && IsReady)
+        {
+            agent.isStopped = true;
+            stoppedForRecovery = true;
+        }
+
+        if (hasPendingMove)
+            MoveTo(pendingDestination, pendingSpeedMultiplier, pendingStoppingDistance, pendingPreferJump);
+        else if (hasPendingStop)
+            Stop();
+
+        hasPendingMove = false;
+        hasPendingStop = false;
+
+        Landed?.Invoke();
+    }
+
+    // Lompatan dibatalkan (mis. mati di udara). Musuh langsung ditaruh di titik mendarat.
+    private void CancelJump()
+    {
+        if (jumpRoutine == null)
+            return;
+
+        StopCoroutine(jumpRoutine);
+        jumpRoutine = null;
+
+        transform.position = jumpEnd;
+
+        if (agent.enabled && agent.isOnOffMeshLink)
+            agent.CompleteOffMeshLink();
+
+        hasPendingMove = false;
+        hasPendingStop = false;
     }
 
     private void OnDrawGizmos()

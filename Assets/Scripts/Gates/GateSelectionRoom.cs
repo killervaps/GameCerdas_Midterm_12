@@ -82,6 +82,13 @@ public class GateSelectionRoom : MonoBehaviour
 
     public WaveData UpcomingWave => upcomingWave;
 
+    // Dipanggil RunManager setelah arena ronde berikutnya dipilih. MC diteleport ke sini saat memilih gate.
+    public void SetArenaSpawn(Transform point)
+    {
+        if (point != null)
+            arenaSpawn = point;
+    }
+
     // Dipanggil RunManager di Awake. Room tidak memulai sendiri dan tombol debug R dimatikan.
     public void UseExternalDriver(int maxGates)
     {

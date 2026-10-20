@@ -15,6 +15,8 @@ public class CombatDebugPanel : MonoBehaviour
 
     [Header("Layout")]
     [SerializeField] private bool showPanel = true;
+    // Aktif = panel hanya tampil saat AI Debug Mode menyala (F1).
+    [SerializeField] private bool followDebugToggle = true;
     [SerializeField] private Vector2 position = new Vector2(10f, 420f);
     [SerializeField] private float uiScale = 1f;
     [SerializeField] private float refreshInterval = 0.1f;
@@ -25,9 +27,11 @@ public class CombatDebugPanel : MonoBehaviour
     private float nextRefresh;
     private GUIStyle style;
 
+    private bool Visible => showPanel && (!followDebugToggle || AIDebugSettings.Enabled);
+
     private void Update()
     {
-        if (!showPanel || Time.unscaledTime < nextRefresh)
+        if (!Visible || Time.unscaledTime < nextRefresh)
             return;
 
         nextRefresh = Time.unscaledTime + refreshInterval;
@@ -103,7 +107,7 @@ public class CombatDebugPanel : MonoBehaviour
 
     private void OnGUI()
     {
-        if (!showPanel)
+        if (!Visible)
             return;
 
         if (style == null)

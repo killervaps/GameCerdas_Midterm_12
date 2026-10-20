@@ -26,7 +26,8 @@ public class AIDebugOverlay : MonoBehaviour
     [SerializeField, Range(0.05f, 1f)] private float slowMotionScale = 0.3f;
 
     [Header("Start")]
-    [SerializeField] private bool startEnabled = true;
+    // Mati = permainan mulai bersih, tekan F1 untuk membuka debug.
+    [SerializeField] private bool startEnabled = false;
 
     [Header("Layers")]
     [SerializeField] private bool drawPerception = true;

@@ -12,6 +12,9 @@ public class SpawnPoint : MonoBehaviour
         return acceptAnyRole || role == candidate;
     }
 
+    // Titik khusus satu role, mis. puncak menara untuk Shooter.
+    public bool IsDedicated => !acceptAnyRole;
+
     public bool IsDedicatedTo(EnemyRole candidate)
     {
         return !acceptAnyRole && role == candidate;

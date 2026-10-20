@@ -74,6 +74,16 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
+    // Dipanggil RunManager saat arena berganti. Spawn berikutnya memakai titik-titik dari arena itu.
+    public void UseSpawnPoints(SpawnPoint[] points)
+    {
+        spawnPoints = points ?? Array.Empty<SpawnPoint>();
+        usedPoints.Clear();
+
+        if (spawnPoints.Length == 0)
+            Debug.LogWarning("EnemySpawner: arena ini belum punya SpawnPoint.", this);
+    }
+
     public bool TryGetRole(EnemyHealth enemy, out EnemyRole role)
     {
         return roles.TryGetValue(enemy, out role);
@@ -160,14 +170,17 @@ public class EnemySpawner : MonoBehaviour
         roles[enemy] = role;
     }
 
-    // Prioritas titik khusus role, lalu titik umum yang belum dipakai, lalu titik apa pun.
+    // Urutan prioritas, masing-masing dipilih acak di antara yang cocok:
+    //   1. titik khusus role ini yang belum dipakai (mis. puncak menara untuk Shooter, 2 menara + 1 Shooter = 50/50)
+    //   2. titik lain yang menerima role ini dan belum dipakai
+    //   3. semua titik penuh: pakai ulang titik umum, baru titik khusus role ini
+    // Titik khusus role lain tidak pernah dipakai, jadi Charger/Guardian tidak muncul di menara.
     private SpawnPoint PickPoint(EnemyRole role)
     {
-        SpawnPoint chosen = FindFree(p => p.IsDedicatedTo(role)) ??
-                            FindFree(p => p.Accepts(role));
-
-        if (chosen == null && spawnPoints.Length > 0)
-            chosen = spawnPoints[usedPoints.Count % spawnPoints.Length];
+        SpawnPoint chosen = PickRandom(p => p.IsDedicatedTo(role), true) ??
+                            PickRandom(p => p.Accepts(role), true) ??
+                            PickRandom(p => !p.IsDedicated, false) ??
+                            PickRandom(p => p.Accepts(role), false);
 
         if (chosen != null)
             usedPoints.Add(chosen);
@@ -175,15 +188,24 @@ public class EnemySpawner : MonoBehaviour
         return chosen;
     }
 
-    private SpawnPoint FindFree(Predicate<SpawnPoint> match)
+    private SpawnPoint PickRandom(Predicate<SpawnPoint> match, bool freeOnly)
     {
+        SpawnPoint result = null;
+        int seen = 0;
+
         foreach (SpawnPoint point in spawnPoints)
         {
-            if (point != null && !usedPoints.Contains(point) && match(point))
-                return point;
+            if (point == null || !match(point) || (freeOnly && usedPoints.Contains(point)))
+                continue;
+
+            // Reservoir sampling: tiap titik yang cocok punya peluang sama tanpa membuat list baru.
+            seen++;
+
+            if (UnityEngine.Random.Range(0, seen) == 0)
+                result = point;
         }
 
-        return null;
+        return result;
     }
 
     private EnemyHealth GetPrefab(EnemyRole role)

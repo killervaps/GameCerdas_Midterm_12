@@ -26,6 +26,9 @@ public class EnemyPerception : MonoBehaviour
     public bool InProximity { get; private set; }
     public bool LineOfSightBlocked { get; private set; }
 
+    // Platform tinggi (menara) tempat musuh ini berdiri. Collider-nya tidak menghalangi pandangan.
+    public ElevatedPlatform Platform { get; private set; }
+
     public float VisionRange => visionRange;
     public float VisionAngle => visionAngle;
     public float ProximityRadius => proximityRadius;
@@ -65,6 +68,8 @@ public class EnemyPerception : MonoBehaviour
             return;
         }
 
+        Platform = ElevatedPlatform.Below(transform.position);
+
         Vector3 toPlayer = player.transform.position - transform.position;
         toPlayer.y = 0f;
         float distance = toPlayer.magnitude;
@@ -78,7 +83,7 @@ public class EnemyPerception : MonoBehaviour
 
         // Raycast hanya jika lolos jarak dan sudut, supaya hemat.
         LineOfSightBlocked = candidate &&
-                             Physics.Linecast(EyePosition, player.AimPoint, obstacleMask, QueryTriggerInteraction.Ignore);
+                             ElevatedPlatform.LineBlocked(EyePosition, player.AimPoint, obstacleMask, Platform);
 
         bool canSee = candidate && !LineOfSightBlocked;
 

@@ -32,6 +32,11 @@ public class RunManager : MonoBehaviour
     [SerializeField] private BattleManager battle;
     [SerializeField] private PlayerHealth playerHealth;
 
+    [Header("Arena")]
+    // Opsional. Jika diisi, arena dipilih acak tiap ronde (arena ronde sebelumnya peluangnya dikurangi).
+    // Kosong = selalu memakai arena dan SpawnPoint yang sudah diatur di GateSelectionRoom dan EnemySpawner.
+    [SerializeField] private ArenaSelector arenaSelector;
+
     [Header("Waves")]
     // Satu WaveData per ronde, urut dari ronde 1.
     [SerializeField] private WaveData[] waves;
@@ -61,6 +66,9 @@ public class RunManager : MonoBehaviour
     // Wave ronde saat ini. Saat Preparing, ini wave yang akan dihadapi setelah memilih gate.
     public WaveData CurrentWave =>
         waves != null && CurrentRound >= 1 && CurrentRound <= waves.Length ? waves[CurrentRound - 1] : null;
+
+    // Arena ronde saat ini. Null jika tidak memakai ArenaSelector.
+    public Arena CurrentArena => arenaSelector != null ? arenaSelector.Current : null;
 
     public float RunStartTime { get; private set; }
 
@@ -140,6 +148,11 @@ public class RunManager : MonoBehaviour
         RunStartTime = Time.time;
         RunEndTime = 0f;
 
+        if (arenaSelector != null)
+            arenaSelector.ResetHistory();
+
+        PrepareArena();
+
         // Wave diberikan dulu supaya kartu gate bisa menghitung ancaman.
         gateRoom.SetUpcomingWave(CurrentWave);
 
@@ -204,10 +217,28 @@ public class RunManager : MonoBehaviour
 
         CurrentRound++;
         spawner.ClearWave();
+        PrepareArena();
         gateRoom.SetUpcomingWave(CurrentWave);
         gateRoom.ReturnToSafezone();
 
         SetState(RunState.Preparing);
+    }
+
+    // Memilih arena ronde berikutnya, lalu mengarahkan teleport MC dan SpawnPoint musuh ke arena itu.
+    private void PrepareArena()
+    {
+        if (arenaSelector == null)
+            return;
+
+        Arena arena = arenaSelector.PickNext();
+
+        if (arena == null)
+            return;
+
+        spawner.UseSpawnPoints(arena.SpawnPoints);
+        gateRoom.SetArenaSpawn(arena.PlayerEntry);
+
+        Log("ronde " + CurrentRound + " di arena " + arena.DisplayName);
     }
 
     private void HandlePlayerDied()

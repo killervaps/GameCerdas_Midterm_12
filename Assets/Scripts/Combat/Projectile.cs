@@ -31,6 +31,8 @@ public class Projectile : MonoBehaviour
     private bool flying;
     private int mask;
     private TrailRenderer trail;
+    // Collider di bawah objek ini dilewati, mis. lantai menara tempat penembak berdiri.
+    private Transform ignoreRoot;
 
     public bool IsFlying => flying;
 
@@ -47,9 +49,11 @@ public class Projectile : MonoBehaviour
         IDamageable homingTarget,
         float projectileDamage,
         GameObject projectileSource,
-        DamageKind damageKind = DamageKind.Projectile)
+        DamageKind damageKind = DamageKind.Projectile,
+        Transform ignoreCollidersUnder = null)
     {
         pool = owner;
+        ignoreRoot = ignoreCollidersUnder;
         target = homingTarget;
         targetComponent = homingTarget as Component;
         source = projectileSource;
@@ -88,7 +92,8 @@ public class Projectile : MonoBehaviour
         Vector3 position = transform.position;
         float step = speed * dt;
 
-        if (Physics.SphereCast(position, radius, direction, out RaycastHit hit, step, mask, QueryTriggerInteraction.Ignore))
+        if (Physics.SphereCast(position, radius, direction, out RaycastHit hit, step, mask, QueryTriggerInteraction.Ignore) &&
+            (ignoreRoot == null || !hit.collider.transform.IsChildOf(ignoreRoot)))
         {
             Hit(hit);
             return;
@@ -139,6 +144,7 @@ public class Projectile : MonoBehaviour
         flying = false;
         target = null;
         targetComponent = null;
+        ignoreRoot = null;
 
         if (pool != null)
             pool.Release(this);

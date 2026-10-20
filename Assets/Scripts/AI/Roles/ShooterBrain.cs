@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -32,6 +33,23 @@ public class ShooterBrain : EnemyBrain
     // Titik yang lebih jauh dari ini dari posisi sekarang dianggap terlalu mahal untuk dikejar.
     [SerializeField] private float maxTravelDistance = 6f;
     [SerializeField] private float navMeshSampleRadius = 1f;
+
+    [Header("Jump Escape")]
+    // Shooter di tempat tinggi (puncak menara) melompat turun lewat NavMeshLink area lompat jika MC mendekat,
+    // tidak harus lewat tangga yang mungkin sedang dihalangi MC.
+    [SerializeField] private bool useJumpEscape = true;
+    // MC sedekat ini, lompatan dipertimbangkan (saat Kite, Reposition, atau Flee).
+    [SerializeField] private float jumpTriggerDistance = 5f;
+    // Jarak mendatar maksimal dari Shooter ke ujung awal link, supaya link dianggap ada di platform yang sama.
+    [SerializeField] private float jumpLinkSearchRadius = 8f;
+    // Selisih tinggi maksimal antara kaki Shooter dan ujung awal link.
+    [SerializeField] private float jumpLinkHeightTolerance = 1f;
+    // Setelah memilih lompatan, Shooter tetap menuju link selama ini walaupun skor aksi berubah.
+    [SerializeField] private float jumpCommitDuration = 2.5f;
+    // Shooter yang berdiri di ElevatedPlatform (menara) bertahan di sana dan menembak ke bawah.
+    // Kite, Reposition, dan Search dimatikan selama MC tidak ikut naik ke platform yang sama.
+    // Begitu MC naik (termasuk tangga di dalam objek menara), Shooter lompat turun lewat link.
+    [SerializeField] private bool holdHighGround = true;
 
     [Header("Debug")]
     [SerializeField] private bool drawGizmos = true;
@@ -66,6 +84,16 @@ public class ShooterBrain : EnemyBrain
     private Vector3 repositionPoint;
     private bool hasRepositionPoint;
     private Vector3 fleePoint;
+
+    private static NavMeshLink[] sceneLinks;
+    private static float sceneLinksCachedAt = float.NegativeInfinity;
+
+    private ElevatedPlatform platform;
+    private bool playerOnPlatform;
+
+    private bool jumpCommitted;
+    private float jumpCommitUntil;
+    private Vector3 jumpLanding;
 
     public override string BrainName => "Utility/Shooter";
 
@@ -104,6 +132,7 @@ public class ShooterBrain : EnemyBrain
         base.Initialize(controller);
 
         search = new SearchRoutine(Motor, transform);
+        Motor.Landed += HandleLanded;
         candidates = new Candidate[Mathf.Max(4, candidateCount)];
         obstacleMask = GameLayers.ObstacleMask;
 
@@ -135,7 +164,14 @@ public class ShooterBrain : EnemyBrain
     public override void OnDied()
     {
         search.Cancel();
+        jumpCommitted = false;
         base.OnDied();
+    }
+
+    private void OnDestroy()
+    {
+        if (Controller != null && Motor != null)
+            Motor.Landed -= HandleLanded;
     }
 
     // ---------- Konteks ----------
@@ -149,6 +185,10 @@ public class ShooterBrain : EnemyBrain
             cachedPlayer = player;
             playerStats = player != null ? player.GetComponent<PlayerStats>() : null;
         }
+
+        platform = holdHighGround ? Controller.Perception.Platform : null;
+        playerOnPlatform = platform != null && player != null &&
+                           ElevatedPlatform.Below(player.transform.position) == platform;
 
         float playerRange = playerStats != null ? playerStats.Get(StatType.Range) : 8f;
 
@@ -281,13 +321,22 @@ public class ShooterBrain : EnemyBrain
         return Data.FleeByHealth.Evaluate(shiftedHealth);
     }
 
+    // Di menara dan MC masih di bawah: tetap di tempat, jangan turun mengejar jarak ideal.
+    private bool StayOnHighGround => platform != null && !playerOnPlatform;
+
     private float ScoreKite()
     {
+        if (StayOnHighGround)
+            return 0f;
+
         return Blackboard.CanSeePlayer ? KiteScore(tooClose, mobility) : 0f;
     }
 
     private float ScoreReposition()
     {
+        if (StayOnHighGround)
+            return 0f;
+
         if (!Blackboard.CanSeePlayer || !hasRepositionPoint)
             return 0f;
 
@@ -303,6 +352,9 @@ public class ShooterBrain : EnemyBrain
 
     private float ScoreSearch()
     {
+        if (StayOnHighGround)
+            return 0f;
+
         if (Blackboard.CanSeePlayer || !Blackboard.HasLastKnownPosition || Blackboard.MemoryDuration <= 0f)
             return 0f;
 
@@ -319,6 +371,9 @@ public class ShooterBrain : EnemyBrain
 
         PlayerHealth player = Blackboard.Player;
         Vector3 threat = player != null ? player.transform.position : Blackboard.LastKnownPosition;
+
+        if (TryJumpEscape(threat))
+            return;
 
         Vector3 away = transform.position - threat;
         away.y = 0f;
@@ -353,6 +408,9 @@ public class ShooterBrain : EnemyBrain
         SetAction(EnemyAction.Kite);
 
         Vector3 playerPosition = Blackboard.Player.transform.position;
+
+        if (TryJumpEscape(playerPosition))
+            return;
         Vector3 away = transform.position - playerPosition;
         away.y = 0f;
 
@@ -380,6 +438,9 @@ public class ShooterBrain : EnemyBrain
 
         SetAction(EnemyAction.Reposition);
 
+        if (TryJumpEscape(Blackboard.Player.transform.position))
+            return;
+
         if (hasRepositionPoint)
             Motor.MoveTo(repositionPoint, 1f, 0.2f);
 
@@ -398,9 +459,21 @@ public class ShooterBrain : EnemyBrain
             return;
         }
 
-        SetAction(EnemyAction.Hold);
-
         Vector3 playerPosition = Blackboard.Player.transform.position;
+
+        // Di menara: tahan posisi dan tembak ke bawah, atau lompat turun jika MC ikut naik.
+        if (platform != null)
+        {
+            if (TryJumpEscape(playerPosition))
+                return;
+
+            SetAction(EnemyAction.Hold);
+            Motor.Stop();
+            Motor.FacePosition(playerPosition);
+            return;
+        }
+
+        SetAction(EnemyAction.Hold);
 
         // Dengan coordinator, posisi tahan adalah slot di ring Shooter (dibagi supaya tidak bertumpuk dengan rekan).
         if (Controller.HasSlot)
@@ -445,12 +518,138 @@ public class ShooterBrain : EnemyBrain
         }
     }
 
+    // ---------- Lompat turun ----------
+
+    // Jika MC dekat dan Shooter berdiri di platform yang punya link lompat, pilih link yang mendaratkan
+    // Shooter paling jauh dari MC lalu jalan ke sana. Path lewat link karena biaya area lompat dibuat murah.
+    private bool TryJumpEscape(Vector3 threat)
+    {
+        if (!useJumpEscape || !Motor.CanUseJumpLinks)
+            return false;
+
+        if (!jumpCommitted || Time.time > jumpCommitUntil)
+        {
+            jumpCommitted = !Motor.IsBusyJumping && FindJumpEscape(threat, out jumpLanding);
+
+            if (!jumpCommitted)
+                return false;
+
+            jumpCommitUntil = Time.time + jumpCommitDuration;
+        }
+
+        SetAction(EnemyAction.Flee);
+        fleePoint = jumpLanding;
+
+        Motor.ClearFacing();
+        Motor.MoveTo(jumpLanding, 1.1f, 0.2f, true);
+
+        return true;
+    }
+
+    private bool FindJumpEscape(Vector3 threat, out Vector3 landing)
+    {
+        landing = Vector3.zero;
+
+        // Di menara bertanda ElevatedPlatform: lompat hanya jika MC naik ke platform yang sama.
+        // Tanpa penanda: lompat jika MC sudah sedekat Jump Trigger Distance.
+        bool threatened = platform != null
+            ? playerOnPlatform
+            : Blackboard.DistanceToPlayer <= jumpTriggerDistance;
+
+        if (!threatened)
+            return false;
+
+        Vector3 position = transform.position;
+        float currentThreatDistance = FlatDistance(position, threat);
+        float bestScore = float.NegativeInfinity;
+        bool found = false;
+
+        foreach (NavMeshLink link in SceneLinks())
+        {
+            if (link == null || !link.isActiveAndEnabled || link.area != Motor.JumpArea)
+                continue;
+
+            GetLinkEnds(link, out Vector3 start, out Vector3 end);
+
+            found |= ConsiderJump(start, end, position, threat, currentThreatDistance, ref bestScore, ref landing);
+
+            if (link.bidirectional)
+                found |= ConsiderJump(end, start, position, threat, currentThreatDistance, ref bestScore, ref landing);
+        }
+
+        return found;
+    }
+
+    private bool ConsiderJump(Vector3 from, Vector3 to, Vector3 position, Vector3 threat,
+        float currentThreatDistance, ref float bestScore, ref Vector3 landing)
+    {
+        // Ujung awal harus di platform yang sama, dan lompatan harus turun (bukan naik).
+        if (Mathf.Abs(from.y - position.y) > jumpLinkHeightTolerance || to.y > position.y + 0.1f)
+            return false;
+
+        float walk = FlatDistance(from, position);
+
+        if (walk > jumpLinkSearchRadius)
+            return false;
+
+        // Titik mendarat harus lebih jauh dari MC daripada posisi sekarang, dan jalan ke link tidak melewati MC.
+        float landingThreatDistance = FlatDistance(to, threat);
+
+        if (landingThreatDistance <= currentThreatDistance || FlatDistance(from, threat) < walk * 0.5f)
+            return false;
+
+        float score = landingThreatDistance - walk * 0.5f;
+
+        if (score <= bestScore)
+            return false;
+
+        if (!NavMesh.SamplePosition(to, out NavMeshHit hit, navMeshSampleRadius, NavMesh.AllAreas))
+            return false;
+
+        bestScore = score;
+        landing = hit.position;
+        return true;
+    }
+
+    private void HandleLanded()
+    {
+        jumpCommitted = false;
+        selector.RequestDecision();
+    }
+
+    private static NavMeshLink[] SceneLinks()
+    {
+        // Dicari ulang tiap beberapa detik supaya arena yang baru aktif ikut terbaca.
+        if (sceneLinks == null || Time.time - sceneLinksCachedAt > 5f || Time.time < sceneLinksCachedAt)
+        {
+            sceneLinks = FindObjectsByType<NavMeshLink>(FindObjectsSortMode.None);
+            sceneLinksCachedAt = Time.time;
+        }
+
+        return sceneLinks;
+    }
+
+    private static void GetLinkEnds(NavMeshLink link, out Vector3 start, out Vector3 end)
+    {
+        Transform t = link.transform;
+
+        start = link.startTransform != null ? link.startTransform.position : t.position + t.rotation * link.startPoint;
+        end = link.endTransform != null ? link.endTransform.position : t.position + t.rotation * link.endPoint;
+    }
+
+    private static float FlatDistance(Vector3 a, Vector3 b)
+    {
+        a.y = 0f;
+        b.y = 0f;
+        return Vector3.Distance(a, b);
+    }
+
     // ---------- Menembak ----------
 
     private void UpdateShooting()
     {
         // Token dipegang selama MC terlihat. Saat kehilangan MC atau kabur, token dilepas untuk musuh lain.
-        if (!Blackboard.CanSeePlayer || CurrentAction == EnemyAction.Flee)
+        if (!Blackboard.CanSeePlayer || CurrentAction == EnemyAction.Flee || Motor.IsBusyJumping)
         {
             if (Controller.HasAttackToken)
                 Controller.ReleaseAttackToken();
@@ -484,13 +683,18 @@ public class ShooterBrain : EnemyBrain
 
         Vector3 origin = transform.TransformPoint(muzzleOffset);
 
+        // Peluru tidak tertahan lantai menara tempat Shooter berdiri.
+        ElevatedPlatform standingOn = Controller.Perception.Platform;
+
         projectile.Launch(
             pool,
             origin,
             player.AimPoint - origin,
             player,
             Data.Damage,
-            gameObject
+            gameObject,
+            DamageKind.Projectile,
+            standingOn != null ? standingOn.transform : null
         );
     }
 
