@@ -22,6 +22,11 @@ public class ArenaSelector : MonoBehaviour
 
     public Arena Current { get; private set; }
 
+    // Peluang arena saat ini ketika dipilih (0-1). Untuk panel debug.
+    public float CurrentPickChance { get; private set; }
+
+    public float RepeatPenalty => repeatPenalty;
+
     public IReadOnlyList<Arena> Arenas => arenas;
 
     public event Action<Arena> ArenaPicked;
@@ -40,6 +45,7 @@ public class ArenaSelector : MonoBehaviour
     {
         previous = null;
         Current = null;
+        CurrentPickChance = 0f;
     }
 
     public float WeightOf(Arena arena)
@@ -98,6 +104,7 @@ public class ArenaSelector : MonoBehaviour
             picked = arenas[UnityEngine.Random.Range(0, arenas.Length)];
         }
 
+        CurrentPickChance = picked != null ? ChanceOf(picked) : 0f;
         previous = picked;
         Current = picked;
 
