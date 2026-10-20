@@ -53,6 +53,22 @@ public class GateSelectionRoom : MonoBehaviour
     // Dikirim setelah MC kembali ke Safezone dan pilihan baru sudah dibuka.
     public event Action SelectionOpened;
 
+    // Dikirim saat MC masuk collider trigger sebuah gate (gate itu menjadi aktif). Dipakai GateInfoModal.
+    public event Action<GatePortal> PortalFocused;
+
+    // Dikirim saat gate aktif dilepas (MC keluar trigger, gate dipilih, atau pilihan ditutup).
+    public event Action<GatePortal> PortalUnfocused;
+
+    // Progress tahan tombol Interact (0-1) selama MC berdiri di depan gate yang terbuka.
+    public float ConfirmProgress =>
+        IsSelecting &&
+        activePortal != null &&
+        activePortal.IsOpen &&
+        confirmAction != null &&
+        confirmAction.phase == InputActionPhase.Started
+            ? Mathf.Clamp01(confirmAction.GetTimeoutCompletionPercentage())
+            : 0f;
+
     private void Awake()
     {
         confirmAction = InputSystem.actions != null
@@ -134,6 +150,14 @@ public class GateSelectionRoom : MonoBehaviour
         {
             ReturnToSafezone();
         }
+    }
+
+    public Transform SafezoneSpawn => safezoneSpawn;
+
+    // Hanya memindahkan MC ke Safezone tanpa membuka pilihan gate. Dipakai menu utama.
+    public void TeleportToSafezone()
+    {
+        TeleportPlayer(safezoneSpawn);
     }
 
     public void ReturnToSafezone()
@@ -225,10 +249,16 @@ public class GateSelectionRoom : MonoBehaviour
 
         // Gate bersebelahan. Yang terakhir dimasuki yang aktif.
         if (activePortal != null && activePortal != portal)
-            activePortal.SetHighlighted(false);
+        {
+            GatePortal previous = activePortal;
+            previous.SetHighlighted(false);
+            PortalUnfocused?.Invoke(previous);
+        }
 
         activePortal = portal;
         portal.SetHighlighted(true);
+
+        PortalFocused?.Invoke(portal);
     }
 
     public void NotifyPortalExit(GatePortal portal, Collider other)
@@ -241,10 +271,14 @@ public class GateSelectionRoom : MonoBehaviour
 
     private void ClearActivePortal()
     {
-        if (activePortal != null)
-            activePortal.SetHighlighted(false);
+        if (activePortal == null)
+            return;
 
+        GatePortal previous = activePortal;
+        previous.SetHighlighted(false);
         activePortal = null;
+
+        PortalUnfocused?.Invoke(previous);
     }
 
     private void CloseAllPortals()
