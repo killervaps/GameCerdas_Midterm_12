@@ -11,6 +11,15 @@ public class HintToast : UIScreen
 
     [SerializeField] private float duration = 6.5f;
 
+    [Header("Lebar")]
+    [SerializeField] private float maxWidth = 980f;
+    [SerializeField] private float minWidth = 520f;
+    // Jarak minimum dari tepi kanan kartu HUD kiri atas. Toast selebar 980 menimpa kartu itu
+    // di layar 16:10 dan 4:3, karena lebar canvas di sana lebih sempit dari 1920.
+    [SerializeField] private float hudGap = 24f;
+    // Dipakai jika HUD tidak ditemukan (posisi kartu 28 + lebar 430 + jarak 24).
+    [SerializeField] private float fallbackSideClearance = 482f;
+
     // Diingat selama aplikasi berjalan, juga melewati "Ulangi Run" dan "Menu Utama".
     private static readonly HashSet<string> seenThisSession = new HashSet<string>();
 
@@ -18,17 +27,18 @@ public class HintToast : UIScreen
 
     private TextMeshProUGUI label;
     private RectTransform timerFill;
+    private RectTransform panelRect;
     private float remaining;
 
     protected override void Build()
     {
-        Image panel = UIKit.CreatePanel("Panel", rect, new Color(0.08f, 0.1f, 0.14f, 0.94f));
-        UIKit.Place(panel.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -36f), new Vector2(980f, 0f));
+        Image panel = UIKit.CreatePanel("Panel", rect, UIKit.Panel);
+        panelRect = panel.rectTransform;
+        UIKit.Place(panelRect, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -36f), new Vector2(maxWidth, 0f));
         UIKit.AddHorizontal(panel.gameObject, 18f, new RectOffset(24, 28, 18, 22), TextAnchor.MiddleLeft);
         UIKit.FitHeight(panel.gameObject);
 
-        TextMeshProUGUI badge = UIKit.CreateText("Badge", panel.transform, "TIPS", 20f, UIKit.Accent, TextAlignmentOptions.Center, true);
-        badge.characterSpacing = 3f;
+        TextMeshProUGUI badge = UIKit.CreateText("Badge", panel.transform, "Tips", 20f, UIKit.TextMuted, TextAlignmentOptions.Center, true);
         UIKit.Layout(badge, 30f, 70f, 0f);
 
         label = UIKit.CreateText("Label", panel.transform, string.Empty, 24f, UIKit.Text);
@@ -45,7 +55,7 @@ public class HintToast : UIScreen
         timerRect.offsetMin = new Vector2(14f, 6f);
         timerRect.offsetMax = new Vector2(-14f, 10f);
 
-        Image fill = UIKit.CreateImage("Fill", timerBack.transform, UIKit.Accent, false);
+        Image fill = UIKit.CreateImage("Fill", timerBack.transform, new Color(1f, 1f, 1f, 0.35f), false);
         timerFill = fill.rectTransform;
         UIKit.SetBarFill(timerFill, 1f);
     }
@@ -97,7 +107,26 @@ public class HintToast : UIScreen
         label.text = queue.Dequeue();
         remaining = duration;
         UIKit.SetBarFill(timerFill, 1f);
+        FitWidth();
         Show();
+    }
+
+    // Toast di tengah atas dibatasi supaya tidak masuk ke area kartu HUD kiri atas. Kartu timer
+    // di kanan lebih sempit, jadi cukup menjaga sisi kiri lalu dicerminkan ke kanan.
+    private void FitWidth()
+    {
+        float side = fallbackSideClearance;
+
+        if (ui != null && ui.Hud != null)
+        {
+            RectTransform card = ui.Hud.CardRect;
+            side = card.anchoredPosition.x + card.rect.width + hudGap;
+        }
+
+        float width = Mathf.Clamp(rect.rect.width - 2f * side, minWidth, maxWidth);
+
+        if (!Mathf.Approximately(panelRect.sizeDelta.x, width))
+            panelRect.sizeDelta = new Vector2(width, panelRect.sizeDelta.y);
     }
 
     protected override void Update()
@@ -106,6 +135,9 @@ public class HintToast : UIScreen
 
         if (!IsVisible)
             return;
+
+        // Dicek tiap frame karena resolusi bisa berubah (mis. ukuran Game view diubah saat Play).
+        FitWidth();
 
         // Waktu berhenti saat jeda supaya petunjuk tidak hilang tanpa terbaca.
         if (ui != null && ui.IsPaused)

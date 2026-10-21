@@ -175,7 +175,7 @@ public class EnemyHealthBars : UIScreen
     {
         Bar bar = new Bar();
 
-        Image frame = UIKit.CreateImage("EnemyHealthBar", rect, FrameColor);
+        Image frame = UIKit.SetCorners(UIKit.CreateImage("EnemyHealthBar", rect, FrameColor), UIKit.RoundedSmall);
         bar.frame = frame;
         bar.root = frame.rectTransform;
         UIKit.Place(bar.root, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0f), Vector2.zero, barSize);
@@ -184,7 +184,7 @@ public class EnemyHealthBars : UIScreen
         bar.group.interactable = false;
 
         // Penanda warna role di sisi kiri.
-        bar.roleTab = UIKit.CreateImage("RoleTab", frame.transform, Color.white);
+        bar.roleTab = UIKit.SetCorners(UIKit.CreateImage("RoleTab", frame.transform, Color.white), UIKit.RoundedSmall);
         RectTransform tab = bar.roleTab.rectTransform;
         tab.anchorMin = new Vector2(0f, 0f);
         tab.anchorMax = new Vector2(0f, 1f);

@@ -1,18 +1,27 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
-// Widget meter ancaman: bar tiga zona (Aman / Sedang / Bahaya) dengan penanda rasio build sekarang,
-// plus penanda kedua (garis putus) untuk rasio setelah gate yang sedang dilihat.
+// Widget meter ancaman gaya stiker: cap level ancaman (miring), lalu bar tiga zona (Aman / Sedang / Bahaya)
+// bergaris tinta dengan penanda krem untuk rasio build sekarang, plus penanda kedua yang lebih pudar untuk
+// rasio setelah gate yang sedang dilihat.
 // Bukan MonoBehaviour. Pemiliknya memanggil Tick() setiap frame untuk animasi penanda.
 public class ThreatMeter
 {
+    // Tebal garis tinta di antara zona dan di tepi bar.
+    private const float Gap = 3f;
+
     private readonly RectTransform bar;
     private readonly RectTransform safeZone;
     private readonly RectTransform mediumZone;
     private readonly RectTransform dangerZone;
     private readonly RectTransform marker;
     private readonly RectTransform ghostMarker;
-    private readonly TextMeshProUGUI headline;
+    private readonly Image nowStamp;
+    private readonly TextMeshProUGUI nowLabel;
+    private readonly GameObject arrow;
+    private readonly Image afterStamp;
+    private readonly TextMeshProUGUI afterLabel;
     private readonly TextMeshProUGUI detail;
 
     private float maxRatio = 2f;
@@ -24,49 +33,60 @@ public class ThreatMeter
 
     public ThreatMeter(Transform parent)
     {
-        headline = UIKit.CreateText("ThreatHeadline", parent, string.Empty, 26f, UIKit.Text, TextAlignmentOptions.Left, true);
+        RectTransform headline = UIKit.CreateRect("ThreatHeadline", parent);
+        UIKit.AddHorizontal(headline.gameObject, 10f, new RectOffset(0, 0, 2, 2), TextAnchor.MiddleLeft);
+
+        nowStamp = UIKit.CreateStamp("NowStamp", headline, 24f, -4f, out nowLabel);
+
+        TextMeshProUGUI arrowText = UIKit.UseDisplayFont(UIKit.CreateText("Arrow", headline, "→", 26f, UIKit.TextMuted, TextAlignmentOptions.Center, true));
+        arrow = arrowText.gameObject;
+
+        afterStamp = UIKit.CreateStamp("AfterStamp", headline, 24f, 3f, out afterLabel);
 
         RectTransform holder = UIKit.CreateRect("ThreatBar", parent);
         UIKit.Layout(holder, 34f);
 
-        bar = UIKit.CreateImage("Track", holder, new Color(0f, 0f, 0f, 0.4f)).rectTransform;
+        bar = UIKit.SetCorners(UIKit.CreateImage("Track", holder, UIKit.Ink), UIKit.RoundedSmall).rectTransform;
         bar.anchorMin = new Vector2(0f, 0.5f);
         bar.anchorMax = new Vector2(1f, 0.5f);
-        bar.sizeDelta = new Vector2(0f, 14f);
+        bar.sizeDelta = new Vector2(0f, 20f);
         bar.anchoredPosition = Vector2.zero;
 
-        safeZone = UIKit.CreateImage("Safe", bar, Faded(ThreatLevel.Safe), false).rectTransform;
-        mediumZone = UIKit.CreateImage("Medium", bar, Faded(ThreatLevel.Medium), false).rectTransform;
-        dangerZone = UIKit.CreateImage("Danger", bar, Faded(ThreatLevel.Danger), false).rectTransform;
+        safeZone = UIKit.CreateImage("Safe", bar, UIKit.ThreatColor(ThreatLevel.Safe), false).rectTransform;
+        mediumZone = UIKit.CreateImage("Medium", bar, UIKit.ThreatColor(ThreatLevel.Medium), false).rectTransform;
+        dangerZone = UIKit.CreateImage("Danger", bar, UIKit.ThreatColor(ThreatLevel.Danger), false).rectTransform;
 
-        ghostMarker = UIKit.CreateImage("GhostMarker", bar, new Color(1f, 1f, 1f, 0.55f)).rectTransform;
-        ghostMarker.sizeDelta = new Vector2(6f, 18f);
+        ghostMarker = UIKit.SetCorners(UIKit.CreateImage("GhostMarker", bar, new Color(UIKit.Cream.r, UIKit.Cream.g, UIKit.Cream.b, 0.6f)), UIKit.InkSmall).rectTransform;
+        ghostMarker.sizeDelta = new Vector2(10f, 24f);
 
-        marker = UIKit.CreateImage("Marker", bar, Color.white).rectTransform;
-        marker.sizeDelta = new Vector2(8f, 26f);
+        marker = UIKit.SetCorners(UIKit.CreateImage("Marker", bar, UIKit.Cream), UIKit.InkSmall).rectTransform;
+        marker.sizeDelta = new Vector2(12f, 32f);
 
-        detail = UIKit.CreateText("ThreatDetail", parent, string.Empty, 19f, UIKit.TextMuted);
-    }
-
-    private static Color Faded(ThreatLevel level)
-    {
-        Color color = UIKit.ThreatColor(level);
-        color.a = 0.55f;
-        return color;
+        detail = UIKit.CreateText("ThreatDetail", parent, string.Empty, 18f, UIKit.TextMuted);
     }
 
     public void Configure(float safeBelow, float dangerAbove)
     {
         maxRatio = Mathf.Max(2f, dangerAbove * 1.6f);
 
-        UIKit.SetHorizontalSpan(safeZone, 0f, safeBelow / maxRatio);
-        UIKit.SetHorizontalSpan(mediumZone, safeBelow / maxRatio, dangerAbove / maxRatio);
-        UIKit.SetHorizontalSpan(dangerZone, dangerAbove / maxRatio, 1f);
+        SetZone(safeZone, 0f, safeBelow / maxRatio, Gap, Gap * 0.5f);
+        SetZone(mediumZone, safeBelow / maxRatio, dangerAbove / maxRatio, Gap * 0.5f, Gap * 0.5f);
+        SetZone(dangerZone, dangerAbove / maxRatio, 1f, Gap * 0.5f, Gap);
+    }
+
+    // Zona diinset supaya track tinta terlihat sebagai garis di tepi dan di antara zona.
+    private static void SetZone(RectTransform zone, float from, float to, float leftInset, float rightInset)
+    {
+        UIKit.SetHorizontalSpan(zone, from, to);
+        zone.offsetMin = new Vector2(leftInset, Gap);
+        zone.offsetMax = new Vector2(-rightInset, -Gap);
     }
 
     public void SetEmpty(string message)
     {
-        headline.text = "Ancaman  <color=" + UIKit.MutedHex + ">-</color>";
+        UIKit.SetStamp(nowStamp, nowLabel, "-", UIKit.Well);
+        nowLabel.color = UIKit.TextMuted;
+        ShowAfter(false);
         detail.text = message;
         hasGhost = false;
         ghostMarker.gameObject.SetActive(false);
@@ -76,9 +96,7 @@ public class ThreatMeter
     public void Set(ThreatResult now, ThreatResult? after)
     {
         target = Normalize(now.ratio);
-
-        headline.text = "Ancaman  <color=" + now.ColorHex + ">" + now.Label.ToUpperInvariant() + "</color>" +
-                        "  <size=75%><color=" + UIKit.MutedHex + ">" + UIKit.FormatRatio(now.ratio) + "</color></size>";
+        UIKit.SetStamp(nowStamp, nowLabel, now.Label, UIKit.ThreatColor(now.level));
 
         if (after.HasValue)
         {
@@ -92,21 +110,29 @@ public class ThreatMeter
                 ghostShown = shown;
             }
 
-            string arrow = next.ratio < now.ratio - 0.005f ? "turun" : next.ratio > now.ratio + 0.005f ? "naik" : "tetap";
+            ShowAfter(true);
+            UIKit.SetStamp(afterStamp, afterLabel, next.Label, UIKit.ThreatColor(next.level));
 
-            headline.text += "  <size=75%><color=" + UIKit.MutedHex + ">-></color></size>  <color=" + next.ColorHex + ">" +
-                             next.Label.ToUpperInvariant() + "</color>  <size=75%><color=" + UIKit.MutedHex + ">" +
-                             UIKit.FormatRatio(next.ratio) + "</color></size>";
-
-            detail.text = "Jika gate ini dipilih, ancaman <b>" + arrow + "</b>.  Musuh " + Compact(next.enemyPower) +
-                          " vs MC " + Compact(next.playerPower);
+            string change = next.ratio < now.ratio - 0.005f ? "turun" : next.ratio > now.ratio + 0.005f ? "naik" : "tetap";
+            detail.text = "Jika gate ini dipilih, ancaman <b>" + change + "</b> (" + UIKit.FormatRatio(now.ratio) + " → " +
+                          UIKit.FormatRatio(next.ratio) + "). Musuh " + Compact(next.enemyPower) + " vs kamu " + Compact(next.playerPower);
         }
         else
         {
             hasGhost = false;
             ghostMarker.gameObject.SetActive(false);
-            detail.text = "Power musuh " + Compact(now.enemyPower) + " vs Power MC " + Compact(now.playerPower);
+            ShowAfter(false);
+            detail.text = "Rasio " + UIKit.FormatRatio(now.ratio) + " · musuh " + Compact(now.enemyPower) + " vs kamu " + Compact(now.playerPower);
         }
+    }
+
+    private void ShowAfter(bool visible)
+    {
+        if (arrow.activeSelf != visible)
+            arrow.SetActive(visible);
+
+        if (afterStamp.gameObject.activeSelf != visible)
+            afterStamp.gameObject.SetActive(visible);
     }
 
     public void Tick(float deltaTime)

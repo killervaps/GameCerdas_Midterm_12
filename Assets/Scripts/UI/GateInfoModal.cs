@@ -4,8 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // Kartu detail gate. Muncul saat MC masuk collider trigger GatePortal (lewat event
-// GateSelectionRoom.PortalFocused) dan hilang saat keluar. Berisi deskripsi, efek buff/trade-off,
-// perubahan stat, ancaman ronde berikutnya, serta progress "Tahan E".
+// GateSelectionRoom.PortalFocused) dan hilang saat keluar. Berisi pita nama + rarity, deskripsi,
+// efek per baris (operator asli dan perubahan stat), ancaman ronde berikutnya, serta progress "Tahan E".
 // Tidak menjeda game: MC tetap bisa berjalan ke gate sebelah untuk membandingkan.
 public class GateInfoModal : UIScreen
 {
@@ -13,14 +13,12 @@ public class GateInfoModal : UIScreen
     private const float SlideDistance = 60f;
 
     private RectTransform card;
-    private Image rarityStripe;
+    private Image headerBand;
     private TextMeshProUGUI nameText;
     private TextMeshProUGUI rarityText;
-    private Image rarityPill;
     private TextMeshProUGUI tagsText;
     private TextMeshProUGUI descriptionText;
     private RectTransform effectsList;
-    private TextMeshProUGUI statsText;
     private TextMeshProUGUI threatText;
     private GameObject threatSection;
     private TextMeshProUGUI confirmText;
@@ -34,69 +32,58 @@ public class GateInfoModal : UIScreen
         Image panel = UIKit.CreatePanel("Card", rect, UIKit.Panel);
         card = panel.rectTransform;
         UIKit.Place(card, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-40f, -20f), new Vector2(Width, 0f));
-        UIKit.AddVertical(panel.gameObject, 10f, new RectOffset(28, 28, 30, 24));
+        int ink = Mathf.RoundToInt(UIKit.InkWidth);
+        UIKit.AddVertical(panel.gameObject, 0f, new RectOffset(ink, ink, ink, 22));
         UIKit.FitHeight(panel.gameObject);
 
-        rarityStripe = UIKit.CreateImage("RarityStripe", panel.transform, Color.white);
-        LayoutElement stripeLayout = rarityStripe.gameObject.AddComponent<LayoutElement>();
-        stripeLayout.ignoreLayout = true;
-        RectTransform stripe = rarityStripe.rectTransform;
-        stripe.anchorMin = new Vector2(0f, 1f);
-        stripe.anchorMax = new Vector2(1f, 1f);
-        stripe.pivot = new Vector2(0.5f, 1f);
-        stripe.offsetMin = new Vector2(0f, -8f);
-        stripe.offsetMax = new Vector2(0f, 0f);
+        // Pita kepala selebar kartu, warnanya mengikuti rarity. Menggantikan garis atas + pill rarity
+        // sebelumnya, jadi rarity cukup ditandai satu kali.
+        headerBand = UIKit.SetCorners(UIKit.CreateImage("HeaderBand", panel.transform, Color.white), UIKit.InkTopBand);
+        UIKit.AddHorizontal(headerBand.gameObject, 12f, new RectOffset(20, 20, 8, 14), TextAnchor.MiddleLeft);
+        UIKit.Layout(headerBand, 74f);
 
-        // Kepala kartu: nama + label rarity.
-        RectTransform header = UIKit.CreateRect("Header", panel.transform);
-        UIKit.AddHorizontal(header.gameObject, 12f);
-        UIKit.Layout(header, 48f);
-
-        nameText = UIKit.CreateText("Name", header, string.Empty, 38f, UIKit.Text, TextAlignmentOptions.Left, true);
+        nameText = UIKit.UseDisplayFont(UIKit.CreateText("Name", headerBand.transform, string.Empty, 34f, UIKit.Ink, TextAlignmentOptions.Left, true));
         nameText.textWrappingMode = TextWrappingModes.NoWrap;
+        // Ellipsis menyembunyikan seluruh baris jika tingginya tidak muat, dan baris Fredoka lebih tinggi dari
+        // LiberationSans, jadi kotak nama diberi ruang 52 untuk teks 34.
         nameText.overflowMode = TextOverflowModes.Ellipsis;
-        UIKit.Layout(nameText, 48f, -1f, 1f);
+        UIKit.Layout(nameText, 52f, -1f, 1f);
 
-        rarityPill = UIKit.CreateImage("RarityPill", header, Color.white);
-        UIKit.Layout(rarityPill, 32f, 110f, 0f);
-        rarityText = UIKit.CreateText("Label", rarityPill.transform, string.Empty, 17f, new Color(0.06f, 0.07f, 0.1f), TextAlignmentOptions.Center, true);
-        rarityText.characterSpacing = 2f;
-        UIKit.Stretch(rarityText.rectTransform);
+        rarityText = UIKit.UseDisplayFont(UIKit.CreateText("Rarity", headerBand.transform, string.Empty, 20f, UIKit.Ink, TextAlignmentOptions.Right, true));
+        UIKit.Layout(rarityText, 52f, 100f, 0f);
 
-        tagsText = UIKit.CreateText("Tags", panel.transform, string.Empty, 19f, UIKit.TextMuted);
+        RectTransform body = UIKit.CreateRect("Body", panel.transform);
+        UIKit.AddVertical(body.gameObject, 10f, new RectOffset(20, 20, 14, 0));
 
-        descriptionText = UIKit.CreateText("Description", panel.transform, string.Empty, 22f, new Color(0.82f, 0.85f, 0.9f));
-        descriptionText.fontStyle = FontStyles.Italic;
+        tagsText = UIKit.CreateText("Tags", body, string.Empty, 19f, UIKit.TextMuted);
 
-        UIKit.CreateDivider(panel.transform);
+        descriptionText = UIKit.CreateText("Description", body, string.Empty, 22f, new Color(0.82f, 0.85f, 0.9f));
 
-        SectionTitle(panel.transform, "EFEK GATE");
-        effectsList = UIKit.CreateRect("Effects", panel.transform);
-        UIKit.AddVertical(effectsList.gameObject, 6f);
+        effectsList = UIKit.CreateRect("Effects", body);
+        UIKit.AddVertical(effectsList.gameObject, 8f);
 
-        SectionTitle(panel.transform, "PERUBAHAN STAT");
-        statsText = UIKit.CreateText("Stats", panel.transform, string.Empty, 22f, UIKit.Text);
-
-        threatSection = UIKit.CreateRect("ThreatSection", panel.transform).gameObject;
+        threatSection = UIKit.CreateRect("ThreatSection", body).gameObject;
         UIKit.AddVertical(threatSection, 4f);
-        SectionTitle(threatSection.transform, "ANCAMAN RONDE BERIKUTNYA");
+        UIKit.CreateText("SectionTitle", threatSection.transform, "Ancaman ronde berikutnya", 19f, UIKit.TextMuted, TextAlignmentOptions.Left, true);
         threatText = UIKit.CreateText("Threat", threatSection.transform, string.Empty, 24f, UIKit.Text);
 
-        UIKit.CreateDivider(panel.transform);
+        // Kaki kartu: tutup tombol [E] emas + bar progress di sumur tinta.
+        confirmText = UIKit.CreateText("Confirm", body, string.Empty, 20f, UIKit.Text, TextAlignmentOptions.Left);
 
-        // Kaki kartu: petunjuk tahan E dengan progress.
-        confirmText = UIKit.CreateText("Confirm", panel.transform, "Tahan <b>[E]</b> untuk memilih gate ini", 22f, UIKit.Accent, TextAlignmentOptions.Center, true);
+        RectTransform confirmRow = UIKit.CreateRect("ConfirmRow", body);
+        UIKit.AddHorizontal(confirmRow.gameObject, 10f, null, TextAnchor.MiddleLeft);
+        UIKit.Layout(confirmRow, 40f);
 
-        RectTransform bar = UIKit.CreateBar("ConfirmBar", panel.transform, new Color(0f, 0f, 0f, 0.45f), UIKit.Accent, out Image fill);
-        UIKit.Layout(bar, 10f);
+        Image keyCap = UIKit.SetCorners(UIKit.CreateImage("KeyCap", confirmRow, UIKit.Accent), UIKit.InkSmall);
+        UIKit.Layout(keyCap, 38f, 40f, 0f);
+        TextMeshProUGUI keyLabel = UIKit.UseDisplayFont(UIKit.CreateText("Key", keyCap.transform, "E", 24f,
+            new Color(0.23f, 0.15f, 0.02f), TextAlignmentOptions.Center, true));
+        UIKit.Stretch(keyLabel.rectTransform);
+
+        RectTransform bar = UIKit.CreateBar("ConfirmBar", confirmRow, UIKit.Ink, UIKit.Accent, out Image fill);
+        UIKit.Layout(bar, 14f, -1f, 1f);
         confirmFill = fill.rectTransform;
         UIKit.SetBarFill(confirmFill, 0f);
-    }
-
-    private static void SectionTitle(Transform parent, string text)
-    {
-        TextMeshProUGUI label = UIKit.CreateText("SectionTitle", parent, text, 17f, UIKit.TextMuted, TextAlignmentOptions.Left, true);
-        label.characterSpacing = 3f;
     }
 
     public void Open(MathGateData gate)
@@ -119,11 +106,14 @@ public class GateInfoModal : UIScreen
     private void Fill(MathGateData gate)
     {
         Color rarityColor = UIKit.RarityColor(gate.Rarity);
+        // Teks di pita memakai versi gelap dari warna rarity, bukan hitam polos.
+        Color bandText = Color.Lerp(rarityColor, UIKit.Ink, 0.82f);
 
-        rarityStripe.color = rarityColor;
-        rarityPill.color = rarityColor;
-        rarityText.text = UIKit.RarityLabel(gate.Rarity);
+        headerBand.color = rarityColor;
         nameText.text = gate.DisplayName;
+        nameText.color = bandText;
+        rarityText.text = UIKit.RarityLabel(gate.Rarity);
+        rarityText.color = bandText;
 
         builder.Clear();
 
@@ -145,77 +135,81 @@ public class GateInfoModal : UIScreen
         descriptionText.gameObject.SetActive(!string.IsNullOrEmpty(gate.Description));
 
         BuildEffects(gate);
-        statsText.text = BuildStatChanges(gate);
         BuildThreat(gate);
     }
 
+
+    // Satu baris per efek: lingkaran operator asli (+ − × ÷), nama stat dan jenisnya, lalu nilai
+    // sekarang -> sesudah gate. Garis bawah berwarna menandai buff (hijau) atau trade-off (merah).
     private void BuildEffects(MathGateData gate)
     {
         UIKit.ClearChildren(effectsList);
+
+        PlayerStats stats = ui.Stats;
+        bool hasPreview = stats != null;
+        StatSnapshot preview = hasPreview ? stats.Preview(gate) : default;
 
         foreach (ModifierEffect effect in gate.Effects)
         {
             bool buff = effect.IsBuff;
             bool tradeOff = effect.IsTradeOff;
             Color color = buff ? UIKit.Buff : tradeOff ? UIKit.TradeOff : UIKit.Neutral;
+            string hex = buff ? UIKit.BuffHex : tradeOff ? UIKit.TradeOffHex : UIKit.MutedHex;
+            Color dark = Color.Lerp(color, UIKit.Ink, 0.8f);
 
-            Image row = UIKit.CreateImage("Effect", effectsList, new Color(color.r, color.g, color.b, 0.12f));
-            HorizontalLayoutGroup layout = UIKit.AddHorizontal(row.gameObject, 12f, new RectOffset(12, 14, 6, 6));
+            Image row = UIKit.SetCorners(UIKit.CreateImage("Effect", effectsList, UIKit.Well), UIKit.InkMedium);
+            HorizontalLayoutGroup layout = UIKit.AddHorizontal(row.gameObject, 12f, new RectOffset(10, 16, 8, 12));
             layout.childAlignment = TextAnchor.MiddleLeft;
-            UIKit.Layout(row, 46f);
+            UIKit.Layout(row, 60f);
 
-            Image icon = UIKit.CreateImage("Icon", row.transform, color);
-            UIKit.Layout(icon, 30f, 30f, 0f);
-            TextMeshProUGUI symbol = UIKit.CreateText("Symbol", icon.transform, buff ? "+" : tradeOff ? "-" : "=", 24f,
-                new Color(0.06f, 0.07f, 0.1f), TextAlignmentOptions.Center, true);
-            UIKit.Stretch(symbol.rectTransform, 0f, 0f, 0f, 2f);
+            Image strip = UIKit.CreateImage("KindStrip", row.transform, color, false);
+            strip.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+            RectTransform stripRect = strip.rectTransform;
+            stripRect.anchorMin = new Vector2(0f, 0f);
+            stripRect.anchorMax = new Vector2(1f, 0f);
+            stripRect.pivot = new Vector2(0.5f, 0f);
+            stripRect.offsetMin = new Vector2(8f, 3f);
+            stripRect.offsetMax = new Vector2(-8f, 7f);
+
+            Image icon = UIKit.SetCircle(UIKit.CreateImage("Operator", row.transform, color));
+            UIKit.Layout(icon, 38f, 38f, 0f);
+            TextMeshProUGUI symbol = UIKit.UseDisplayFont(UIKit.CreateText("Symbol", icon.transform, OperatorGlyph(effect.op), 26f,
+                dark, TextAlignmentOptions.Center, true));
+            UIKit.Stretch(symbol.rectTransform, 0f, 0f, 0f, 3f);
 
             TextMeshProUGUI label = UIKit.CreateText("Text", row.transform,
-                "<b>" + UIKit.StatLabel(effect.stat) + "</b>  " + effect.Symbol + effect.value.ToString("0.##"), 24f, UIKit.Text);
+                "<b>" + UIKit.StatLabel(effect.stat) + "</b>  " + effect.Symbol + effect.value.ToString("0.##") +
+                "\n<size=75%><color=" + hex + ">" + (buff ? "Buff" : tradeOff ? "Trade-off" : "Netral") + "</color></size>",
+                22f, UIKit.Text);
             label.textWrappingMode = TextWrappingModes.NoWrap;
+            label.lineSpacing = -8f;
             UIKit.Layout(label, -1f, -1f, 1f);
 
-            TextMeshProUGUI kind = UIKit.CreateText("Kind", row.transform, buff ? "BUFF" : tradeOff ? "TRADE-OFF" : "NETRAL",
-                16f, color, TextAlignmentOptions.Right, true);
-            kind.characterSpacing = 2f;
-            UIKit.Layout(kind, -1f, 120f, 0f);
+            if (hasPreview)
+            {
+                float now = stats.Get(effect.stat);
+                float after = preview.Get(effect.stat);
+
+                TextMeshProUGUI change = UIKit.UseDisplayFont(UIKit.CreateText("Change", row.transform,
+                    now.ToString("0.##") + " <color=" + UIKit.MutedHex + ">→</color> <color=" + hex + ">" + after.ToString("0.##") + "</color>",
+                    22f, UIKit.Text, TextAlignmentOptions.Right, true));
+                change.textWrappingMode = TextWrappingModes.NoWrap;
+                UIKit.Layout(change, -1f, 140f, 0f);
+            }
         }
     }
 
-    // Hanya stat yang berubah, mis. "Defense   10 -> 15  (+5)".
-    private string BuildStatChanges(MathGateData gate)
+    // Tanda minus tipografis (U+2212) supaya lebarnya sama dengan + × ÷ di lingkaran operator.
+    private static string OperatorGlyph(ModifierOp op)
     {
-        PlayerStats stats = ui.Stats;
-
-        if (stats == null)
-            return "-";
-
-        StatSnapshot preview = stats.Preview(gate);
-        builder.Clear();
-
-        for (int i = 0; i < StatTypes.Count; i++)
+        switch (op)
         {
-            StatType stat = (StatType)i;
-            float now = stats.Get(stat);
-            float after = preview.Get(stat);
-
-            if (Mathf.Approximately(now, after))
-                continue;
-
-            string color = after > now ? UIKit.BuffHex : UIKit.TradeOffHex;
-            float delta = after - now;
-
-            if (builder.Length > 0)
-                builder.Append('\n');
-
-            builder.Append(UIKit.StatLabel(stat))
-                .Append("<pos=38%>").Append(now.ToString("0.##"))
-                .Append("<pos=54%><color=").Append(UIKit.MutedHex).Append(">-></color>")
-                .Append("<pos=64%><color=").Append(color).Append("><b>").Append(after.ToString("0.##")).Append("</b>")
-                .Append("<pos=82%><size=80%>(").Append(delta > 0f ? "+" : string.Empty).Append(delta.ToString("0.##")).Append(")</size></color>");
+            case ModifierOp.Add: return "+";
+            case ModifierOp.Subtract: return "−";
+            case ModifierOp.Multiply: return "×";
+            case ModifierOp.Divide: return "÷";
+            default: return "?";
         }
-
-        return builder.Length > 0 ? builder.ToString() : "<color=" + UIKit.MutedHex + ">Tidak ada stat yang berubah.</color>";
     }
 
     private void BuildThreat(MathGateData gate)
@@ -237,7 +231,7 @@ public class GateInfoModal : UIScreen
 
         threatText.text =
             "<color=" + now.ColorHex + ">" + now.Label + "</color> <size=75%><color=" + UIKit.MutedHex + ">" + UIKit.FormatRatio(now.ratio) + "</color></size>" +
-            "   <color=" + UIKit.MutedHex + ">-></color>   " +
+            "   <color=" + UIKit.MutedHex + ">→</color>   " +
             "<b><color=" + after.ColorHex + ">" + after.Label + "</color></b> <size=75%><color=" + UIKit.MutedHex + ">" + UIKit.FormatRatio(after.ratio) + "</color></size>" +
             "\n<size=75%><color=" + UIKit.MutedHex + ">" + wave.Describe() + "</color></size>";
     }
@@ -258,6 +252,6 @@ public class GateInfoModal : UIScreen
         UIKit.SetBarFill(confirmFill, progress);
         confirmText.text = progress > 0.01f
             ? "Memilih... <b>" + Mathf.RoundToInt(progress * 100f) + "%</b>"
-            : "Tahan <b>[E]</b> untuk memilih gate ini";
+            : "Tahan <b>E</b> untuk memilih gate ini";
     }
 }

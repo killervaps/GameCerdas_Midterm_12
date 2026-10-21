@@ -5,8 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // HUD selama run:
-//  - kiri atas: satu kartu berisi ronde, status, sisa musuh, ancaman live, build, dan (di Safezone)
-//    preview musuh ronde berikutnya yang diisi EnemyPreviewPanel lewat PreviewHost;
+//  - kiri atas: kumpulan stiker, yaitu token ronde + label status, kartu info (sisa musuh dan ancaman
+//    live saat bertarung, preview musuh berikutnya di Safezone lewat PreviewHost), dan chip build;
 //  - tengah bawah: HP bar besar;
 //  - kanan bawah: cooldown Aura Burst berbentuk lingkaran dengan ikon ledakan;
 //  - kanan atas: waktu run; tengah: banner "RONDE N" saat pertempuran dimulai.
@@ -23,18 +23,30 @@ public class HudPanel : UIScreen
     [SerializeField] private float lowHpMinAlpha = 0.3f;
     [SerializeField] private float lowHpMaxAlpha = 0.7f;
 
-    private TextMeshProUGUI roundText;
-    private TextMeshProUGUI stateText;
+    private RectTransform topLeft;
+    private RectTransform roundTokens;
+    private int shownRound = -1;
+    private int shownTotalRounds = -1;
+    private Image stateTag;
+    private TextMeshProUGUI stateTagLabel;
+    private GameObject infoCard;
+    private GameObject battleSection;
+    private TextMeshProUGUI enemyCountText;
+    private RectTransform enemyTokens;
+    private readonly List<Image> enemyTokenImages = new List<Image>();
+    private readonly List<TextMeshProUGUI> enemyTokenLabels = new List<TextMeshProUGUI>();
+    private readonly List<Color> enemyTokenColors = new List<Color>();
+    // Musuh yang sedang diwakili token, untuk mendeteksi wave baru.
+    private readonly List<EnemyHealth> tokenEnemies = new List<EnemyHealth>();
+    private GameObject threatLine;
+    private Image threatStamp;
+    private TextMeshProUGUI threatStampLabel;
+    private TextMeshProUGUI threatRatioText;
+    private RectTransform buildChips;
     private TextMeshProUGUI hpText;
     private RectTransform hpFill;
     private Image hpFillImage;
     private RectTransform hpGhost;
-    private GameObject enemyRow;
-    private TextMeshProUGUI enemyText;
-    private GameObject threatRow;
-    private TextMeshProUGUI threatText;
-    private Image threatDot;
-    private TextMeshProUGUI buildText;
     private TextMeshProUGUI timerText;
 
     private CanvasGroup skillGroup;
@@ -79,46 +91,13 @@ public class HudPanel : UIScreen
         lowHpVignette.sprite = UIKit.Vignette;
         UIKit.Stretch(lowHpVignette.rectTransform);
 
-        lowHpLabel = UIKit.CreateText("LowHpLabel", rect, "HP KRITIS!", 30f, new Color(1f, 0.35f, 0.35f), TextAlignmentOptions.Center, true);
-        lowHpLabel.characterSpacing = 6f;
+        lowHpLabel = UIKit.UseDisplayFont(UIKit.CreateText("LowHpLabel", rect, "HP KRITIS!", 32f, new Color(1f, 0.35f, 0.35f), TextAlignmentOptions.Center, true));
         lowHpLabel.outlineWidth = 0.2f;
         lowHpLabel.outlineColor = new Color32(30, 0, 0, 220);
         UIKit.Place(lowHpLabel.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 82f), new Vector2(500f, 44f));
         lowHpLabel.alpha = 0f;
 
-        // ---------- Kartu kiri atas ----------
-        Image card = UIKit.CreatePanel("StatusCard", rect, UIKit.Panel);
-        UIKit.Place(card.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(28f, -28f), new Vector2(430f, 0f));
-        UIKit.AddVertical(card.gameObject, 8f, new RectOffset(22, 22, 18, 20));
-        UIKit.FitHeight(card.gameObject);
-
-        roundText = UIKit.CreateText("Round", card.transform, "RONDE -", 34f, UIKit.Text, TextAlignmentOptions.Left, true);
-        roundText.characterSpacing = 3f;
-
-        stateText = UIKit.CreateText("State", card.transform, string.Empty, 20f, UIKit.Accent);
-
-        enemyRow = UIKit.CreateRect("EnemyRow", card.transform).gameObject;
-        UIKit.AddHorizontal(enemyRow, 8f);
-        UIKit.Layout(enemyRow.transform, 28f);
-        enemyText = UIKit.CreateText("Text", enemyRow.transform, string.Empty, 21f, UIKit.Text);
-        UIKit.Layout(enemyText, -1f, -1f, 1f);
-
-        threatRow = UIKit.CreateRect("ThreatRow", card.transform).gameObject;
-        UIKit.AddHorizontal(threatRow, 10f);
-        UIKit.Layout(threatRow.transform, 28f);
-        threatDot = UIKit.CreateImage("Dot", threatRow.transform, Color.white);
-        UIKit.Layout(threatDot, 14f, 14f, 0f);
-        threatText = UIKit.CreateText("Text", threatRow.transform, string.Empty, 21f, UIKit.Text);
-        UIKit.Layout(threatText, -1f, -1f, 1f);
-
-        UIKit.CreateDivider(card.transform);
-
-        buildText = UIKit.CreateText("Build", card.transform, string.Empty, 19f, UIKit.TextMuted);
-
-        // Bagian preview musuh (diisi EnemyPreviewPanel, hanya aktif di Safezone).
-        previewHost = UIKit.CreateRect("EnemyPreviewSection", card.transform);
-        UIKit.AddVertical(previewHost.gameObject, 10f);
-        previewHost.gameObject.SetActive(false);
+        BuildTopLeft();
 
         // ---------- Tengah bawah: HP bar ----------
         Image hpPanel = UIKit.CreatePanel("HPPanel", rect, UIKit.Panel);
@@ -127,12 +106,13 @@ public class HudPanel : UIScreen
         UIKit.Place(statusCard, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), HpPanelPosition, new Vector2(640f, 40f));
 
         // HP bar dengan "ghost" merah yang turun pelan setelah kena damage.
-        RectTransform hpBar = UIKit.CreateBar("HPBar", hpPanel.transform, new Color(0f, 0f, 0f, 0.45f), new Color(0.85f, 0.25f, 0.25f, 0.9f), out Image ghost);
-        UIKit.Stretch(hpBar, 4f, 4f, 4f, 4f);
+        RectTransform hpBar = UIKit.CreateBar("HPBar", hpPanel.transform, UIKit.Well, new Color(0.85f, 0.25f, 0.25f, 0.9f), out Image ghost);
+        // Diinset sedikit lebih dari tebal tinta panel supaya garis tinta tetap terlihat utuh.
+        UIKit.Stretch(hpBar, 7f, 7f, 7f, 7f);
         hpFrame = hpBar.GetComponent<Image>();
         hpGhost = ghost.rectTransform;
 
-        hpFillImage = UIKit.CreateImage("Fill", hpBar, UIKit.Buff);
+        hpFillImage = UIKit.SetCorners(UIKit.CreateImage("Fill", hpBar, UIKit.Buff), UIKit.RoundedSmall);
         hpFill = hpFillImage.rectTransform;
         UIKit.SetBarFill(hpFill, 1f);
 
@@ -145,7 +125,7 @@ public class HudPanel : UIScreen
         Image timerCard = UIKit.CreatePanel("TimerCard", rect, UIKit.Panel);
         UIKit.Place(timerCard.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-28f, -28f), new Vector2(200f, 92f));
 
-        timerText = UIKit.CreateText("Time", timerCard.transform, "00:00", 36f, UIKit.Text, TextAlignmentOptions.Center, true);
+        timerText = UIKit.UseDisplayFont(UIKit.CreateText("Time", timerCard.transform, "00:00", 38f, UIKit.Text, TextAlignmentOptions.Center, true));
         UIKit.Stretch(timerText.rectTransform, 0f, 0f, 8f, 34f);
 
         TextMeshProUGUI pauseHint = UIKit.CreateText("PauseHint", timerCard.transform, "<b>[Esc]</b> Jeda", 17f, UIKit.TextMuted, TextAlignmentOptions.Center);
@@ -165,13 +145,16 @@ public class HudPanel : UIScreen
         bannerGroup.blocksRaycasts = false;
         bannerGroup.interactable = false;
 
-        bannerTitle = UIKit.CreateText("Title", banner, string.Empty, 84f, UIKit.Text, TextAlignmentOptions.Center, true);
+        // Banner "RONDE N" adalah momen kunci, jadi tetap kapital dengan spacing.
+        bannerTitle = UIKit.UseDisplayFont(UIKit.CreateText("Title", banner, string.Empty, 84f, UIKit.Text, TextAlignmentOptions.Center, true));
         bannerTitle.characterSpacing = 10f;
-        bannerTitle.outlineWidth = 0.15f;
-        bannerTitle.outlineColor = new Color32(0, 0, 0, 200);
+        bannerTitle.outlineWidth = 0.25f;
+        bannerTitle.outlineColor = UIKit.Ink;
         UIKit.Stretch(bannerTitle.rectTransform, 0f, 0f, 0f, 50f);
 
-        bannerSubtitle = UIKit.CreateText("Subtitle", banner, string.Empty, 28f, UIKit.Accent, TextAlignmentOptions.Center, true);
+        bannerSubtitle = UIKit.CreateText("Subtitle", banner, string.Empty, 28f, UIKit.Text, TextAlignmentOptions.Center, true);
+        bannerSubtitle.outlineWidth = 0.15f;
+        bannerSubtitle.outlineColor = new Color32(0, 0, 0, 200);
         UIKit.Stretch(bannerSubtitle.rectTransform, 0f, 0f, 112f, 0f);
     }
 
@@ -181,7 +164,87 @@ public class HudPanel : UIScreen
     // Wadah di dalam kartu kiri atas untuk konten EnemyPreviewPanel.
     public RectTransform PreviewHost => previewHost;
 
-    public RectTransform CardRect => (RectTransform)roundText.transform.parent;
+    // Wadah stiker kiri atas. Dipakai HintToast untuk menjaga jarak dan EnemyPreviewPanel untuk rebuild layout.
+    public RectTransform CardRect => topLeft;
+
+    // ---------- Kiri atas ----------
+    // Dipecah jadi beberapa stiker (ronde, status, kartu info, chip build) alih-alih satu kartu statistik,
+    // supaya HUD terbaca seperti tempelan di layar, bukan tabel.
+    private void BuildTopLeft()
+    {
+        topLeft = UIKit.CreateRect("TopLeft", rect);
+        UIKit.Place(topLeft, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(28f, -28f), new Vector2(430f, 0f));
+        VerticalLayoutGroup column = UIKit.AddVertical(topLeft.gameObject, 16f, null, TextAnchor.UpperLeft);
+        column.childForceExpandWidth = false;
+        UIKit.FitHeight(topLeft.gameObject);
+
+        // Baris 1: stiker "Ronde" + token per ronde, lalu label status miring.
+        RectTransform roundRow = UIKit.CreateRect("RoundRow", topLeft);
+        UIKit.AddHorizontal(roundRow.gameObject, 14f, null, TextAnchor.MiddleLeft);
+
+        Image roundSticker = UIKit.SetCorners(UIKit.CreateImage("RoundSticker", roundRow, UIKit.Panel), UIKit.InkMedium);
+        UIKit.AddHardShadow(roundSticker, UIKit.ButtonShadow);
+        UIKit.AddHorizontal(roundSticker.gameObject, 8f, new RectOffset(14, 14, 7, 9), TextAnchor.MiddleLeft);
+
+        TextMeshProUGUI roundLabel = UIKit.UseDisplayFont(UIKit.CreateText("Label", roundSticker.transform, "Ronde", 26f, UIKit.Text, TextAlignmentOptions.Left, true));
+        roundLabel.textWrappingMode = TextWrappingModes.NoWrap;
+
+        roundTokens = UIKit.CreateRect("Tokens", roundSticker.transform);
+        UIKit.AddHorizontal(roundTokens.gameObject, 6f, null, TextAnchor.MiddleLeft);
+
+        stateTag = UIKit.CreateStamp("StateTag", roundRow, 22f, 4f, out stateTagLabel);
+
+        // Baris 2: kartu info. Isinya bagian pertempuran atau preview musuh (Safezone).
+        Image card = UIKit.CreatePanel("InfoCard", topLeft, UIKit.Panel);
+        infoCard = card.gameObject;
+        UIKit.Layout(card, -1f, 330f, 0f);
+        UIKit.AddVertical(card.gameObject, 10f, new RectOffset(18, 18, 14, 18));
+
+        RectTransform battleRoot = UIKit.CreateRect("BattleSection", card.transform);
+        battleSection = battleRoot.gameObject;
+        UIKit.AddVertical(battleSection, 10f);
+
+        RectTransform countRow = UIKit.CreateRect("CountRow", battleRoot);
+        UIKit.AddHorizontal(countRow.gameObject, 8f, null, TextAnchor.MiddleLeft);
+        TextMeshProUGUI caption = UIKit.CreateText("Caption", countRow, "Musuh tersisa", 20f, UIKit.TextMuted);
+        UIKit.Layout(caption, -1f, -1f, 1f);
+        enemyCountText = UIKit.UseDisplayFont(UIKit.CreateText("Count", countRow, "-", 30f, UIKit.Text, TextAlignmentOptions.Right, true));
+        enemyCountText.textWrappingMode = TextWrappingModes.NoWrap;
+
+        // Satu token per musuh yang di-spawn. Token musuh yang sudah mati diredupkan.
+        enemyTokens = UIKit.CreateRect("EnemyTokens", battleRoot);
+        GridLayoutGroup grid = enemyTokens.gameObject.AddComponent<GridLayoutGroup>();
+        grid.cellSize = new Vector2(30f, 30f);
+        grid.spacing = new Vector2(6f, 6f);
+        grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        grid.constraintCount = 8;
+        grid.childAlignment = TextAnchor.UpperLeft;
+
+        RectTransform threatRoot = UIKit.CreateRect("ThreatLine", battleRoot);
+        threatLine = threatRoot.gameObject;
+        UIKit.AddHorizontal(threatLine, 12f, new RectOffset(0, 0, 4, 0), TextAnchor.MiddleLeft);
+        threatStamp = UIKit.CreateStamp("ThreatStamp", threatRoot, 22f, -4f, out threatStampLabel);
+        threatRatioText = UIKit.CreateText("Ratio", threatRoot, string.Empty, 20f, UIKit.TextMuted);
+        UIKit.Layout(threatRatioText, -1f, -1f, 1f);
+
+        // Bagian preview musuh (diisi EnemyPreviewPanel, hanya aktif di Safezone).
+        previewHost = UIKit.CreateRect("EnemyPreviewSection", card.transform);
+        UIKit.AddVertical(previewHost.gameObject, 10f);
+        previewHost.gameObject.SetActive(false);
+
+        // Baris 3: label "Build" + chip per gate yang sudah dipilih.
+        RectTransform buildRow = UIKit.CreateRect("BuildRow", topLeft);
+        UIKit.AddHorizontal(buildRow.gameObject, 10f, null, TextAnchor.UpperLeft);
+
+        Image buildLabel = UIKit.CreateStamp("BuildLabel", buildRow, 19f, 0f, out TextMeshProUGUI buildLabelText);
+        buildLabel.color = UIKit.Panel;
+        buildLabelText.text = "Build";
+        buildLabelText.color = UIKit.Text;
+
+        buildChips = UIKit.CreateRect("Chips", buildRow);
+        VerticalLayoutGroup chipColumn = UIKit.AddVertical(buildChips.gameObject, 10f);
+        chipColumn.childForceExpandWidth = false;
+    }
 
     private void BuildSkill()
     {
@@ -201,6 +264,8 @@ public class HudPanel : UIScreen
         skillGlow.sprite = UIKit.Glow;
         UIKit.Place(skillGlow.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(circleSize * 1.5f, circleSize * 1.5f));
 
+        // Lingkaran polos semi-transparan tanpa garis tinta atau bayangan, sengaja beda dari panel lain:
+        // pemilik project memilih tampilan awal ini supaya lingkaran skill tidak tampak seperti lubang hitam.
         Image background = UIKit.CreateImage("Background", circle, new Color(0.06f, 0.08f, 0.12f, 0.88f), false);
         background.sprite = UIKit.Circle;
         UIKit.Stretch(background.rectTransform);
@@ -230,7 +295,7 @@ public class HudPanel : UIScreen
         skillIconInner.rectTransform.localRotation = Quaternion.Euler(0f, 0f, 22.5f);
 
         // Hitung mundur di lapisan paling atas, di atas ikon.
-        skillCountdown = UIKit.CreateText("Countdown", circle, string.Empty, 40f, Color.white, TextAlignmentOptions.Center, true);
+        skillCountdown = UIKit.UseDisplayFont(UIKit.CreateText("Countdown", circle, string.Empty, 40f, Color.white, TextAlignmentOptions.Center, true));
         skillCountdown.textWrappingMode = TextWrappingModes.NoWrap;
         skillCountdown.outlineWidth = 0.25f;
         skillCountdown.outlineColor = new Color32(0, 0, 0, 230);
@@ -258,18 +323,21 @@ public class HudPanel : UIScreen
         bannerTime = bannerDuration;
     }
 
+    // Satu chip per gate, warna rarity, berisi nama dan operasinya (mis. "Pembagi   +40 HP   ÷2 DMG").
     public void RefreshBuild()
     {
+        UIKit.ClearChildren(buildChips);
+
         PlayerStats stats = ui.Stats;
 
         if (stats == null || stats.SelectedGates.Count == 0)
         {
-            buildText.text = "Build: <color=" + UIKit.MutedHex + ">belum ada gate</color>";
+            Image empty = UIKit.CreateStamp("EmptyChip", buildChips, 19f, 0f, out TextMeshProUGUI emptyLabel);
+            empty.color = UIKit.Well;
+            emptyLabel.text = "belum ada gate";
+            emptyLabel.color = UIKit.TextMuted;
             return;
         }
-
-        builder.Clear();
-        builder.Append("Build: ");
 
         for (int i = 0; i < stats.SelectedGates.Count; i++)
         {
@@ -278,14 +346,25 @@ public class HudPanel : UIScreen
             if (gate == null)
                 continue;
 
-            if (i > 0)
-                builder.Append("<color=" + UIKit.MutedHex + "> + </color>");
+            builder.Clear();
+            builder.Append(ShortGateName(gate.DisplayName));
 
-            builder.Append("<color=#").Append(ColorUtility.ToHtmlStringRGB(UIKit.RarityColor(gate.Rarity))).Append('>')
-                .Append(gate.DisplayName).Append("</color>");
+            foreach (ModifierEffect effect in gate.Effects)
+                builder.Append("   ").Append(effect.Symbol).Append(effect.value.ToString("0.##")).Append(' ').Append(UIKit.StatShort(effect.stat));
+
+            // Kemiringan bergantian supaya tumpukan chip terasa ditempel tangan.
+            Image chip = UIKit.CreateStamp("GateChip", buildChips, 19f, i % 2 == 0 ? -2f : 2f, out TextMeshProUGUI chipLabel);
+            UIKit.SetStamp(chip, chipLabel, builder.ToString(), UIKit.RarityColor(gate.Rarity));
         }
 
-        buildText.text = builder.ToString();
+        UIKit.ForceRebuild(topLeft);
+    }
+
+    // "Gerbang Pembagi" -> "Pembagi". Kata "Gerbang" sudah jelas dari konteks chip build.
+    private static string ShortGateName(string displayName)
+    {
+        const string prefix = "Gerbang ";
+        return displayName != null && displayName.StartsWith(prefix) ? displayName.Substring(prefix.Length) : displayName;
     }
 
     protected override void Update()
@@ -313,11 +392,11 @@ public class HudPanel : UIScreen
 
         if (run != null)
         {
-            roundText.text = "RONDE " + Mathf.Max(1, run.CurrentRound) + " <size=70%><color=" + UIKit.MutedHex + ">/ " + run.TotalRounds + "</color></size>";
+            RefreshRoundTokens(run);
             timerText.text = UIKit.FormatTime(run.RunDuration);
         }
 
-        stateText.text = StateLabel(state, run);
+        RefreshStateTag(state, run);
 
         PlayerHealth health = ui.Health;
 
@@ -327,18 +406,169 @@ public class HudPanel : UIScreen
         bool inBattle = state == RunState.Battle;
         BattleManager battle = ui.Battle;
 
-        enemyRow.SetActive(inBattle && battle != null);
+        battleSection.SetActive(inBattle && battle != null);
 
         if (inBattle && battle != null)
-            enemyText.text = "Musuh tersisa  <b>" + battle.AliveCount + "</b> <color=" + UIKit.MutedHex + ">/ " + battle.TotalCount + "</color>";
+        {
+            enemyCountText.text = battle.AliveCount + "<size=65%><color=" + UIKit.MutedHex + "> / " + battle.TotalCount + "</color></size>";
+            RefreshEnemyTokens();
+        }
 
-        threatRow.SetActive(inBattle && ui.Threat != null);
+        threatLine.SetActive(inBattle && ui.Threat != null);
 
         if (inBattle && ui.Threat != null && Time.unscaledTime >= nextThreat)
         {
             nextThreat = Time.unscaledTime + threatInterval;
             RefreshLiveThreat();
         }
+
+        // Kartu info disembunyikan jika tidak ada isinya (mis. saat ronde bersih).
+        bool hasInfo = battleSection.activeSelf || previewHost.gameObject.activeSelf;
+
+        if (infoCard.activeSelf != hasInfo)
+            infoCard.SetActive(hasInfo);
+    }
+
+    // Token ronde: sudah lewat = slate, sekarang = krem besar dan miring, belum = sumur redup.
+    private void RefreshRoundTokens(RunManager run)
+    {
+        int total = Mathf.Max(1, run.TotalRounds);
+        int current = Mathf.Clamp(run.CurrentRound, 1, total);
+
+        if (current == shownRound && total == shownTotalRounds)
+            return;
+
+        shownRound = current;
+        shownTotalRounds = total;
+        UIKit.ClearChildren(roundTokens);
+
+        for (int i = 1; i <= total; i++)
+        {
+            bool now = i == current;
+            bool past = i < current;
+            Color fill = now ? UIKit.Cream : past ? UIKit.PanelLight : UIKit.Well;
+
+            Image token = UIKit.CreateToken("Round" + i, roundTokens, now ? 40f : 30f, fill, i.ToString(), out TextMeshProUGUI label);
+
+            if (now)
+                token.rectTransform.localRotation = Quaternion.Euler(0f, 0f, -6f);
+            else
+                label.color = past ? UIKit.Text : UIKit.TextMuted;
+        }
+    }
+
+    private void RefreshStateTag(RunState state, RunManager run)
+    {
+        string text;
+        Color fill;
+
+        switch (state)
+        {
+            case RunState.Preparing:
+                text = "Safezone";
+                fill = UIKit.Cream;
+                break;
+            case RunState.Battle:
+                text = run != null && run.CurrentArena != null ? run.CurrentArena.DisplayName : "Arena";
+                fill = UIKit.PanelLight;
+                break;
+            case RunState.RoundCleared:
+                text = "Ronde bersih";
+                fill = UIKit.Buff;
+                break;
+            case RunState.Victory:
+                text = "Menang";
+                fill = UIKit.Accent;
+                break;
+            case RunState.Defeat:
+                text = "Kalah";
+                fill = UIKit.TradeOff;
+                break;
+            default:
+                text = null;
+                fill = UIKit.Cream;
+                break;
+        }
+
+        bool show = !string.IsNullOrEmpty(text);
+
+        if (stateTag.gameObject.activeSelf != show)
+            stateTag.gameObject.SetActive(show);
+
+        if (!show || stateTagLabel.text == text)
+            return;
+
+        UIKit.SetStamp(stateTag, stateTagLabel, text, fill);
+
+        // Isi slate terlalu gelap untuk teks gelap, jadi labelnya terang.
+        if (fill == UIKit.PanelLight)
+            stateTagLabel.color = UIKit.Text;
+    }
+
+    // Satu token per musuh yang di-spawn ronde ini, warna role + huruf role. Dibangun ulang setiap kali
+    // daftar musuh berganti (bukan hanya jumlahnya, karena dua ronde bisa sama-sama berisi 2 musuh dengan
+    // role berbeda), lalu hanya warnanya yang diperbarui saat musuh mati.
+    private void RefreshEnemyTokens()
+    {
+        if (ui.Spawner == null)
+            return;
+
+        IReadOnlyList<EnemyHealth> spawned = ui.Spawner.Spawned;
+
+        if (!SameEnemies(spawned))
+        {
+            tokenEnemies.Clear();
+            UIKit.ClearChildren(enemyTokens);
+            enemyTokenImages.Clear();
+            enemyTokenLabels.Clear();
+            enemyTokenColors.Clear();
+
+            for (int i = 0; i < spawned.Count; i++)
+            {
+                tokenEnemies.Add(spawned[i]);
+                EnemyRole role = RoleOf(spawned[i]);
+                Color roleColor = RoleColors.Get(role);
+
+                Image token = UIKit.CreateToken("Enemy" + i, enemyTokens, 30f, roleColor, EnemyPreviewBoard.RoleBadgeLetter(role), out TextMeshProUGUI label);
+                enemyTokenImages.Add(token);
+                enemyTokenLabels.Add(label);
+                enemyTokenColors.Add(roleColor);
+            }
+        }
+
+        for (int i = 0; i < enemyTokenImages.Count && i < spawned.Count; i++)
+        {
+            bool dead = spawned[i] == null || spawned[i].IsDead;
+            enemyTokenImages[i].color = dead ? UIKit.Well : enemyTokenColors[i];
+            enemyTokenLabels[i].color = dead ? UIKit.TextMuted : UIKit.DarkOf(enemyTokenColors[i]);
+        }
+    }
+
+    private bool SameEnemies(IReadOnlyList<EnemyHealth> spawned)
+    {
+        if (spawned.Count != tokenEnemies.Count)
+            return false;
+
+        for (int i = 0; i < spawned.Count; i++)
+        {
+            if (spawned[i] != tokenEnemies[i])
+                return false;
+        }
+
+        return true;
+    }
+
+    // Role dari catatan spawner (sesuai entri wave). Role Data di controller hanya cadangan.
+    private EnemyRole RoleOf(EnemyHealth enemy)
+    {
+        if (enemy == null)
+            return EnemyRole.Charger;
+
+        if (ui.Spawner != null && ui.Spawner.TryGetRole(enemy, out EnemyRole role))
+            return role;
+
+        EnemyController controller = enemy.GetComponentInParent<EnemyController>();
+        return controller != null ? controller.Role : EnemyRole.Charger;
     }
 
     private void RefreshLiveThreat()
@@ -363,23 +593,8 @@ public class HudPanel : UIScreen
         }
 
         ThreatResult threat = ui.Threat.EvaluateLive(liveEnemies, ui.Stats.GetSnapshot());
-        threatDot.color = UIKit.ThreatColor(threat.level);
-        threatText.text = "Ancaman  <b><color=" + threat.ColorHex + ">" + threat.Label + "</color></b> <size=80%><color=" +
-                          UIKit.MutedHex + ">(" + UIKit.FormatRatio(threat.ratio) + ")</color></size>";
-    }
-
-    private static string StateLabel(RunState state, RunManager run)
-    {
-        switch (state)
-        {
-            case RunState.Preparing: return "Safezone - pilih gate untuk ronde ini";
-            case RunState.Battle:
-                return run != null && run.CurrentArena != null ? "Bertarung di " + run.CurrentArena.DisplayName : "Bertarung";
-            case RunState.RoundCleared: return "Ronde bersih! Kembali ke Safezone...";
-            case RunState.Victory: return "Menang!";
-            case RunState.Defeat: return "Kalah";
-            default: return string.Empty;
-        }
+        UIKit.SetStamp(threatStamp, threatStampLabel, threat.Label, UIKit.ThreatColor(threat.level));
+        threatRatioText.text = "rasio " + UIKit.FormatRatio(threat.ratio);
     }
 
     private void UpdateHpBar()
@@ -404,7 +619,7 @@ public class HudPanel : UIScreen
             : Vector2.zero;
         statusCard.anchoredPosition = HpPanelPosition + shake;
         statusCardImage.color = Color.Lerp(UIKit.Panel, new Color(0.45f, 0.08f, 0.08f, 0.95f), hitFlash * 0.8f);
-        hpFrame.color = Color.Lerp(new Color(0f, 0f, 0f, 0.45f), new Color(1f, 0.25f, 0.25f, 0.9f), hitFlash);
+        hpFrame.color = Color.Lerp(UIKit.Well, new Color(1f, 0.25f, 0.25f, 0.9f), hitFlash);
 
         // Ghost mengejar HP sebenarnya dengan pelan saat turun, langsung saat naik.
         ghostHp = ratio > ghostHp ? ratio : Mathf.MoveTowards(ghostHp, ratio, 0.5f * Time.unscaledDeltaTime);
@@ -475,7 +690,8 @@ public class HudPanel : UIScreen
 
         skillCountdown.text = ready ? string.Empty : auraBurst.CooldownRemaining.ToString("0.0");
 
-        // Saat baru siap: membesar sesaat.
+        // Saat baru siap: membesar sesaat. Selama siap ikon berputar pelan dan glow berdenyut, supaya
+        // status siap terasa hidup (dipilih pemilik project, lihat audit antislop #7).
         if (ready && !skillWasReady)
             skillPunch = 1f;
 

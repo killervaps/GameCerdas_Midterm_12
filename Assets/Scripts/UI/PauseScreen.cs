@@ -29,9 +29,12 @@ public class PauseScreen : UIScreen
         UIKit.Layout(left, -1f, 380f, 0f);
         UIKit.AddVertical(left.gameObject, 14f);
 
-        TextMeshProUGUI title = UIKit.CreateText("Title", left, "JEDA", 64f, UIKit.Text, TextAlignmentOptions.Left, true);
-        title.characterSpacing = 6f;
-        UIKit.Layout(title, 76f);
+        // Judul berupa stiker krem miring. Dibungkus baris horizontal supaya stiker tidak ikut melebar.
+        RectTransform titleRow = UIKit.CreateRect("TitleRow", left);
+        UIKit.AddHorizontal(titleRow.gameObject, 0f, new RectOffset(4, 0, 4, 8), TextAnchor.MiddleLeft);
+        Image title = UIKit.CreateStamp("Title", titleRow, 56f, -3f, out TextMeshProUGUI titleLabel);
+        UIKit.SetStamp(title, titleLabel, "Jeda", UIKit.Cream);
+        UIKit.SetShadowDistance(title, new Vector2(6f, -7f));
 
         info = UIKit.CreateText("Info", left, string.Empty, 22f, UIKit.TextMuted);
         UIKit.Layout(info, 40f);
@@ -47,18 +50,16 @@ public class PauseScreen : UIScreen
         firstSelected = resume;
 
         // Kanan: build saat ini.
-        Image card = UIKit.CreatePanel("BuildCard", panel.transform, UIKit.PanelLight, false);
+        Image card = UIKit.SetCorners(UIKit.CreatePanel("BuildCard", panel.transform, UIKit.Well, false), UIKit.InkMedium);
         UIKit.Layout(card, -1f, -1f, 1f);
         UIKit.AddVertical(card.gameObject, 10f, new RectOffset(28, 28, 24, 24));
 
-        TextMeshProUGUI heading = UIKit.CreateText("Heading", card.transform, "BUILD SAAT INI", 22f, UIKit.Accent, TextAlignmentOptions.Left, true);
-        heading.characterSpacing = 3f;
+        UIKit.UseDisplayFont(UIKit.CreateText("Heading", card.transform, "Build saat ini", 26f, UIKit.Text, TextAlignmentOptions.Left, true));
 
         statsText = UIKit.CreateText("Stats", card.transform, string.Empty, 24f, UIKit.Text);
         UIKit.CreateDivider(card.transform);
 
-        TextMeshProUGUI gatesHeading = UIKit.CreateText("GatesHeading", card.transform, "GATE DIPILIH", 22f, UIKit.Accent, TextAlignmentOptions.Left, true);
-        gatesHeading.characterSpacing = 3f;
+        UIKit.UseDisplayFont(UIKit.CreateText("GatesHeading", card.transform, "Gate dipilih", 26f, UIKit.Text, TextAlignmentOptions.Left, true));
 
         gatesText = UIKit.CreateText("Gates", card.transform, string.Empty, 22f, UIKit.Text);
 

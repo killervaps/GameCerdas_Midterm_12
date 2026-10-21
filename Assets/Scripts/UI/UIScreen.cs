@@ -18,6 +18,9 @@ public abstract class UIScreen : MonoBehaviour
 
     private bool interactive = true;
 
+    // Tombol terakhir yang dipilih di layar ini, untuk mengembalikan fokus setelah seleksi lepas.
+    private GameObject lastSelected;
+
     public bool IsVisible { get; private set; }
 
     public void Initialize(GameUI owner, bool interactiveScreen)
@@ -103,5 +106,63 @@ public abstract class UIScreen : MonoBehaviour
 
         if (!IsVisible && group.alpha <= 0f)
             gameObject.SetActive(false);
+
+        if (IsVisible)
+            KeepFocus();
+    }
+
+    // Klik di area kosong (backdrop) membuat EventSystem melepas seleksi, sehingga panah dan Enter
+    // berhenti bekerja. Hal yang sama terjadi jika seleksi tertinggal di tombol nonaktif atau di layar
+    // yang sedang menutup. Seleksi dikembalikan ke tombol terakhir, hanya oleh layar yang paling atas.
+    private void KeepFocus()
+    {
+        if (!interactive || EventSystem.current == null)
+            return;
+
+        GameObject current = EventSystem.current.currentSelectedGameObject;
+
+        if (IsSelectable(current))
+        {
+            if (current.transform.IsChildOf(transform))
+                lastSelected = current;
+
+            return;
+        }
+
+        if (IsCoveredByLaterScreen())
+            return;
+
+        GameObject target = IsSelectable(lastSelected)
+            ? lastSelected
+            : firstSelected != null ? firstSelected.gameObject : null;
+
+        if (target != null)
+            EventSystem.current.SetSelectedGameObject(target);
+    }
+
+    private static bool IsSelectable(GameObject candidate)
+    {
+        return candidate != null &&
+               candidate.activeInHierarchy &&
+               candidate.TryGetComponent(out Selectable selectable) &&
+               selectable.IsInteractable();
+    }
+
+    // Layar yang dibuat belakangan digambar di atas (mis. Tutorial di atas Jeda), jadi layar ini
+    // tidak boleh merebut fokus jika ada layar interaktif sesudahnya yang sedang tampil.
+    private bool IsCoveredByLaterScreen()
+    {
+        Transform parent = transform.parent;
+
+        if (parent == null)
+            return false;
+
+        for (int i = transform.GetSiblingIndex() + 1; i < parent.childCount; i++)
+        {
+            if (parent.GetChild(i).TryGetComponent(out UIScreen other) && other.IsVisible && other.interactive)
+                return true;
+        }
+
+        return false;
     }
 }

@@ -39,14 +39,19 @@ public class TutorialScreen : UIScreen
         Image panel = UIKit.CreatePanel("Panel", rect, UIKit.Panel);
         UIKit.Place(panel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(1120f, 680f));
 
-        TextMeshProUGUI header = UIKit.CreateText("Header", panel.transform, "CARA BERMAIN", 22f, UIKit.Accent, TextAlignmentOptions.Left, true);
-        header.characterSpacing = 4f;
-        UIKit.Place(header.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(56f, -40f), new Vector2(600f, 30f));
+        // Tab stiker krem yang menempel di tepi atas panel, miring sedikit.
+        Image header = UIKit.CreateFreeStamp("Header", panel.transform, "Cara bermain", 30f, UIKit.Cream, -3f, out _);
+        UIKit.SetShadowDistance(header, new Vector2(5f, -6f));
+        RectTransform headerRect = header.rectTransform;
+        headerRect.anchorMin = new Vector2(0f, 1f);
+        headerRect.anchorMax = new Vector2(0f, 1f);
+        headerRect.pivot = new Vector2(0f, 0.5f);
+        headerRect.anchoredPosition = new Vector2(44f, 2f);
 
-        counter = UIKit.CreateText("Counter", panel.transform, string.Empty, 22f, UIKit.TextMuted, TextAlignmentOptions.Right);
+        counter = UIKit.UseDisplayFont(UIKit.CreateText("Counter", panel.transform, string.Empty, 26f, UIKit.TextMuted, TextAlignmentOptions.Right, true));
         UIKit.Place(counter.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-56f, -40f), new Vector2(200f, 30f));
 
-        pageTitle = UIKit.CreateText("PageTitle", panel.transform, string.Empty, 46f, UIKit.Text, TextAlignmentOptions.Left, true);
+        pageTitle = UIKit.UseDisplayFont(UIKit.CreateText("PageTitle", panel.transform, string.Empty, 46f, UIKit.Text, TextAlignmentOptions.Left, true));
         UIKit.Place(pageTitle.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(56f, -80f), new Vector2(1008f, 64f));
 
         pageBody = UIKit.CreateText("PageBody", panel.transform, string.Empty, 27f, UIKit.Text, TextAlignmentOptions.TopLeft);
@@ -63,7 +68,7 @@ public class TutorialScreen : UIScreen
 
         // Bawah: titik halaman + tombol navigasi.
         dots = UIKit.CreateRect("Dots", panel.transform);
-        UIKit.Place(dots, new Vector2(0f, 0f), new Vector2(0f, 0.5f), new Vector2(56f, 70f), new Vector2(300f, 16f));
+        UIKit.Place(dots, new Vector2(0f, 0f), new Vector2(0f, 0.5f), new Vector2(56f, 70f), new Vector2(300f, 18f));
         UIKit.AddHorizontal(dots.gameObject, 10f);
 
         RectTransform nav = UIKit.CreateRect("Nav", panel.transform);
@@ -81,7 +86,26 @@ public class TutorialScreen : UIScreen
         UIKit.Layout(nextButton, 64f, 220f);
         nextLabel = nextButton.GetComponentInChildren<TextMeshProUGUI>();
 
+        // Panah dan A/D dipakai untuk membalik halaman (lihat Update), jadi tombol nav tidak boleh ikut
+        // memindah fokus ke kiri/kanan. Tanpa ini, panah kiri memindah fokus ke TUTUP dan Enter
+        // berikutnya menutup tutorial. Fokus tetap di BERIKUTNYA, mouse tetap bisa mengklik ketiganya.
+        LockNavigation(prevButton);
+        LockNavigation(close);
+        LockNavigation(nextButton);
+
         firstSelected = nextButton;
+
+        TextMeshProUGUI keys = UIKit.CreateText("KeyHint", panel.transform,
+            "<b>A / D</b> atau <b>panah kiri / kanan</b> untuk ganti halaman   |   <b>Esc</b> untuk menutup",
+            18f, UIKit.TextMuted);
+        keys.textWrappingMode = TextWrappingModes.NoWrap;
+        UIKit.Place(keys.rectTransform, new Vector2(0f, 0f), new Vector2(0f, 0.5f), new Vector2(56f, 22f), new Vector2(1008f, 26f));
+    }
+
+    private static void LockNavigation(Selectable selectable)
+    {
+        // Explicit tanpa tujuan: arah tidak memindah fokus, tetapi klik mouse tetap memilih tombol.
+        selectable.navigation = new Navigation { mode = Navigation.Mode.Explicit };
     }
 
     public void Open(int page)
@@ -133,7 +157,7 @@ public class TutorialScreen : UIScreen
             Image dot = dots.GetChild(i).GetComponent<Image>();
 
             if (dot != null)
-                dot.color = i == index ? UIKit.Accent : new Color(1f, 1f, 1f, 0.2f);
+                dot.color = i == index ? UIKit.Cream : UIKit.Well;
         }
     }
 
@@ -143,8 +167,8 @@ public class TutorialScreen : UIScreen
 
         for (int i = 0; i < pages.Length; i++)
         {
-            Image dot = UIKit.CreateImage("Dot", dots, Color.white);
-            UIKit.Layout(dot, 12f, 36f);
+            Image dot = UIKit.SetCorners(UIKit.CreateImage("Dot", dots, Color.white), UIKit.InkSmall);
+            UIKit.Layout(dot, 14f, 40f);
         }
     }
 
@@ -152,13 +176,32 @@ public class TutorialScreen : UIScreen
     {
         base.Update();
 
-        if (!IsVisible || Keyboard.current == null)
+        if (!IsVisible)
             return;
 
-        if (Keyboard.current.rightArrowKey.wasPressedThisFrame || Keyboard.current.dKey.wasPressedThisFrame)
+        if (NextPressed())
             Next();
-        else if (Keyboard.current.leftArrowKey.wasPressedThisFrame || Keyboard.current.aKey.wasPressedThisFrame)
+        else if (PreviousPressed())
             Previous();
+    }
+
+    // Gamepad ikut didukung karena tombol nav tidak lagi bisa dicapai lewat d-pad kiri/kanan.
+    private static bool NextPressed()
+    {
+        Keyboard keyboard = Keyboard.current;
+        Gamepad gamepad = Gamepad.current;
+
+        return (keyboard != null && (keyboard.rightArrowKey.wasPressedThisFrame || keyboard.dKey.wasPressedThisFrame)) ||
+               (gamepad != null && (gamepad.dpad.right.wasPressedThisFrame || gamepad.rightShoulder.wasPressedThisFrame));
+    }
+
+    private static bool PreviousPressed()
+    {
+        Keyboard keyboard = Keyboard.current;
+        Gamepad gamepad = Gamepad.current;
+
+        return (keyboard != null && (keyboard.leftArrowKey.wasPressedThisFrame || keyboard.aKey.wasPressedThisFrame)) ||
+               (gamepad != null && (gamepad.dpad.left.wasPressedThisFrame || gamepad.leftShoulder.wasPressedThisFrame));
     }
 
     private Page[] BuildPages()
@@ -175,9 +218,9 @@ public class TutorialScreen : UIScreen
         {
             new Page("Tujuan",
                 "Bertahan melewati <b>" + rounds + " ronde</b>. Setiap ronde punya alur yang sama:\n" +
-                "<color=" + UIKit.AccentHex + ">1.</color> Di <b>Safezone</b>, pilih satu dari tiga gate.\n" +
-                "<color=" + UIKit.AccentHex + ">2.</color> Kamu diteleport ke arena dan musuh muncul.\n" +
-                "<color=" + UIKit.AccentHex + ">3.</color> Kalahkan semua musuh, HP pulih sebagian, lalu kembali ke Safezone.\n\n" +
+                "<b>1.</b> Di <b>Safezone</b>, pilih satu dari tiga gate.\n" +
+                "<b>2.</b> Kamu diteleport ke arena dan musuh muncul.\n" +
+                "<b>3.</b> Kalahkan semua musuh, HP pulih sebagian, lalu kembali ke Safezone.\n\n" +
                 "Efek gate <b>menumpuk</b> sepanjang run. Jika HP habis, run berakhir."),
 
             new Page("Kontrol",

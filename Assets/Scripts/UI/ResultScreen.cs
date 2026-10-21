@@ -34,7 +34,8 @@ public class ResultScreen : UIScreen
         UIKit.AddVertical(panel.gameObject, 14f, new RectOffset(48, 48, 40, 40));
         UIKit.FitHeight(panel.gameObject);
 
-        title = UIKit.CreateText("Title", panel.transform, string.Empty, 84f, UIKit.Text, TextAlignmentOptions.Center, true);
+        // Judul MENANG/KALAH adalah momen kunci: tetap kapital dengan spacing, dan emas saat menang.
+        title = UIKit.UseDisplayFont(UIKit.CreateText("Title", panel.transform, string.Empty, 84f, UIKit.Text, TextAlignmentOptions.Center, true));
         title.characterSpacing = 8f;
 
         subtitle = UIKit.CreateText("Subtitle", panel.transform, string.Empty, 26f, UIKit.TextMuted, TextAlignmentOptions.Center);
@@ -45,9 +46,9 @@ public class ResultScreen : UIScreen
         statsLayout.childForceExpandWidth = true;
         UIKit.Layout(stats, 96f);
 
-        timeValue = SummaryTile(stats, "WAKTU");
-        roundValue = SummaryTile(stats, "RONDE");
-        gateValue = SummaryTile(stats, "GATE");
+        timeValue = SummaryTile(stats, "Waktu");
+        roundValue = SummaryTile(stats, "Ronde");
+        gateValue = SummaryTile(stats, "Gate");
 
         // Detail build.
         RectTransform detail = UIKit.CreateRect("Detail", panel.transform);
@@ -57,13 +58,13 @@ public class ResultScreen : UIScreen
         RectTransform statsColumn = UIKit.CreateRect("Stats", detail);
         UIKit.AddVertical(statsColumn.gameObject, 6f);
         UIKit.Layout(statsColumn, -1f, -1f, 1f);
-        Heading(statsColumn, "STAT AKHIR");
+        Heading(statsColumn, "Stat akhir");
         statsText = UIKit.CreateText("Text", statsColumn, string.Empty, 22f, UIKit.Text);
 
         RectTransform gatesColumn = UIKit.CreateRect("Gates", detail);
         UIKit.AddVertical(gatesColumn.gameObject, 6f);
         UIKit.Layout(gatesColumn, -1f, -1f, 1f);
-        Heading(gatesColumn, "GATE DIPILIH");
+        Heading(gatesColumn, "Gate dipilih");
         gatesText = UIKit.CreateText("Text", gatesColumn, string.Empty, 22f, UIKit.Text);
 
         // Tombol.
@@ -83,20 +84,18 @@ public class ResultScreen : UIScreen
 
     private static void Heading(Transform parent, string text)
     {
-        TextMeshProUGUI label = UIKit.CreateText("Heading", parent, text, 18f, UIKit.Accent, TextAlignmentOptions.Left, true);
-        label.characterSpacing = 3f;
+        UIKit.CreateText("Heading", parent, text, 20f, UIKit.TextMuted, TextAlignmentOptions.Left, true);
     }
 
     private static TextMeshProUGUI SummaryTile(Transform parent, string caption)
     {
-        Image tile = UIKit.CreateImage("Tile_" + caption, parent, UIKit.PanelLight);
+        Image tile = UIKit.SetCorners(UIKit.CreateImage("Tile_" + caption, parent, UIKit.Well), UIKit.InkMedium);
         UIKit.Layout(tile, 96f, -1f, 1f);
 
-        TextMeshProUGUI value = UIKit.CreateText("Value", tile.transform, "-", 38f, UIKit.Text, TextAlignmentOptions.Center, true);
+        TextMeshProUGUI value = UIKit.UseDisplayFont(UIKit.CreateText("Value", tile.transform, "-", 38f, UIKit.Text, TextAlignmentOptions.Center, true));
         UIKit.Stretch(value.rectTransform, 8f, 8f, 10f, 34f);
 
-        TextMeshProUGUI label = UIKit.CreateText("Caption", tile.transform, caption, 16f, UIKit.TextMuted, TextAlignmentOptions.Center, true);
-        label.characterSpacing = 3f;
+        TextMeshProUGUI label = UIKit.CreateText("Caption", tile.transform, caption, 18f, UIKit.TextMuted, TextAlignmentOptions.Center, true);
         UIKit.Stretch(label.rectTransform, 8f, 8f, 60f, 10f);
 
         return value;

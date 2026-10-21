@@ -304,7 +304,7 @@ public class DamageFeedback : UIScreen
 
     private Popup CreatePopup()
     {
-        TextMeshProUGUI text = UIKit.CreateText("DamagePopup", popupLayer, string.Empty, enemyFontSize, Color.white, TextAlignmentOptions.Center, true);
+        TextMeshProUGUI text = UIKit.UseDisplayFont(UIKit.CreateText("DamagePopup", popupLayer, string.Empty, enemyFontSize, Color.white, TextAlignmentOptions.Center, true));
         text.textWrappingMode = TextWrappingModes.NoWrap;
         text.outlineWidth = 0.22f;
         text.outlineColor = new Color32(20, 10, 10, 255);
@@ -342,11 +342,11 @@ public class DamageFeedback : UIScreen
         RectTransform root = UIKit.CreateRect("HitIndicator", indicatorLayer);
         UIKit.Place(root, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(80f, 40f));
 
-        Image left = UIKit.CreateImage("Left", root, PlayerHitColor);
+        Image left = UIKit.SetCorners(UIKit.CreateImage("Left", root, PlayerHitColor), UIKit.RoundedSmall);
         UIKit.Place(left.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(1f, 0.5f), new Vector2(3f, 0f), new Vector2(46f, 12f));
         left.rectTransform.localRotation = Quaternion.Euler(0f, 0f, 30f);
 
-        Image right = UIKit.CreateImage("Right", root, PlayerHitColor);
+        Image right = UIKit.SetCorners(UIKit.CreateImage("Right", root, PlayerHitColor), UIKit.RoundedSmall);
         UIKit.Place(right.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0f, 0.5f), new Vector2(-3f, 0f), new Vector2(46f, 12f));
         right.rectTransform.localRotation = Quaternion.Euler(0f, 0f, -30f);
 

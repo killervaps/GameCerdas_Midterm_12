@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 // Pengumuman besar di tengah layar saat ronde selesai ("RONDE BERSIH!" / "KEMENANGAN!").
 // Urutan animasi: layar meredup, sinar cahaya berputar di belakang, pita gelap terbuka,
-// garis emas memanjang, judul jatuh membesar lalu memantul, subjudul muncul, lalu semuanya memudar.
+// garis emas memanjang, judul jatuh membesar lalu memantul, subjudul muncul, bintang berputar di
+// kiri-kanan judul, lalu semuanya memudar.
 // Selama tampil, GameUI menyembunyikan overlay lain (HUD, health bar, angka damage, tips).
 public class RoundAnnouncement : UIScreen
 {
@@ -66,16 +67,18 @@ public class RoundAnnouncement : UIScreen
         lineBottom = lineBottomImage.rectTransform;
         UIKit.Place(lineBottom, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -130f), new Vector2(0f, 4f));
 
-        kicker = UIKit.CreateText("Kicker", rect, string.Empty, 28f, Color.white, TextAlignmentOptions.Center, true);
+        // Pengumuman ronde adalah umpan balik yang disengaja di momen kunci, jadi kicker dan judul
+        // tetap kapital dengan spacing dan memakai font display.
+        kicker = UIKit.UseDisplayFont(UIKit.CreateText("Kicker", rect, string.Empty, 28f, Color.white, TextAlignmentOptions.Center, true));
         kicker.characterSpacing = 18f;
         kicker.textWrappingMode = TextWrappingModes.NoWrap;
         UIKit.Place(kicker.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 128f), new Vector2(1400f, 40f));
 
-        title = UIKit.CreateText("Title", rect, string.Empty, 132f, Color.white, TextAlignmentOptions.Center, true);
+        title = UIKit.UseDisplayFont(UIKit.CreateText("Title", rect, string.Empty, 132f, Color.white, TextAlignmentOptions.Center, true));
         title.characterSpacing = 8f;
         title.textWrappingMode = TextWrappingModes.NoWrap;
-        title.outlineWidth = 0.18f;
-        title.outlineColor = new Color32(40, 22, 0, 255);
+        title.outlineWidth = 0.24f;
+        title.outlineColor = UIKit.Ink;
         title.enableVertexGradient = true;
         UIKit.Place(title.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 30f), new Vector2(1600f, 170f));
 
@@ -83,6 +86,7 @@ public class RoundAnnouncement : UIScreen
         subtitle.textWrappingMode = TextWrappingModes.NoWrap;
         UIKit.Place(subtitle.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -88f), new Vector2(1400f, 40f));
 
+        // Bintang kiri-kanan judul (dipilih pemilik project sebagai tanda perayaan ronde bersih dan menang).
         leftStarImage = UIKit.CreateImage("StarLeft", rect, Color.clear, false);
         leftStarImage.sprite = UIKit.Burst;
         leftStar = leftStarImage.rectTransform;
