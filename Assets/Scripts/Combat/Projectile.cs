@@ -17,6 +17,21 @@ public class Projectile : MonoBehaviour
     [SerializeField] private bool useLayerCollisionMatrix = true;
     [SerializeField] private LayerMask hitMask = ~0;
 
+    [Header("Launch VFX (opsional)")]
+    // Efek di titik keluar saat proyektil dilepas (muzzle flash), menghadap arah tembakan.
+    [SerializeField] private GameObject launchEffect;
+    [SerializeField] private float launchEffectScale = 1f;
+
+    [Header("Impact VFX (opsional)")]
+    // Efek saat mengenai karakter (IDamageable), mis. CFXR Hit A dari JMO Assets.
+    [SerializeField] private GameObject characterImpactEffect;
+    // Efek saat menabrak dinding, obstacle, atau lantai.
+    [SerializeField] private GameObject wallImpactEffect;
+    // Pengali ukuran efek. Arena yang diperkecil biasanya butuh nilai di bawah 1.
+    [SerializeField] private float impactEffectScale = 1f;
+    // Efek wall impact digeser sedikit keluar dari permukaan supaya tidak terbenam di dinding.
+    [SerializeField] private float surfaceOffset = 0.02f;
+
     [Header("Debug")]
     [SerializeField] private bool drawGizmos = true;
 
@@ -70,6 +85,9 @@ public class Projectile : MonoBehaviour
 
         if (trail != null)
             trail.Clear();
+
+        if (launchEffect != null)
+            EffectPool.Spawn(launchEffect, position, Quaternion.LookRotation(direction), launchEffectScale);
     }
 
     private void Update()
@@ -132,11 +150,32 @@ public class Projectile : MonoBehaviour
     private void Hit(RaycastHit hit)
     {
         IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
+        bool hitCharacter = damageable != null && !damageable.IsDead;
 
-        if (damageable != null && !damageable.IsDead)
+        if (hitCharacter)
             damageable.TakeDamage(new DamageInfo(damage, source, hit.point, kind));
 
+        SpawnImpact(hit, hitCharacter);
+
         Despawn();
+    }
+
+    private void SpawnImpact(RaycastHit hit, bool hitCharacter)
+    {
+        GameObject prefab = hitCharacter ? characterImpactEffect : wallImpactEffect;
+
+        if (prefab == null)
+            return;
+
+        // Normal permukaan menghadap balik ke arah datang proyektil. Jika tidak valid, pakai arah balik terbang.
+        Vector3 normal = hit.normal.sqrMagnitude > 0.0001f ? hit.normal : -direction;
+
+        EffectPool.Spawn(
+            prefab,
+            hit.point + normal * surfaceOffset,
+            Quaternion.LookRotation(normal),
+            impactEffectScale
+        );
     }
 
     private void Despawn()

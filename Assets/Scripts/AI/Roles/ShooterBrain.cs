@@ -73,6 +73,9 @@ public class ShooterBrain : EnemyBrain
     private Candidate[] candidates;
     private int obstacleMask;
     private float nextShotTime;
+    // Tembakan yang animasinya sudah mulai tapi peluru belum keluar.
+    private bool shotPending;
+    private float shotReleaseTime;
 
     // Konteks yang dihitung ulang setiap tick, dipakai skor dan debug.
     private float idealDistance;
@@ -165,7 +168,25 @@ public class ShooterBrain : EnemyBrain
     {
         search.Cancel();
         jumpCommitted = false;
+        shotPending = false;
         base.OnDied();
+    }
+
+    // Peluru dilepas per frame supaya tepat waktu, walau brain hanya tick 0,1-0,2 s.
+    private void Update()
+    {
+        if (!shotPending || Time.time < shotReleaseTime)
+            return;
+
+        shotPending = false;
+
+        PlayerHealth player = Blackboard != null ? Blackboard.Player : null;
+
+        if (Controller.Health.IsDead || player == null || player.IsDead)
+            return;
+
+        // Dibidik ke posisi MC saat peluru keluar. MC yang bergerak selama animasi masih bisa menghindar.
+        Fire(player);
     }
 
     private void OnDestroy()
@@ -657,13 +678,13 @@ public class ShooterBrain : EnemyBrain
             return;
         }
 
-        if (Time.time < nextShotTime)
+        if (shotPending || Time.time < nextShotTime)
             return;
 
         if (!Controller.RequestAttackToken())
             return;
 
-        Fire(Blackboard.Player);
+        StartShot();
         nextShotTime = Time.time + Data.AttackCooldown;
     }
 
@@ -696,6 +717,21 @@ public class ShooterBrain : EnemyBrain
             DamageKind.Projectile,
             standingOn != null ? standingOn.transform : null
         );
+    }
+
+    // Animasi tembak dimulai sekarang, peluru menyusul setelah Shot Release Delay.
+    private void StartShot()
+    {
+        NotifyAttack();
+
+        if (Data.ShotReleaseDelay <= 0f)
+        {
+            Fire(Blackboard.Player);
+            return;
+        }
+
+        shotPending = true;
+        shotReleaseTime = Time.time + Data.ShotReleaseDelay;
     }
 
     private StringBuilder AppendScore(string label, UtilityAction action)

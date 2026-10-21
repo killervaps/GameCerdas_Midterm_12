@@ -183,6 +183,9 @@ public class RunManager : MonoBehaviour
         battle.EndBattle();
         spawner.ClearWave();
 
+        // MC yang kalah lalu kembali ke menu tidak boleh tetap dalam pose mati di Safezone.
+        playerHealth.RestoreFull();
+
         Log("run dihentikan");
 
         SetState(RunState.Idle);

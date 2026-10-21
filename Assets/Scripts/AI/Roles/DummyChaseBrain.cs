@@ -90,6 +90,7 @@ public class DummyChaseBrain : EnemyBrain
             if (enableMeleeAttack && Time.time >= nextAttackTime)
             {
                 player.TakeDamage(new DamageInfo(Data.Damage, gameObject, player.AimPoint, DamageKind.Melee));
+                NotifyAttack();
                 nextAttackTime = Time.time + Data.AttackCooldown;
             }
 

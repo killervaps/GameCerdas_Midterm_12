@@ -27,6 +27,9 @@ public class GuardianBrain : EnemyBrain
     private bool enraged;
     private bool engaging;
     private float nextAttackTime;
+    // Ayunan yang sudah dimulai tapi belum mendarat. Damage diberikan saat swingHitTime, bukan saat animasi dimulai.
+    private bool swingPending;
+    private float swingHitTime;
     private Vector3 interposePoint;
     private bool hasInterposePoint;
 
@@ -39,10 +42,16 @@ public class GuardianBrain : EnemyBrain
 
     public bool IsEnraged => enraged;
 
+    public bool IsSwinging => swingPending;
+
     public override string DebugDetail
     {
         get
         {
+            if (swingPending)
+                return "<color=#ffaa33>ayun " + Mathf.Max(0f, swingHitTime - Time.time).ToString("0.00") + "s</color>" +
+                       (enraged ? " <color=#ff5555>MARAH</color>" : string.Empty);
+
             if (enraged)
                 return "<color=#ff5555>MARAH</color>";
 
@@ -145,6 +154,19 @@ public class GuardianBrain : EnemyBrain
     {
         if (staticAnchor != null)
             Destroy(staticAnchor.gameObject);
+    }
+
+    public override void OnDied()
+    {
+        swingPending = false;
+        base.OnDied();
+    }
+
+    // Pukulan diselesaikan per frame supaya tepat waktu, walau brain hanya tick 0,1-0,2 s.
+    private void Update()
+    {
+        if (swingPending && Time.time >= swingHitTime)
+            ResolveSwing();
     }
 
     // ---------- Kondisi ----------
@@ -335,22 +357,68 @@ public class GuardianBrain : EnemyBrain
         if (player == null)
             return;
 
+        // Selama ayunan, Guardian berdiri dan tetap menghadap MC sampai pukulan mendarat.
+        if (swingPending)
+        {
+            Motor.Stop();
+            Motor.FacePosition(player.transform.position);
+            return;
+        }
+
         if (Blackboard.DistanceToPlayer <= Data.AttackRange)
         {
             Motor.Stop();
             Motor.FacePosition(player.transform.position);
 
             if (Time.time >= nextAttackTime && Controller.HasAttackToken)
-            {
-                player.TakeDamage(new DamageInfo(Data.Damage, gameObject, player.AimPoint, DamageKind.Melee));
-                nextAttackTime = Time.time + Data.AttackCooldown;
-            }
+                StartSwing();
 
             return;
         }
 
         Motor.ClearFacing();
         Motor.MoveTo(player.transform.position, speedMultiplier, Data.AttackRange * 0.8f);
+    }
+
+    // Animasi dimulai sekarang, damage menyusul setelah Melee Hit Delay. MC punya kesempatan menghindar.
+    private void StartSwing()
+    {
+        NotifyAttack();
+
+        swingPending = true;
+        swingHitTime = Time.time + Data.MeleeHitDelay;
+        nextAttackTime = Time.time + Data.AttackCooldown;
+
+        if (Data.MeleeHitDelay <= 0f)
+            ResolveSwing();
+    }
+
+    private void ResolveSwing()
+    {
+        swingPending = false;
+
+        if (Controller.Health.IsDead)
+            return;
+
+        PlayerHealth player = Blackboard.Player;
+
+        if (player == null || player.IsDead)
+            return;
+
+        Vector3 toPlayer = player.transform.position - transform.position;
+        toPlayer.y = 0f;
+
+        bool inRange = toPlayer.magnitude <= Data.AttackRange * Data.MeleeHitRangeMultiplier;
+        bool inFront = Data.MeleeHitAngle >= 360f || Vector3.Angle(transform.forward, toPlayer) <= Data.MeleeHitAngle * 0.5f;
+
+        if (inRange && inFront)
+        {
+            player.TakeDamage(new DamageInfo(Data.Damage, gameObject, player.AimPoint, DamageKind.Melee));
+        }
+        else if (Controller.LogStateChanges)
+        {
+            Debug.Log(name + ": pukulan meleset (" + (inRange ? "di luar sudut" : "di luar jangkauan") + ")", this);
+        }
     }
 
     public Vector3 AnchorPosition => anchor != null ? anchor.position : transform.position;

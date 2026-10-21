@@ -73,6 +73,8 @@ public class EnemyRoleData : ScriptableObject
     [SerializeField] private float guardianBonusRadius = 3f;
     [SerializeField] private float utilityDecisionInterval = 0.25f;
     [SerializeField] private float utilityInertia = 0.1f;
+    // Jeda dari awal animasi tembak sampai peluru keluar. Samakan dengan momen tangan melepas di animasi.
+    [SerializeField] private float shotReleaseDelay = 0.3f;
 
     [Header("Guardian (anchor)")]
     // MC masuk radius ini (diukur dari anchor), Guardian bereaksi.
@@ -86,6 +88,12 @@ public class EnemyRoleData : ScriptableObject
     [SerializeField] private float enrageSpeedMultiplier = 1.4f;
     // Diserang MC di luar aggro radius tetapi masih dalam leash, Guardian boleh mengejar selama sekian detik.
     [SerializeField] private float damageAggroDuration = 3f;
+    // Jeda dari awal ayunan sampai pukulan mendarat. Samakan dengan momen tinju menyentuh di animasi Melee Attack.
+    [SerializeField] private float meleeHitDelay = 0.4f;
+    // Saat pukulan mendarat, MC masih kena jika jaraknya <= Attack Range × nilai ini. Di luar itu pukulan meleset.
+    [SerializeField] private float meleeHitRangeMultiplier = 1.2f;
+    // Sudut di depan Guardian yang masih terkena pukulan. MC yang berputar ke belakang lolos.
+    [SerializeField, Range(30f, 360f)] private float meleeHitAngle = 120f;
 
     public EnemyRole Role => role;
     public string DisplayName => string.IsNullOrEmpty(displayName) ? role.ToString() : displayName;
@@ -130,6 +138,7 @@ public class EnemyRoleData : ScriptableObject
     public float GuardianBonusRadius => guardianBonusRadius;
     public float UtilityDecisionInterval => utilityDecisionInterval;
     public float UtilityInertia => utilityInertia;
+    public float ShotReleaseDelay => Mathf.Max(0f, shotReleaseDelay);
 
     public float AggroRadius => aggroRadius;
     public float LeashRadius => leashRadius;
@@ -137,6 +146,9 @@ public class EnemyRoleData : ScriptableObject
     public float GuardDistance => guardDistance;
     public float EnrageSpeedMultiplier => enrageSpeedMultiplier;
     public float DamageAggroDuration => damageAggroDuration;
+    public float MeleeHitDelay => Mathf.Max(0f, meleeHitDelay);
+    public float MeleeHitRangeMultiplier => Mathf.Max(1f, meleeHitRangeMultiplier);
+    public float MeleeHitAngle => meleeHitAngle;
 
     // Dipakai threat estimation: DPS = damage / cooldown.
     public float DPS => damage / Mathf.Max(0.01f, attackCooldown);

@@ -29,6 +29,11 @@ public class AuraCaster : MonoBehaviour
     // Pengali MoveSpeed selama menembak di mode Hold. 1 berarti tanpa penalti.
     [SerializeField, Range(0.1f, 1f)] private float moveSpeedWhileFiring = 0.6f;
 
+    [Header("Cast Timing")]
+    // Jeda dari awal animasi cast sampai Bola Aura keluar. Samakan dengan momen tangan melepas di animasi Cast.
+    // Harus lebih pendek dari 1 / AttackRate supaya cast berikutnya tidak tertahan.
+    [SerializeField] private float releaseDelay = 0.25f;
+
     [Header("Muzzle")]
     [SerializeField] private Vector3 muzzleOffset = new Vector3(0f, 1f, 0.6f);
 
@@ -53,7 +58,17 @@ public class AuraCaster : MonoBehaviour
     // True selama MC sedang dalam kondisi menembak (mode Auto: ada target; mode Hold: tombol ditahan dan ada target).
     public bool IsFiring { get; private set; }
 
+    // Animasi cast dimulai. Bola Aura menyusul setelah Release Delay.
+    public event Action<EnemyHealth> CastStarted;
+
+    // Bola Aura benar-benar keluar.
     public event Action<EnemyHealth> Fired;
+
+    public bool IsCasting => castPending;
+
+    private bool castPending;
+    private float castReleaseTime;
+    private EnemyHealth castTarget;
 
     private void Awake()
     {
@@ -93,9 +108,13 @@ public class AuraCaster : MonoBehaviour
     {
         if (health != null && health.IsDead)
         {
+            castPending = false;
             SetFiring(false);
             return;
         }
+
+        if (castPending && Time.time >= castReleaseTime)
+            ReleaseCast();
 
         float interval = Interval;
 
@@ -111,11 +130,41 @@ public class AuraCaster : MonoBehaviour
         // Penalti hanya berlaku saat benar-benar ada yang ditembak, menahan tombol tanpa target tidak memperlambat.
         SetFiring(wantsToFire && hasTarget);
 
-        if (!IsFiring || timer < interval)
+        if (!IsFiring || timer < interval || castPending)
             return;
 
-        Fire(target);
+        StartCast(target);
         timer = 0f;
+    }
+
+    private void StartCast(EnemyHealth target)
+    {
+        castTarget = target;
+        CastStarted?.Invoke(target);
+
+        if (releaseDelay <= 0f)
+        {
+            ReleaseCast();
+            return;
+        }
+
+        castPending = true;
+        castReleaseTime = Time.time + releaseDelay;
+    }
+
+    // Saat dilepas, target lama dipakai jika masih hidup. Jika sudah mati, pakai target saat ini, atau batal.
+    private void ReleaseCast()
+    {
+        castPending = false;
+
+        EnemyHealth target = castTarget != null && !castTarget.IsDead && castTarget.isActiveAndEnabled
+            ? castTarget
+            : targetSelector != null ? targetSelector.CurrentTarget : null;
+
+        castTarget = null;
+
+        if (target != null && !target.IsDead)
+            Fire(target);
     }
 
     private void SetFiring(bool firing)

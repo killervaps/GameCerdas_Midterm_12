@@ -21,10 +21,18 @@ public class AuraBurst : MonoBehaviour
     [Header("Input")]
     [SerializeField] private string actionName = "Player/AuraBurst";
 
+    [Header("Timing")]
+    // Jeda dari awal animasi Burst sampai damage mendarat. Samakan dengan momen ledakan di animasi.
+    // Cooldown mulai saat tombol ditekan, bukan saat ledakan.
+    [SerializeField] private float releaseDelay = 0.4f;
+
     [Header("Visual (opsional)")]
-    // Mis. efek dari Cartoon FX. Dibuat di posisi MC lalu dihancurkan setelah Visual Lifetime.
+    // Muncul saat tombol ditekan, mis. aura berkumpul di sekitar MC.
+    [SerializeField] private GameObject chargeEffectPrefab;
+    // Muncul saat damage mendarat, mis. ledakan dari Cartoon FX.
     [SerializeField] private GameObject burstEffectPrefab;
-    [SerializeField] private float visualLifetime = 2f;
+    // Pengali ukuran kedua efek. Arena yang diperkecil biasanya butuh nilai di bawah 1.
+    [SerializeField] private float effectScale = 1f;
 
     [Header("Debug")]
     [SerializeField] private bool drawGizmos = true;
@@ -37,6 +45,8 @@ public class AuraBurst : MonoBehaviour
     private InputAction burstAction;
     private int enemyMask;
     private float lastBurstTime = float.NegativeInfinity;
+    private bool releasePending;
+    private float releaseTime;
 
     public float CooldownRemaining { get; private set; }
 
@@ -53,6 +63,11 @@ public class AuraBurst : MonoBehaviour
 
     // Jumlah musuh yang terkena.
     public event Action<int> Burst;
+
+    // Animasi Burst dimulai. Damage menyusul setelah Release Delay.
+    public event Action BurstStarted;
+
+    public bool IsCharging => releasePending;
 
     private void Awake()
     {
@@ -83,14 +98,43 @@ public class AuraBurst : MonoBehaviour
             CooldownRemaining = Mathf.Max(0f, CooldownRemaining - Time.deltaTime);
 
         if (health != null && health.IsDead)
+        {
+            releasePending = false;
             return;
+        }
 
-        if (burstAction != null && burstAction.WasPressedThisFrame() && IsReady)
+        if (releasePending && Time.time >= releaseTime)
+            Release();
+
+        if (burstAction != null && burstAction.WasPressedThisFrame() && IsReady && !releasePending)
             Activate();
     }
 
+    // Memulai Burst: animasi dan efek charge sekarang, damage setelah Release Delay.
     public void Activate()
     {
+        CooldownRemaining = cooldown;
+
+        BurstStarted?.Invoke();
+
+        if (chargeEffectPrefab != null)
+            EffectPool.Spawn(chargeEffectPrefab, transform.position, Quaternion.identity, effectScale);
+
+        if (releaseDelay <= 0f)
+        {
+            Release();
+            return;
+        }
+
+        releasePending = true;
+        releaseTime = Time.time + releaseDelay;
+    }
+
+    // Damage area dihitung dari posisi MC saat ledakan, jadi MC boleh bergerak selama charge.
+    private void Release()
+    {
+        releasePending = false;
+
         Vector3 center = transform.position;
         float damage = Damage;
 
@@ -117,14 +161,10 @@ public class AuraBurst : MonoBehaviour
             target.TakeDamage(new DamageInfo(damage, gameObject, target.AimPoint, DamageKind.Burst));
         }
 
-        CooldownRemaining = cooldown;
         lastBurstTime = Time.time;
 
         if (burstEffectPrefab != null)
-        {
-            GameObject effect = Instantiate(burstEffectPrefab, center, Quaternion.identity);
-            Destroy(effect, visualLifetime);
-        }
+            EffectPool.Spawn(burstEffectPrefab, center, Quaternion.identity, effectScale);
 
         if (logBurst)
             Debug.Log("AuraBurst: kena " + damagedThisBurst.Count + " musuh, damage " + damage.ToString("0.#"), this);

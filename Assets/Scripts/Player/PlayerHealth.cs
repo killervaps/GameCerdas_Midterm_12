@@ -30,6 +30,9 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
     public event Action Died;
 
+    // Dikirim saat MC yang sudah mati dihidupkan lagi (run baru atau kembali ke menu). Dipakai untuk reset animasi.
+    public event Action Revived;
+
     // Damage akhir setelah Defense beserta paket aslinya.
     public event Action<float, DamageInfo> Damaged;
 
@@ -120,7 +123,12 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     // Untuk awal run baru atau heal penuh antar ronde. Juga menghidupkan kembali MC yang sudah mati.
     public void RestoreFull()
     {
+        bool wasDead = IsDead;
+
         CurrentHealth = MaxHealth;
+
+        if (wasDead)
+            Revived?.Invoke();
     }
 
     // Uji sementara selama musuh belum bisa menyerang. Klik titik tiga di komponen saat Play.

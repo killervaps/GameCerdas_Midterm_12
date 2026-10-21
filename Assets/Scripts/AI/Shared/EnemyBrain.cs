@@ -29,6 +29,14 @@ public abstract class EnemyBrain : MonoBehaviour, IEnemyBrain
     // Baris tambahan untuk label debug, mis. skor utility atau sisa cooldown.
     public virtual string DebugDetail => string.Empty;
 
+    // Dikirim setiap kali brain melakukan serangan sekali jalan (pukulan, tembakan). Dipakai animasi dan nanti SFX/VFX.
+    public event System.Action AttackPerformed;
+
+    protected void NotifyAttack()
+    {
+        AttackPerformed?.Invoke();
+    }
+
     public virtual void Initialize(EnemyController controller)
     {
         Controller = controller;
