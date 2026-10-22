@@ -101,6 +101,13 @@ public class EnemyMotor : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
     }
 
+    // Saat Start agent sudah menempel ke NavMesh, cost area lompat aman diatur.
+    private void Start()
+    {
+        if (canJump && IsReady)
+            agent.SetAreaCost(jumpArea, jumpAreaCost);
+    }
+
     public void Configure(EnemyRoleData data)
     {
         // Bisa dipanggil EnemyController sebelum Awake motor berjalan.
@@ -130,7 +137,11 @@ public class EnemyMotor : MonoBehaviour
             canJump = true;
             // Lompatan digerakkan sendiri (lintasan melengkung), bukan meluncur bawaan agent.
             agent.autoTraverseOffMeshLink = false;
-            agent.SetAreaCost(jumpArea, jumpAreaCost);
+
+            // SetAreaCost hanya boleh saat agent aktif dan sudah di NavMesh. Configure dipanggil dari Awake,
+            // saat agent belum menempel, jadi cost diatur di Start atau langsung oleh MoveTo sebelum mencari path.
+            if (IsReady)
+                agent.SetAreaCost(jumpArea, jumpAreaCost);
         }
         else
         {
