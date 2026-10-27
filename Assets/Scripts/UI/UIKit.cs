@@ -853,6 +853,73 @@ public static class UIKit
         return button;
     }
 
+    // Slider 0-1 bergaya stiker: track sumur bertinta, isi emas, kenop krem bulat.
+    // Panah kiri/kanan menggeser 10% saat slider dipilih (bawaan Slider). Bingkai fokus sama dengan tombol.
+    public static Slider CreateSlider(string name, Transform parent, float height = 48f)
+    {
+        const float knobSize = 34f;
+        const float trackHeight = 18f;
+
+        RectTransform root = CreateRect(name, parent);
+        Layout(root, height, -1f, 1f);
+
+        // Area klik transparan setinggi slider, supaya mudah diklik walau track tipis.
+        Image hitArea = CreateImage("HitArea", root, new Color(0f, 0f, 0f, 0f), false);
+        hitArea.raycastTarget = true;
+        Stretch(hitArea.rectTransform);
+
+        Image track = SetCorners(CreateImage("Track", root, Well), InkSmall);
+        RectTransform trackRect = track.rectTransform;
+        trackRect.anchorMin = new Vector2(0f, 0.5f);
+        trackRect.anchorMax = new Vector2(1f, 0.5f);
+        trackRect.pivot = new Vector2(0.5f, 0.5f);
+        trackRect.offsetMin = new Vector2(knobSize * 0.25f, -trackHeight * 0.5f);
+        trackRect.offsetMax = new Vector2(-knobSize * 0.25f, trackHeight * 0.5f);
+
+        RectTransform fillArea = CreateRect("FillArea", track.transform);
+        Stretch(fillArea, 3f, 3f, 3f, 3f);
+        Image fill = SetCorners(CreateImage("Fill", fillArea, Accent), RoundedSmall);
+        Stretch(fill.rectTransform);
+
+        RectTransform handleArea = CreateRect("HandleArea", root);
+        handleArea.anchorMin = new Vector2(0f, 0.5f);
+        handleArea.anchorMax = new Vector2(1f, 0.5f);
+        handleArea.pivot = new Vector2(0.5f, 0.5f);
+        handleArea.offsetMin = new Vector2(knobSize * 0.5f, -knobSize * 0.5f);
+        handleArea.offsetMax = new Vector2(-knobSize * 0.5f, knobSize * 0.5f);
+
+        Image knob = SetCircle(CreateImage("Knob", handleArea, Cream, false));
+        knob.rectTransform.sizeDelta = new Vector2(knobSize, 0f);
+        AddHardShadow(knob, new Vector2(2f, -3f));
+
+        Slider slider = root.gameObject.AddComponent<Slider>();
+        slider.fillRect = fill.rectTransform;
+        slider.handleRect = knob.rectTransform;
+        slider.targetGraphic = knob;
+        slider.direction = Slider.Direction.LeftToRight;
+        slider.minValue = 0f;
+        slider.maxValue = 1f;
+
+        ColorBlock colors = slider.colors;
+        colors.normalColor = Cream;
+        colors.highlightedColor = Color.white;
+        colors.selectedColor = Cream;
+        colors.pressedColor = AccentHighlight;
+        colors.disabledColor = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+        colors.colorMultiplier = 1f;
+        colors.fadeDuration = 0.08f;
+        slider.colors = colors;
+
+        // Bingkai fokus mengelilingi seluruh slider, hanya tampil saat dipilih keyboard/gamepad.
+        Image frame = CreateImage("FocusFrame", root, Focus, false);
+        frame.sprite = RoundedOutline;
+        frame.type = Image.Type.Sliced;
+        Stretch(frame.rectTransform, -8f, -8f, -2f, -2f);
+        root.gameObject.AddComponent<UIFocusFrame>().Bind(frame);
+
+        return slider;
+    }
+
     // ---------- Layout ----------
 
     public static VerticalLayoutGroup AddVertical(

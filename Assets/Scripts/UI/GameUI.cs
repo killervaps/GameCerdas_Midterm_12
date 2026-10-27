@@ -69,6 +69,7 @@ public class GameUI : MonoBehaviour
     private HintToast hints;
     private PauseScreen pause;
     private TutorialScreen tutorial;
+    private SettingsScreen settings;
     private ResultScreen result;
 
     private InputActionMap playerMap;
@@ -97,6 +98,7 @@ public class GameUI : MonoBehaviour
     public bool IsMainMenuOpen => mainMenu != null && mainMenu.IsVisible;
     public bool IsPaused { get; private set; }
     public bool IsTutorialOpen => tutorial != null && tutorial.IsVisible;
+    public bool IsSettingsOpen => settings != null && settings.IsVisible;
     public bool IsResultOpen => result != null && result.IsVisible;
 
     public RunState State => runManager != null ? runManager.State : RunState.Idle;
@@ -261,6 +263,12 @@ public class GameUI : MonoBehaviour
 
     private void HandleCancel()
     {
+        if (IsSettingsOpen)
+        {
+            CloseSettings();
+            return;
+        }
+
         if (IsTutorialOpen)
         {
             CloseTutorial();
@@ -329,6 +337,7 @@ public class GameUI : MonoBehaviour
 
         pause.Hide();
         tutorial.Hide();
+        settings.Hide();
 
         // Jika MC masih berdiri di depan gate, kartunya dibuka lagi.
         if (gateRoom != null && gateRoom.ActivePortal != null)
@@ -391,6 +400,22 @@ public class GameUI : MonoBehaviour
     public void CloseTutorial()
     {
         tutorial.Hide();
+
+        // Kembalikan fokus keyboard ke layar di bawahnya.
+        if (IsPaused)
+            pause.FocusFirst();
+        else if (IsMainMenuOpen)
+            mainMenu.FocusFirst();
+    }
+
+    public void OpenSettings()
+    {
+        settings.Show();
+    }
+
+    public void CloseSettings()
+    {
+        settings.Hide();
 
         // Kembalikan fokus keyboard ke layar di bawahnya.
         if (IsPaused)
@@ -565,7 +590,7 @@ public class GameUI : MonoBehaviour
         if (playerMap == null)
             return;
 
-        bool allowed = !IsMainMenuOpen && !IsPaused && !IsTutorialOpen && !IsResultOpen;
+        bool allowed = !IsMainMenuOpen && !IsPaused && !IsTutorialOpen && !IsSettingsOpen && !IsResultOpen;
 
         // Skrip gameplay meng-Enable action-nya sendiri di OnEnable, jadi saat input harus mati
         // map dicek ulang setiap frame.
@@ -642,6 +667,7 @@ public class GameUI : MonoBehaviour
         pause = CreateScreen<PauseScreen>("PauseMenu", true);
         mainMenu = CreateScreen<MainMenuScreen>("MainMenu", true);
         tutorial = CreateScreen<TutorialScreen>("Tutorial", true);
+        settings = CreateScreen<SettingsScreen>("Settings", true);
     }
 
     private T CreateScreen<T>(string screenName, bool interactive) where T : UIScreen

@@ -8,6 +8,10 @@ using UnityEngine.UI;
 // gate (motif identitas), subjudul di pita, tombol stiker, dan kartu alur ronde dengan token bernomor.
 public class MainMenuScreen : UIScreen
 {
+    private const float PrimaryHeight = 70f;
+    private const float ButtonHeight = 54f;
+    private const float ButtonWidth = 400f;
+
     protected override void Build()
     {
         // Latar: penahan klik transparan + gradasi gelap dari kiri. Sisi kanan dibiarkan terang
@@ -52,24 +56,29 @@ public class MainMenuScreen : UIScreen
         TextMeshProUGUI subtitle = UIKit.CreateText("Subtitle", tape.transform, ui.GameSubtitle, 23f, new Color(0.87f, 0.89f, 0.93f));
         UIKit.Layout(subtitle, -1f, -1f, 1f);
 
-        RectTransform spacer = UIKit.CreateRect("Spacer", column);
-        UIKit.Layout(spacer, 4f);
+        // Tombol berurutan atas-bawah. Tinggi tombol dan kartu alur dirampingkan supaya empat tombol
+        // tetap muat bersama logo dan kartu di tinggi canvas 1080 tanpa saling tumpang tindih.
+        // Grup tombol diberi ruang ekstra di atas dan bawah karena pita subjudul, MULAI, dan kartu alur
+        // dimiringkan, dan bayangan keras serta bingkai fokus (6 unit) memakan jarak kolom biasa.
+        RectTransform buttons = UIKit.CreateRect("Buttons", column);
+        VerticalLayoutGroup buttonsLayout = UIKit.AddVertical(buttons.gameObject, 10f, new RectOffset(0, 0, 14, 16), TextAnchor.UpperLeft);
+        buttonsLayout.childForceExpandWidth = false;
 
         // Tombol utama paling besar dan sedikit miring, seperti stiker yang ditempel paling akhir.
-        Button play = UIKit.CreateButton("PlayButton", column, "MULAI", UIKit.Safe(ui.StartGame), 76f, true);
-        UIKit.Layout(play, 76f, 400f, 0f);
+        Button play = UIKit.CreateButton("PlayButton", buttons, "MULAI", UIKit.Safe(ui.StartGame), PrimaryHeight, true);
+        UIKit.Layout(play, PrimaryHeight, ButtonWidth, 0f);
         play.transform.localRotation = Quaternion.Euler(0f, 0f, -2f);
 
-        Button tutorialButton = UIKit.CreateButton("TutorialButton", column, "CARA BERMAIN", UIKit.Safe(ui.OpenTutorial), 60f);
-        UIKit.Layout(tutorialButton, 60f, 400f, 0f);
+        Button tutorialButton = UIKit.CreateButton("TutorialButton", buttons, "CARA BERMAIN", UIKit.Safe(ui.OpenTutorial), ButtonHeight);
+        UIKit.Layout(tutorialButton, ButtonHeight, ButtonWidth, 0f);
 
-        Button quit = UIKit.CreateButton("QuitButton", column, "KELUAR", UIKit.Safe(ui.QuitGame), 60f);
-        UIKit.Layout(quit, 60f, 400f, 0f);
+        Button settingsButton = UIKit.CreateButton("SettingsButton", buttons, "PENGATURAN", UIKit.Safe(ui.OpenSettings), ButtonHeight);
+        UIKit.Layout(settingsButton, ButtonHeight, ButtonWidth, 0f);
+
+        Button quit = UIKit.CreateButton("QuitButton", buttons, "KELUAR", UIKit.Safe(ui.QuitGame), ButtonHeight);
+        UIKit.Layout(quit, ButtonHeight, ButtonWidth, 0f);
 
         firstSelected = play;
-
-        RectTransform gap = UIKit.CreateRect("Gap", column);
-        UIKit.Layout(gap, 8f);
 
         BuildRulesCard(column);
 
@@ -148,14 +157,15 @@ public class MainMenuScreen : UIScreen
     }
 
     // Ringkasan aturan dengan token bernomor, di bawah tombol (sisi kanan dipakai karakter).
+    // Dibuat ringkas (teks 18, token 28, jarak rapat) supaya muat di bawah empat tombol.
     private static void BuildRulesCard(RectTransform column)
     {
         Image card = UIKit.CreatePanel("RulesCard", column, UIKit.Panel);
         UIKit.Layout(card, -1f, 580f, 0f);
-        UIKit.AddVertical(card.gameObject, 10f, new RectOffset(24, 24, 18, 22));
+        UIKit.AddVertical(card.gameObject, 6f, new RectOffset(22, 22, 14, 16));
         card.rectTransform.localRotation = Quaternion.Euler(0f, 0f, 1.5f);
 
-        UIKit.UseDisplayFont(UIKit.CreateText("Heading", card.transform, "Alur satu ronde", 26f, UIKit.Text, TextAlignmentOptions.Left, true));
+        UIKit.UseDisplayFont(UIKit.CreateText("Heading", card.transform, "Alur satu ronde", 22f, UIKit.Text, TextAlignmentOptions.Left, true));
 
         string[] steps =
         {
@@ -168,11 +178,11 @@ public class MainMenuScreen : UIScreen
         for (int i = 0; i < steps.Length; i++)
         {
             RectTransform row = UIKit.CreateRect("Step" + (i + 1), card.transform);
-            UIKit.AddHorizontal(row.gameObject, 12f, null, TextAnchor.UpperLeft);
+            UIKit.AddHorizontal(row.gameObject, 10f, null, TextAnchor.UpperLeft);
 
-            UIKit.CreateToken("Number", row, 34f, UIKit.Cream, (i + 1).ToString(), out _);
+            UIKit.CreateToken("Number", row, 28f, UIKit.Cream, (i + 1).ToString(), out _);
 
-            TextMeshProUGUI text = UIKit.CreateText("Text", row, steps[i], 20f, UIKit.Text);
+            TextMeshProUGUI text = UIKit.CreateText("Text", row, steps[i], 18f, UIKit.Text);
             UIKit.Layout(text, -1f, -1f, 1f);
         }
     }

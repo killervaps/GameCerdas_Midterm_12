@@ -20,7 +20,7 @@ public class PauseScreen : UIScreen
         UIKit.Stretch(dim.rectTransform);
 
         Image panel = UIKit.CreatePanel("Panel", rect, UIKit.Panel);
-        UIKit.Place(panel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(980f, 560f));
+        UIKit.Place(panel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(980f, 640f));
         HorizontalLayoutGroup row = UIKit.AddHorizontal(panel.gameObject, 36f, new RectOffset(44, 44, 40, 40), TextAnchor.UpperLeft);
         row.childForceExpandHeight = true;
 
@@ -44,6 +44,7 @@ public class PauseScreen : UIScreen
 
         Button resume = UIKit.CreateButton("ResumeButton", left, "LANJUTKAN", UIKit.Safe(ui.Resume), 68f, true);
         UIKit.CreateButton("TutorialButton", left, "CARA BERMAIN", UIKit.Safe(ui.OpenTutorial));
+        UIKit.CreateButton("SettingsButton", left, "PENGATURAN", UIKit.Safe(ui.OpenSettings));
         UIKit.CreateButton("RestartButton", left, "ULANGI RUN", UIKit.Safe(ui.RestartRun));
         UIKit.CreateButton("MenuButton", left, "MENU UTAMA", UIKit.Safe(ui.BackToMainMenu));
 
@@ -66,7 +67,7 @@ public class PauseScreen : UIScreen
         gatesText.gameObject.AddComponent<TMPRainbowLinks>();
 
         TextMeshProUGUI footer = UIKit.CreateText("Footer", rect, "<b>[Esc]</b> lanjutkan", 20f, UIKit.TextMuted, TextAlignmentOptions.Center);
-        UIKit.Place(footer.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 1f), new Vector2(0f, -300f), new Vector2(600f, 30f));
+        UIKit.Place(footer.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 1f), new Vector2(0f, -340f), new Vector2(600f, 30f));
     }
 
     protected override void OnShow()

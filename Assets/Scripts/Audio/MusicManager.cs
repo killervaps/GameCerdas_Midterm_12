@@ -178,11 +178,14 @@ public class MusicManager : MonoBehaviour
         AudioSource incoming = sources[current];
         AudioSource outgoing = sources[outgoingIndex];
 
-        incoming.volume = musicVolume * VolumeOf(sourceTrack[current]) * duck * fade;
+        // Slider Musik di menu Pengaturan, dikalikan di atas campuran Inspector.
+        float scale = musicVolume * GameAudioSettings.Music * duck;
+
+        incoming.volume = scale * VolumeOf(sourceTrack[current]) * fade;
 
         if (outgoing.isPlaying)
         {
-            outgoing.volume = musicVolume * VolumeOf(sourceTrack[outgoingIndex]) * duck * outgoingStartLevel * (1f - fade);
+            outgoing.volume = scale * VolumeOf(sourceTrack[outgoingIndex]) * outgoingStartLevel * (1f - fade);
 
             if (fade >= 1f)
                 outgoing.Stop();

@@ -156,7 +156,8 @@ public class SfxManager : MonoBehaviour
         AudioSource source = cue == SfxCue.UiClick ? uiSource : NextVoice();
         source.Stop();
         source.clip = clip;
-        source.volume = sfxVolume * entry.volume;
+        // Slider Efek suara di menu Pengaturan, dikalikan di atas campuran Inspector.
+        source.volume = sfxVolume * GameAudioSettings.Sfx * entry.volume;
         source.pitch = UnityEngine.Random.Range(entry.pitchRange.x, entry.pitchRange.y);
         source.Play();
     }
