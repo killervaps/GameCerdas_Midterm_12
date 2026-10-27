@@ -42,6 +42,8 @@ public class GameUI : MonoBehaviour
     [SerializeField] private bool menuCameraShowcase = true;
     // Health bar di atas kepala tiap musuh selama pertempuran.
     [SerializeField] private bool enemyHealthBars = true;
+    // Crosshair auto-target dan lock-on di atas musuh yang sedang dibidik MC.
+    [SerializeField] private bool lockOnReticle = true;
     [SerializeField] private string playerActionMap = "Player";
 
     [Header("Tutorial")]
@@ -57,6 +59,7 @@ public class GameUI : MonoBehaviour
 
     private MainMenuScreen mainMenu;
     private EnemyHealthBars healthBars;
+    private LockOnReticle reticle;
     private DamageFeedback damageFeedback;
     private RoundAnnouncement announcement;
     private MenuCameraShowcase showcase;
@@ -549,6 +552,7 @@ public class GameUI : MonoBehaviour
         bool combat = inGame && !announcing &&
                       (state == RunState.Battle || state == RunState.RoundCleared || state == RunState.Defeat);
         healthBars.SetVisible(enemyHealthBars && combat);
+        reticle.SetVisible(lockOnReticle && combat);
         damageFeedback.SetVisible(combat);
         enemyPreview.SetVisible(inGame && state == RunState.Preparing);
 
@@ -626,6 +630,7 @@ public class GameUI : MonoBehaviour
 
         // Urutan = urutan gambar (yang belakang digambar di atas).
         healthBars = CreateScreen<EnemyHealthBars>("EnemyHealthBars", false);
+        reticle = CreateScreen<LockOnReticle>("LockOnReticle", false);
         damageFeedback = CreateScreen<DamageFeedback>("DamageFeedback", false);
         hud = CreateScreen<HudPanel>("HUD", false);
         enemyPreview = CreateScreen<EnemyPreviewPanel>("EnemyPreview", false);
