@@ -21,8 +21,9 @@ public static class GateTextFormatter
     {
         builder.Clear();
 
-        builder.Append("<b>").Append(gate.DisplayName).Append("</b>\n");
-        builder.Append("<size=70%><color=").Append(MutedColor).Append('>').Append(gate.Rarity);
+        builder.Append("<b>").Append(GateRarityStyle.Wrap(gate.Rarity, gate.DisplayName)).Append("</b>\n");
+        builder.Append("<size=70%>").Append(GateRarityStyle.RichLabel(gate.Rarity));
+        builder.Append("<color=").Append(MutedColor).Append('>');
 
         foreach (string tag in gate.PreviewTags)
             builder.Append(" | ").Append(tag);

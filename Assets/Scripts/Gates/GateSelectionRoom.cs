@@ -166,6 +166,27 @@ public class GateSelectionRoom : MonoBehaviour
         OpenSelection();
     }
 
+    // Mengacak ulang tiga gate tanpa memindahkan MC. Dipakai panel debug (paksa rarity) saat demo.
+    // Gate yang sedang didekati MC tetap difokuskan supaya modal info langsung menampilkan isi barunya.
+    public void RerollOffer()
+    {
+        if (!IsSelecting)
+            return;
+
+        GatePortal focused = activePortal;
+
+        OpenSelection();
+
+        if (focused != null && focused.IsOpen && IsSelecting)
+        {
+            activePortal = focused;
+            focused.SetHighlighted(true);
+            PortalFocused?.Invoke(focused);
+        }
+    }
+
+    public GateGenerator Generator => generator;
+
     public void OpenSelection()
     {
         ClearActivePortal();

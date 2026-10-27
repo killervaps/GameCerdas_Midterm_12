@@ -54132,14 +54132,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GateGenerator
   pool:
   - {fileID: 11400000, guid: 5b43f7f3090c56d4fb3384f335084499, type: 2}
-  - {fileID: 11400000, guid: d78bd9780f806fc4ea3025ab6f52c80d, type: 2}
-  - {fileID: 11400000, guid: 8b2a3cfd8a14a074caa65d8d1df273c4, type: 2}
   - {fileID: 11400000, guid: 8d4292f5d4106f445ac66fbd601fbc8e, type: 2}
-  commonWeight: 60
-  rareWeight: 30
-  epicWeight: 10
+  - {fileID: 11400000, guid: 8b2a3cfd8a14a074caa65d8d1df273c4, type: 2}
+  - {fileID: 11400000, guid: 45607119dec8440429ad259f0c70d5b3, type: 2}
+  - {fileID: 11400000, guid: 1de88420339271f41a865223d1e2faf6, type: 2}
+  - {fileID: 11400000, guid: ef6d69a35a280d74e9e39a49a3c98290, type: 2}
+  - {fileID: 11400000, guid: d78bd9780f806fc4ea3025ab6f52c80d, type: 2}
+  - {fileID: 11400000, guid: 731aa6bc88f750f40aa7b371bd67f2c9, type: 2}
+  - {fileID: 11400000, guid: 4fd807ff42412cb42ab104cf6e1936ff, type: 2}
+  - {fileID: 11400000, guid: 9d6d8688fbc4f2c458c273c653ee7548, type: 2}
+  - {fileID: 11400000, guid: d894f27557265024d8c71b321220403c, type: 2}
+  - {fileID: 11400000, guid: 3acf99b3d391348409bbaae53052ab88, type: 2}
+  - {fileID: 11400000, guid: f5f95e535db519141beab43399d1e99e, type: 2}
+  - {fileID: 11400000, guid: ced5310cc6f653f4a97ca2e8b1aab388, type: 2}
+  - {fileID: 11400000, guid: fd1bf937b61817c4a92960467fea83bb, type: 2}
+  - {fileID: 11400000, guid: 1b058e455045fc7428c1a3c3c5243a0d, type: 2}
+  - {fileID: 11400000, guid: be78c2ee8bb329b4db9104215f587a43, type: 2}
+  - {fileID: 11400000, guid: 68232c48672aff74d97d704a83012082, type: 2}
+  - {fileID: 11400000, guid: 3deddb6cc8089d148a030ef52e644651, type: 2}
+  - {fileID: 11400000, guid: 00f8e59453fc89b469a9e9a14524e0da, type: 2}
+  commonChance: 50
+  rareChance: 25
+  veryRareChance: 13
+  epicChance: 7
+  legendaryChance: 3.5
+  sigmaChance: 1.5
   avoidPreviousOffer: 1
   skipInvalidGates: 1
+  logRolls: 1
 --- !u!114 &998906542
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -76767,6 +76787,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1441237112}
   - component: {fileID: 1441237113}
+  - component: {fileID: 1441237114}
   m_Layer: 0
   m_Name: Safezone
   m_TagString: Untagged
@@ -76853,6 +76874,24 @@ MonoBehaviour:
   startInSafezone: 1
   logEvents: 1
   debugReturnKey: 1
+--- !u!114 &1441237114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1441237111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90747ced028c9fb4ea41484e20e6512f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GateRarityDebugPanel
+  gateRoom: {fileID: 1441237113}
+  showPanel: 1
+  followDebugToggle: 1
+  margin: {x: 10, y: 400}
+  width: 250
+  uiScale: 1
 --- !u!1001 &1447575463
 PrefabInstance:
   m_ObjectHideFlags: 0

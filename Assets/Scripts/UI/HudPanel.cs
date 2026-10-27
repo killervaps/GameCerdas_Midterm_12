@@ -355,6 +355,9 @@ public class HudPanel : UIScreen
             // Kemiringan bergantian supaya tumpukan chip terasa ditempel tangan.
             Image chip = UIKit.CreateStamp("GateChip", buildChips, 19f, i % 2 == 0 ? -2f : 2f, out TextMeshProUGUI chipLabel);
             UIKit.SetStamp(chip, chipLabel, builder.ToString(), UIKit.RarityColor(gate.Rarity));
+
+            if (GateRarityStyle.IsAnimated(gate.Rarity))
+                chip.gameObject.AddComponent<SigmaRainbow>().Bind(chip, chipLabel);
         }
 
         UIKit.ForceRebuild(topLeft);

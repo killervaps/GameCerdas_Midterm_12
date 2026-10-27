@@ -25,6 +25,7 @@ public class GateInfoModal : UIScreen
     private RectTransform confirmFill;
 
     private float slide;
+    private bool animatedRarity;
     private readonly StringBuilder builder = new StringBuilder();
 
     protected override void Build()
@@ -50,7 +51,8 @@ public class GateInfoModal : UIScreen
         UIKit.Layout(nameText, 52f, -1f, 1f);
 
         rarityText = UIKit.UseDisplayFont(UIKit.CreateText("Rarity", headerBand.transform, string.Empty, 20f, UIKit.Ink, TextAlignmentOptions.Right, true));
-        UIKit.Layout(rarityText, 52f, 100f, 0f);
+        // Cukup untuk label terpanjang, "Sangat Langka".
+        UIKit.Layout(rarityText, 52f, 160f, 0f);
 
         RectTransform body = UIKit.CreateRect("Body", panel.transform);
         UIKit.AddVertical(body.gameObject, 10f, new RectOffset(20, 20, 14, 0));
@@ -105,15 +107,11 @@ public class GateInfoModal : UIScreen
 
     private void Fill(MathGateData gate)
     {
-        Color rarityColor = UIKit.RarityColor(gate.Rarity);
-        // Teks di pita memakai versi gelap dari warna rarity, bukan hitam polos.
-        Color bandText = Color.Lerp(rarityColor, UIKit.Ink, 0.82f);
+        animatedRarity = GateRarityStyle.IsAnimated(gate.Rarity);
 
-        headerBand.color = rarityColor;
         nameText.text = gate.DisplayName;
-        nameText.color = bandText;
         rarityText.text = UIKit.RarityLabel(gate.Rarity);
-        rarityText.color = bandText;
+        PaintHeader(UIKit.RarityColor(gate.Rarity));
 
         builder.Clear();
 
@@ -141,6 +139,16 @@ public class GateInfoModal : UIScreen
 
     // Satu baris per efek: lingkaran operator asli (+ − × ÷), nama stat dan jenisnya, lalu nilai
     // sekarang -> sesudah gate. Garis bawah berwarna menandai buff (hijau) atau trade-off (merah).
+    // Teks di pita memakai versi gelap dari warna rarity, bukan hitam polos.
+    private void PaintHeader(Color rarityColor)
+    {
+        Color bandText = Color.Lerp(rarityColor, UIKit.Ink, 0.82f);
+
+        headerBand.color = rarityColor;
+        nameText.color = bandText;
+        rarityText.color = bandText;
+    }
+
     private void BuildEffects(MathGateData gate)
     {
         UIKit.ClearChildren(effectsList);
@@ -247,6 +255,10 @@ public class GateInfoModal : UIScreen
         slide = Mathf.MoveTowards(slide, IsVisible ? 0f : 1f, 6f * Time.unscaledDeltaTime);
         float eased = slide * slide;
         card.anchoredPosition = new Vector2(-40f + eased * SlideDistance, -20f);
+
+        // Pita SIGMA berganti warna terus seperti lampu RGB.
+        if (animatedRarity)
+            PaintHeader(GateRarityStyle.SigmaColor());
 
         float progress = ui.GateRoom != null ? ui.GateRoom.ConfirmProgress : 0f;
         UIKit.SetBarFill(confirmFill, progress);

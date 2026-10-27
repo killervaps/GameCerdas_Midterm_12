@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Gate_Pembagi
   m_EditorClassIdentifier: Assembly-CSharp::MathGateData
   gateName: Gerbang Pembagi
-  description: Nyawa bertambah, aura terbagi dua.
-  rarity: 1
+  description: Nyawa bertambah, aura terbagi.
+  rarity: 0
   previewTags:
   - Tahan lama
   - Lambat membunuh
@@ -24,4 +24,4 @@ MonoBehaviour:
     value: 40
   - stat: 1
     op: 3
-    value: 2
+    value: 1.5

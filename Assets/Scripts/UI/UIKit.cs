@@ -104,24 +104,15 @@ public static class UIKit
         return label;
     }
 
+    // Untuk SIGMA ini warna sesaat dari putaran RGB. Elemen yang perlu terus berputar memakai SigmaRainbow.
     public static Color RarityColor(GateRarity rarity)
     {
-        switch (rarity)
-        {
-            case GateRarity.Rare: return new Color(0.31f, 0.64f, 1f);
-            case GateRarity.Epic: return new Color(0.78f, 0.49f, 1f);
-            default: return new Color(0.69f, 0.72f, 0.77f);
-        }
+        return GateRarityStyle.Color(rarity);
     }
 
     public static string RarityLabel(GateRarity rarity)
     {
-        switch (rarity)
-        {
-            case GateRarity.Rare: return "Langka";
-            case GateRarity.Epic: return "Epik";
-            default: return "Biasa";
-        }
+        return GateRarityStyle.Label(rarity);
     }
 
     public static Color ThreatColor(ThreatLevel level)

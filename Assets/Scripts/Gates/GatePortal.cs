@@ -42,6 +42,10 @@ public class GatePortal : MonoBehaviour
         if (Camera.main != null)
             cameraTransform = Camera.main.transform;
 
+        // Nama dan label gate SIGMA berwarna pelangi yang berputar.
+        if (label != null && label.GetComponent<TMPRainbowLinks>() == null)
+            label.gameObject.AddComponent<TMPRainbowLinks>();
+
         SetHighlighted(false);
     }
 

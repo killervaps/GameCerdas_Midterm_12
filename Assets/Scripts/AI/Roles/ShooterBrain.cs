@@ -643,7 +643,7 @@ public class ShooterBrain : EnemyBrain
         // Dicari ulang tiap beberapa detik supaya arena yang baru aktif ikut terbaca.
         if (sceneLinks == null || Time.time - sceneLinksCachedAt > 5f || Time.time < sceneLinksCachedAt)
         {
-            sceneLinks = FindObjectsByType<NavMeshLink>(FindObjectsSortMode.None);
+            sceneLinks = FindObjectsByType<NavMeshLink>();
             sceneLinksCachedAt = Time.time;
         }
 

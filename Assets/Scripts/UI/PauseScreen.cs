@@ -62,6 +62,8 @@ public class PauseScreen : UIScreen
         UIKit.UseDisplayFont(UIKit.CreateText("GatesHeading", card.transform, "Gate dipilih", 26f, UIKit.Text, TextAlignmentOptions.Left, true));
 
         gatesText = UIKit.CreateText("Gates", card.transform, string.Empty, 22f, UIKit.Text);
+        // Gate SIGMA di daftar ini berwarna pelangi.
+        gatesText.gameObject.AddComponent<TMPRainbowLinks>();
 
         TextMeshProUGUI footer = UIKit.CreateText("Footer", rect, "<b>[Esc]</b> lanjutkan", 20f, UIKit.TextMuted, TextAlignmentOptions.Center);
         UIKit.Place(footer.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 1f), new Vector2(0f, -300f), new Vector2(600f, 30f));
@@ -128,8 +130,7 @@ public class PauseScreen : UIScreen
             if (builder.Length > 0)
                 builder.Append('\n');
 
-            builder.Append("<color=#").Append(ColorUtility.ToHtmlStringRGB(UIKit.RarityColor(gate.Rarity))).Append('>')
-                .Append(i + 1).Append(". ").Append(gate.DisplayName).Append("</color>");
+            builder.Append(GateRarityStyle.Wrap(gate.Rarity, (i + 1) + ". " + gate.DisplayName));
         }
 
         return builder.ToString();

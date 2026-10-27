@@ -34,7 +34,7 @@ public class ArenaSelector : MonoBehaviour
     private void Awake()
     {
         if (arenas == null || arenas.Length == 0)
-            arenas = FindObjectsByType<Arena>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            arenas = FindObjectsByType<Arena>(FindObjectsInactive.Include);
 
         if (arenas.Length == 0)
             Debug.LogError("ArenaSelector: belum ada Arena di scene.", this);
