@@ -241,7 +241,10 @@ public class HudPanel : UIScreen
         buildLabelText.text = "Build";
         buildLabelText.color = UIKit.Text;
 
+        // Kolom chip mengisi sisa lebar baris. Chip yang lebih lebar dari kolom dipersempit oleh layout dan
+        // teksnya turun ke baris berikutnya, jadi nama gate panjang dan efek banyak tetap muat.
         buildChips = UIKit.CreateRect("Chips", buildRow);
+        UIKit.Layout(buildChips, -1f, -1f, 1f);
         VerticalLayoutGroup chipColumn = UIKit.AddVertical(buildChips.gameObject, 10f);
         chipColumn.childForceExpandWidth = false;
     }
@@ -346,14 +349,28 @@ public class HudPanel : UIScreen
             if (gate == null)
                 continue;
 
+            // Baris 1 nama gate, baris 2 operasinya. Simbol, nilai, dan stat satu operasi digabung dengan
+            // spasi tak terputus (U+00A0) supaya "÷1.25 DMG" tidak terbelah saat teks dibungkus.
             builder.Clear();
-            builder.Append(ShortGateName(gate.DisplayName));
+            builder.Append(ShortGateName(gate.DisplayName)).Append("\n<size=82%>");
 
-            foreach (ModifierEffect effect in gate.Effects)
-                builder.Append("   ").Append(effect.Symbol).Append(effect.value.ToString("0.##")).Append(' ').Append(UIKit.StatShort(effect.stat));
+            for (int e = 0; e < gate.Effects.Count; e++)
+            {
+                ModifierEffect effect = gate.Effects[e];
+
+                if (e > 0)
+                    builder.Append("   ");
+
+                builder.Append(effect.Symbol).Append(effect.value.ToString("0.##")).Append(' ').Append(UIKit.StatShort(effect.stat));
+            }
+
+            builder.Append("</size>");
 
             // Kemiringan bergantian supaya tumpukan chip terasa ditempel tangan.
             Image chip = UIKit.CreateStamp("GateChip", buildChips, 19f, i % 2 == 0 ? -2f : 2f, out TextMeshProUGUI chipLabel);
+            chipLabel.textWrappingMode = TextWrappingModes.Normal;
+            chipLabel.alignment = TextAlignmentOptions.Left;
+            chipLabel.lineSpacing = -10f;
             UIKit.SetStamp(chip, chipLabel, builder.ToString(), UIKit.RarityColor(gate.Rarity));
 
             if (GateRarityStyle.IsAnimated(gate.Rarity))
