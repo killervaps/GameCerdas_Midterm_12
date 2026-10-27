@@ -191,6 +191,8 @@ public class GuardianBrain : EnemyBrain
 
             if (Controller.LogStateChanges)
                 Debug.Log(name + ": anchor mati, mode marah", this);
+
+            SfxManager.Play(SfxCue.GuardianEnrage);
         }
 
         return enraged;
@@ -384,6 +386,7 @@ public class GuardianBrain : EnemyBrain
     private void StartSwing()
     {
         NotifyAttack();
+        SfxManager.Play(SfxCue.GuardianSwing);
 
         swingPending = true;
         swingHitTime = Time.time + Data.MeleeHitDelay;
@@ -414,6 +417,7 @@ public class GuardianBrain : EnemyBrain
         if (inRange && inFront)
         {
             player.TakeDamage(new DamageInfo(Data.Damage, gameObject, player.AimPoint, DamageKind.Melee));
+            SfxManager.Play(SfxCue.GuardianHit);
         }
         else if (Controller.LogStateChanges)
         {

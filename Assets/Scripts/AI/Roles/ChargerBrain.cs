@@ -301,6 +301,7 @@ public class ChargerBrain : EnemyBrain
         {
             beatsFired = beat;
             WindupBeat?.Invoke(beat);
+            SfxManager.Play(SfxCue.ChargerWindupBeat);
         }
 
         // Kedip di paruh pertama tiap ketukan.
@@ -331,6 +332,8 @@ public class ChargerBrain : EnemyBrain
         Motor.SetAgentEnabled(false);
 
         EnterPhase(LockedPhase.Lunge);
+
+        SfxManager.Play(SfxCue.ChargerLunge);
     }
 
     private void UpdateLunge(float elapsed)
@@ -366,6 +369,7 @@ public class ChargerBrain : EnemyBrain
             // Hanya sekali per lunge.
             lungeHit = true;
             player.TakeDamage(new DamageInfo(Data.Damage, gameObject, player.AimPoint, DamageKind.Lunge));
+            SfxManager.Play(SfxCue.ChargerLungeHit);
             return;
         }
     }

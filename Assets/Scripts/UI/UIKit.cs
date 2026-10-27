@@ -852,6 +852,9 @@ public static class UIKit
         Stretch(frame.rectTransform, -6f, -6f, -6f, -6f);
         background.gameObject.AddComponent<UIFocusFrame>().Bind(frame);
 
+        // Suara klik saat ditekan.
+        background.gameObject.AddComponent<UIButtonFeedback>();
+
         LayoutElement layout = background.gameObject.AddComponent<LayoutElement>();
         layout.minHeight = height;
         layout.preferredHeight = height;

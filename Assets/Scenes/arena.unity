@@ -18529,6 +18529,67 @@ Transform:
   - {fileID: 137414119}
   m_Father: {fileID: 1928172441}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &337206580
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 337206582}
+  - component: {fileID: 337206581}
+  m_Layer: 0
+  m_Name: MusicManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &337206581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 337206580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1db341bd30e4a3d4798f68fd6b764bf7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MusicManager
+  runManager: {fileID: 1303698171}
+  menuMusic: {fileID: 8300000, guid: 5d69bbb7758df1e4899573becfc0a0d0, type: 3}
+  menuVolume: 1
+  safezoneMusic: {fileID: 8300000, guid: 06bffb16263c37f43a9d905fd48832e4, type: 3}
+  safezoneVolume: 0.4
+  battleMusic: {fileID: 8300000, guid: ea714c5237cb7bb4a8fdf2664292217a, type: 3}
+  battleVolume: 0.6
+  victoryMusic: {fileID: 8300000, guid: ddb373b9b37de304fabd233d40e8adbe, type: 3}
+  victoryVolume: 1
+  defeatMusic: {fileID: 8300000, guid: 7592681d73ec9b34191d97b2497cd0a3, type: 3}
+  defeatVolume: 1
+  loopVictory: 1
+  loopDefeat: 1
+  musicVolume: 0.29
+  crossfadeDuration: 1.2
+  pausedVolume: 0.35
+  logChanges: 1
+--- !u!4 &337206582
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 337206580}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.47749, y: -0, z: 14.25863}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &337529920
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -97252,6 +97313,144 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.6, y: 1.025, z: 0.225}
   m_Center: {x: 0.00000017881393, y: 0.5125, z: 0.012500063}
+--- !u!1 &1826922913
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1826922915}
+  - component: {fileID: 1826922914}
+  m_Layer: 0
+  m_Name: SfxManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1826922914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1826922913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27953e6653b85434a985ed080c0d2e23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SfxManager
+  sfxVolume: 0.8
+  voices: 12
+  uiClick:
+    clips:
+    - {fileID: 8300000, guid: a5a38dee3c153a24b8a7c24ab2dde2ed, type: 3}
+    volume: 0.3
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+  gateChoose:
+    clips:
+    - {fileID: 8300000, guid: 1d572e36cec48b842af2ada894d3424f, type: 3}
+    volume: 1
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+  magicCast:
+    clips:
+    - {fileID: 8300000, guid: 1d572e36cec48b842af2ada894d3424f, type: 3}
+    volume: 1
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+  magicHit:
+    clips:
+    - {fileID: 8300000, guid: 6bb54ed22ac62bf47a390ff9caf9e329, type: 3}
+    volume: 0.5
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+  projectileHitWall:
+    clips:
+    - {fileID: 8300000, guid: 6bb54ed22ac62bf47a390ff9caf9e329, type: 3}
+    volume: 0.5
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+  burstCharge:
+    clips: []
+    volume: 1
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+  burstRelease:
+    clips:
+    - {fileID: 8300000, guid: fef3d69e771d8ce428327f6240308ed6, type: 3}
+    volume: 0.67
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+  chargerWindupBeat:
+    clips: []
+    volume: 0.5
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+  chargerLunge:
+    clips:
+    - {fileID: 8300000, guid: e142944059c14044faa224ba43e4dfbb, type: 3}
+    volume: 1
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+  chargerLungeHit:
+    clips:
+    - {fileID: 8300000, guid: 9a1df0c0a3bff0141892f03530326863, type: 3}
+    volume: 1
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+  guardianSwing:
+    clips:
+    - {fileID: 8300000, guid: e142944059c14044faa224ba43e4dfbb, type: 3}
+    volume: 1
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+  guardianHit:
+    clips:
+    - {fileID: 8300000, guid: 9a1df0c0a3bff0141892f03530326863, type: 3}
+    volume: 1
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+  guardianEnrage:
+    clips: []
+    volume: 1
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+  shooterShot:
+    clips:
+    - {fileID: 8300000, guid: 6ce2be79189b21545a78439eb4e61ae8, type: 3}
+    volume: 1
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+  shooterHit:
+    clips:
+    - {fileID: 8300000, guid: 6bb54ed22ac62bf47a390ff9caf9e329, type: 3}
+    volume: 0.45
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+  enemyDeath:
+    clips: []
+    volume: 1
+    pitchRange: {x: 0.95, y: 1.05}
+    minInterval: 0.05
+--- !u!4 &1826922915
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1826922913}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -7.2088594, y: 0, z: 17.04908}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1828314163
 GameObject:
   m_ObjectHideFlags: 0
@@ -107061,7 +107260,7 @@ MonoBehaviour:
   maxColliders: 32
   actionName: Player/AuraBurst
   releaseDelay: 1
-  chargeEffectPrefab: {fileID: 0}
+  chargeEffectPrefab: {fileID: 7305185502956871417, guid: 85b062a5517cf8345bb6784ffbed4877, type: 3}
   burstEffectPrefab: {fileID: 2433282508537954060, guid: 3ef3ae421f71c5c4e97fe12dc2fc6312, type: 3}
   effectScale: 1
   drawGizmos: 1
@@ -115071,3 +115270,5 @@ SceneRoots:
   - {fileID: 569771814}
   - {fileID: 1928172441}
   - {fileID: 55186987}
+  - {fileID: 337206582}
+  - {fileID: 1826922915}

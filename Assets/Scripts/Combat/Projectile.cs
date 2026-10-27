@@ -48,6 +48,8 @@ public class Projectile : MonoBehaviour
     private TrailRenderer trail;
     // Collider di bawah objek ini dilewati, mis. lantai menara tempat penembak berdiri.
     private Transform ignoreRoot;
+    // Bola Aura MC (layer PlayerProjectile) atau peluru Shooter. Menentukan SFX tembak dan kena.
+    private bool isPlayerProjectile;
 
     public bool IsFlying => flying;
 
@@ -55,6 +57,7 @@ public class Projectile : MonoBehaviour
     {
         trail = GetComponentInChildren<TrailRenderer>();
         mask = useLayerCollisionMatrix ? BuildMaskFromMatrix(gameObject.layer) : hitMask.value;
+        isPlayerProjectile = gameObject.layer == LayerMask.NameToLayer(GameLayers.PlayerProjectile);
     }
 
     public void Launch(
@@ -88,6 +91,8 @@ public class Projectile : MonoBehaviour
 
         if (launchEffect != null)
             EffectPool.Spawn(launchEffect, position, Quaternion.LookRotation(direction), launchEffectScale);
+
+        SfxManager.Play(isPlayerProjectile ? SfxCue.MagicCast : SfxCue.ShooterShot);
     }
 
     private void Update()
@@ -156,6 +161,10 @@ public class Projectile : MonoBehaviour
             damageable.TakeDamage(new DamageInfo(damage, source, hit.point, kind));
 
         SpawnImpact(hit, hitCharacter);
+
+        SfxManager.Play(!hitCharacter
+            ? SfxCue.ProjectileHitWall
+            : isPlayerProjectile ? SfxCue.MagicHit : SfxCue.ShooterHit);
 
         Despawn();
     }

@@ -237,6 +237,8 @@ public class GateSelectionRoom : MonoBehaviour
 
         Log("memilih " + gate.DisplayName + ", teleport ke arena");
 
+        SfxManager.Play(SfxCue.GateChoose);
+
         TeleportPlayer(arenaSpawn);
 
         GateChosen?.Invoke(gate);

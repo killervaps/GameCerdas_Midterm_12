@@ -116,6 +116,7 @@ public class AuraBurst : MonoBehaviour
         CooldownRemaining = cooldown;
 
         BurstStarted?.Invoke();
+        SfxManager.Play(SfxCue.BurstCharge);
 
         if (chargeEffectPrefab != null)
             EffectPool.Spawn(chargeEffectPrefab, transform.position, Quaternion.identity, effectScale);
@@ -165,6 +166,8 @@ public class AuraBurst : MonoBehaviour
 
         if (burstEffectPrefab != null)
             EffectPool.Spawn(burstEffectPrefab, center, Quaternion.identity, effectScale);
+
+        SfxManager.Play(SfxCue.BurstRelease);
 
         if (logBurst)
             Debug.Log("AuraBurst: kena " + damagedThisBurst.Count + " musuh, damage " + damage.ToString("0.#"), this);
