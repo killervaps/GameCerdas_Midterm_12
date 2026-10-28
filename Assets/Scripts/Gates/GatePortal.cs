@@ -46,6 +46,10 @@ public class GatePortal : MonoBehaviour
         if (label != null && label.GetComponent<TMPRainbowLinks>() == null)
             label.gameObject.AddComponent<TMPRainbowLinks>();
 
+        // Model gate berpendar sesuai rarity. Komponen yang sudah dipasang manual (dengan nilai Inspector sendiri) dipakai apa adanya.
+        if (GetComponent<GatePortalGlow>() == null)
+            gameObject.AddComponent<GatePortalGlow>();
+
         SetHighlighted(false);
     }
 
