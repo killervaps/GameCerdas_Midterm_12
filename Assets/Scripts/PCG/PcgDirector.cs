@@ -14,9 +14,6 @@ public class PcgDirector : MonoBehaviour
     [SerializeField] private bool useRandomSeed = true;
     [SerializeField] private int fixedSeed = 12345;
 
-    [Header("References (dicari otomatis jika kosong)")]
-    [SerializeField] private RunManager runManager;
-
     [Header("Default Rules")]
     // Dipakai spawner musuh dan item jika profil ronde tidak menimpanya.
     [SerializeField] private PcgSpawnRules defaultRules = new PcgSpawnRules();
@@ -51,24 +48,18 @@ public class PcgDirector : MonoBehaviour
     // Dikirim saat seed run baru dibuat.
     public event Action<int> SeedChanged;
 
+    // Project memakai Enter Play Mode tanpa Domain Reload, jadi nilai static dari sesi Play sebelumnya harus dibersihkan.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        Current = null;
+        fallbackSeed = 0;
+        hasFallbackSeed = false;
+    }
+
     private void Awake()
     {
         Current = this;
-
-        if (runManager == null)
-            runManager = FindAnyObjectByType<RunManager>();
-    }
-
-    private void OnEnable()
-    {
-        if (runManager != null)
-            runManager.RunStarted += BeginRun;
-    }
-
-    private void OnDisable()
-    {
-        if (runManager != null)
-            runManager.RunStarted -= BeginRun;
     }
 
     private void OnDestroy()
@@ -77,7 +68,22 @@ public class PcgDirector : MonoBehaviour
             Current = null;
     }
 
-    // Membuat seed untuk run baru. Dipanggil otomatis saat RunManager memulai run.
+    // Dipanggil RunManager setiap run baru. Langsung, bukan lewat event, karena PcgDirector dan RunManager
+    // bisa berada di scene berbeda yang urutan load-nya tidak pasti.
+    public static void BeginNewRun()
+    {
+        if (Current != null)
+        {
+            Current.BeginRun();
+            return;
+        }
+
+        fallbackSeed = NewRandomSeed();
+        hasFallbackSeed = true;
+        Debug.LogWarning("PcgDirector belum ada di scene, PCG memakai seed cadangan " + fallbackSeed + ".");
+    }
+
+    // Membuat seed untuk run baru.
     public void BeginRun()
     {
         SetRunSeed(useRandomSeed ? NewRandomSeed() : fixedSeed);
@@ -103,6 +109,22 @@ public class PcgDirector : MonoBehaviour
 
         return new SeededRandom(SeededRandom.Derive(currentRunSeed, round, stream));
     }
+
+    // Aliran untuk sistem lain (RunManager, EnemySpawner). Tanpa PcgDirector di scene tetap jalan
+    // memakai seed cadangan yang dibuat sekali per sesi Play, hanya saja seed tidak bisa diatur atau ditampilkan.
+    public static SeededRandom Stream(int round, PcgStream stream)
+    {
+        if (Current != null)
+            return Current.CreateStream(round, stream);
+
+        if (!hasFallbackSeed)
+            BeginNewRun();
+
+        return new SeededRandom(SeededRandom.Derive(fallbackSeed, round, stream));
+    }
+
+    private static int fallbackSeed;
+    private static bool hasFallbackSeed;
 
     private static int NewRandomSeed()
     {

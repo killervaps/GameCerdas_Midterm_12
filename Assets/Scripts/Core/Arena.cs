@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Satu arena di scene. Dipasang di root arena (mis. arena_1, arena_2_str).
-// Menyimpan titik masuk MC dan semua SpawnPoint di dalam arena, termasuk titik khusus di atas menara.
+// Menyimpan titik masuk MC dan titik khusus role (mis. puncak menara untuk Shooter).
+// Posisi musuh biasa dibuat PCG di PcgSpawnArea, jadi SpawnPoint yang menerima semua role tidak dipakai lagi.
 public class Arena : MonoBehaviour
 {
     [SerializeField] private string displayName;
@@ -51,9 +52,6 @@ public class Arena : MonoBehaviour
 
         if (valid.Count == 0)
             valid.AddRange(GetComponentsInChildren<SpawnPoint>(true));
-
-        if (valid.Count == 0)
-            Debug.LogError("Arena " + name + ": tidak ada SpawnPoint sama sekali.", this);
 
         return valid.ToArray();
     }

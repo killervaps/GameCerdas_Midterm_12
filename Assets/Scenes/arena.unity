@@ -1787,7 +1787,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &32452265
 Transform:
   m_ObjectHideFlags: 0
@@ -2890,12 +2890,12 @@ MonoBehaviour:
   displayName: Charger Arena
   playerEntry: {fileID: 478088408}
   spawnPoints:
-  - {fileID: 146062563}
-  - {fileID: 577654892}
-  - {fileID: 1577580870}
-  - {fileID: 1335316673}
-  - {fileID: 1370823519}
-  - {fileID: 892722207}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   baseWeight: 1
 --- !u!114 &55186989
 MonoBehaviour:
@@ -2912,6 +2912,10 @@ MonoBehaviour:
   center: {x: -4.200001, y: 0.00000011920929, z: 4}
   size: {x: 18, y: 22}
   fitMargin: 0.5
+  roleBias:
+  - role: 0
+    weightMultiplier: 2
+    maxBonus: 1
   probeHeight: 10
   probeDepth: 15
   groundMask:
@@ -29830,12 +29834,26 @@ MonoBehaviour:
     prefab: {fileID: 1171026608}
   - role: 2
     prefab: {fileID: 273725251}
-  spawnPoints:
-  - {fileID: 1994560563}
-  - {fileID: 1038367433}
-  - {fileID: 1743186712}
-  navMeshSnapDistance: 2
+  anchorChances:
+  - role: 1
+    chance: 1
+  overrideRules: 0
+  rules:
+    minDistanceFromPlayer: 4
+    checkRadius: 0.35
+    obstacleMask:
+      serializedVersion: 2
+      m_Bits: 0
+    minimumSpacing: 1.2
+    maxAttemptsPerObject: 50
+    allowElevated: 0
+    requireReachable: 1
+    navMeshSnapDistance: 0.6
+    excludedNavMeshArea: archer_jump
+  relaxOnFailure: 1
+  anchorSnapDistance: 2
   logSpawns: 1
+  drawLastPlacement: 1
 --- !u!4 &501934856
 Transform:
   m_ObjectHideFlags: 0
@@ -33717,11 +33735,11 @@ MonoBehaviour:
   displayName: Shooter Arena
   playerEntry: {fileID: 140133375}
   spawnPoints:
-  - {fileID: 1815763762}
-  - {fileID: 1994157963}
-  - {fileID: 183164162}
-  - {fileID: 1652882824}
-  - {fileID: 1623429423}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   baseWeight: 1
 --- !u!114 &569771816
 MonoBehaviour:
@@ -33738,6 +33756,10 @@ MonoBehaviour:
   center: {x: -6.01, y: 0.00000011920929, z: 5.46}
   size: {x: 10, y: 11}
   fitMargin: 0.5
+  roleBias:
+  - role: 1
+    weightMultiplier: 2
+    maxBonus: 0
   probeHeight: 10
   probeDepth: 15
   groundMask:
@@ -78307,9 +78329,9 @@ MonoBehaviour:
   displayName: Standard Arena
   playerEntry: {fileID: 691072782}
   spawnPoints:
-  - {fileID: 1994560563}
-  - {fileID: 1038367433}
-  - {fileID: 1743186712}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   baseWeight: 1
 --- !u!114 &1293211535
 MonoBehaviour:
@@ -78326,6 +78348,7 @@ MonoBehaviour:
   center: {x: -5.0000005, y: 0.07000001, z: 5.500001}
   size: {x: 10, y: 11.000003}
   fitMargin: 0.5
+  roleBias: []
   probeHeight: 10
   probeDepth: 15
   groundMask:
@@ -78943,10 +78966,55 @@ MonoBehaviour:
   battle: {fileID: 1303698172}
   playerHealth: {fileID: 1987173382}
   arenaSelector: {fileID: 1303698175}
-  waves:
-  - {fileID: 11400000, guid: ab04448f748c6fb4590d1e0c8c5f32c5, type: 2}
-  - {fileID: 11400000, guid: 5017206571060d14c98f3ab272ee50e4, type: 2}
-  - {fileID: 11400000, guid: b6ce365127803d04d845ecf798aee7fe, type: 2}
+  rounds:
+  - label: Ronde 1
+    minEnemies: 2
+    maxEnemies: 3
+    roles:
+    - role: 0
+      weight: 3
+      min: 1
+      max: 3
+    - role: 1
+      weight: 1
+      min: 0
+      max: 1
+    - role: 2
+      weight: 0
+      min: 0
+      max: 0
+  - label: Ronde 2
+    minEnemies: 3
+    maxEnemies: 4
+    roles:
+    - role: 0
+      weight: 2
+      min: 1
+      max: 2
+    - role: 1
+      weight: 2
+      min: 1
+      max: 2
+    - role: 2
+      weight: 0
+      min: 0
+      max: 0
+  - label: Ronde 3
+    minEnemies: 3
+    maxEnemies: 5
+    roles:
+    - role: 0
+      weight: 2
+      min: 1
+      max: 2
+    - role: 1
+      weight: 2
+      min: 1
+      max: 2
+    - role: 2
+      weight: 1
+      min: 1
+      max: 1
   healRule: 1
   partialHealRatio: 0.3
   returnDelay: 2
@@ -114305,7 +114373,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1895919752
 Transform:
   m_ObjectHideFlags: 0
@@ -114425,7 +114493,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PcgDirector
   useRandomSeed: 1
   fixedSeed: 12345
-  runManager: {fileID: 1303698171}
   defaultRules:
     minDistanceFromPlayer: 4
     checkRadius: 0.35
@@ -114439,7 +114506,7 @@ MonoBehaviour:
     navMeshSnapDistance: 0.6
     excludedNavMeshArea: archer_jump
   previewArea: {fileID: 1928172443}
-  previewSeed: 12345
+  previewSeed: 12347
   previewCount: 12
   drawPreview: 1
   currentRunSeed: 0
@@ -116068,13 +116135,13 @@ MonoBehaviour:
   displayName: Guardian Arena
   playerEntry: {fileID: 1794279337}
   spawnPoints:
-  - {fileID: 1122285039}
-  - {fileID: 627807899}
-  - {fileID: 946102688}
-  - {fileID: 1749771199}
-  - {fileID: 1620111112}
-  - {fileID: 885340923}
-  - {fileID: 972894284}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   baseWeight: 1
 --- !u!114 &1928172443
 MonoBehaviour:
@@ -116091,6 +116158,10 @@ MonoBehaviour:
   center: {x: 7, y: 0.00000011920929, z: 0.5}
   size: {x: 14, y: 15}
   fitMargin: 0.5
+  roleBias:
+  - role: 2
+    weightMultiplier: 2
+    maxBonus: 1
   probeHeight: 10
   probeDepth: 15
   groundMask:
@@ -127765,7 +127836,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2102597601
 Transform:
   m_ObjectHideFlags: 0

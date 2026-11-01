@@ -15,12 +15,24 @@ public struct WaveEntry
     }
 }
 
-// Komposisi musuh satu ronde. Satu asset per ronde.
+// Komposisi musuh satu ronde. Dibuat saat runtime oleh PCG (PcgEnemyComposition) setiap ronde,
+// lalu dibaca kartu gate, preview musuh, HUD, dan spawner. Asset buatan tangan masih bisa dipakai alat Editor.
 [CreateAssetMenu(fileName = "Wave_New", menuName = "MathGate/Wave Data")]
 public class WaveData : ScriptableObject
 {
     [SerializeField] private string waveName;
     [SerializeField] private WaveEntry[] entries;
+
+    // Wave sementara hasil PCG. Tidak disimpan ke Project, hapus dengan Destroy jika sudah tidak dipakai.
+    public static WaveData CreateRuntime(string displayName, WaveEntry[] entries)
+    {
+        WaveData wave = CreateInstance<WaveData>();
+        wave.name = displayName;
+        wave.waveName = displayName;
+        wave.entries = entries;
+        wave.hideFlags = HideFlags.DontSave;
+        return wave;
+    }
 
     public string DisplayName => string.IsNullOrEmpty(waveName) ? name : waveName;
 

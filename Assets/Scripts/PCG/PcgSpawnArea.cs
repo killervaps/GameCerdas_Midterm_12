@@ -17,6 +17,11 @@ public class PcgSpawnArea : MonoBehaviour
     // Jarak aman dari tepi lantai saat memakai Fit To Arena Ground.
     [SerializeField, Min(0f)] private float fitMargin = 0.5f;
 
+    [Header("Enemy Composition Bias")]
+    // Tema arena ini terhadap komposisi musuh, mis. arena menara: Shooter x2.
+    // Kosong = komposisi mengikuti profil ronde di RunManager apa adanya.
+    [SerializeField] private ArenaRoleBias[] roleBias = System.Array.Empty<ArenaRoleBias>();
+
     [Header("Ground Probe")]
     // Raycast dimulai setinggi ini di atas area, lalu turun mencari lantai.
     [SerializeField, Min(0.5f)] private float probeHeight = 10f;
@@ -30,6 +35,8 @@ public class PcgSpawnArea : MonoBehaviour
     private Arena arena;
 
     public Vector2 Size => size;
+
+    public IReadOnlyList<ArenaRoleBias> RoleBias => roleBias;
 
     public Arena Arena
     {

@@ -10,6 +10,7 @@ public enum PcgStream
     EnemyPlacement = 2,
     ItemSelection = 3,
     ItemPlacement = 4,
+    Arena = 5,
     Preview = 99
 }
 

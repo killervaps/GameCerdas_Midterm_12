@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum RunState
@@ -23,6 +24,7 @@ public enum HealRule
 
 // Alur satu run.
 // Safezone (pilih gate) -> teleport ke arena -> spawn wave -> pertempuran -> ronde bersih -> kembali ke Safezone.
+// Arena dan komposisi musuh tiap ronde dibuat PCG dari seed run saat masuk Safezone, posisi musuh saat ronde mulai.
 // Menang jika ronde terakhir bersih, kalah jika HP MC habis. Build menumpuk sepanjang run dan di-reset saat run baru.
 public class RunManager : MonoBehaviour
 {
@@ -33,13 +35,13 @@ public class RunManager : MonoBehaviour
     [SerializeField] private PlayerHealth playerHealth;
 
     [Header("Arena")]
-    // Opsional. Jika diisi, arena dipilih acak tiap ronde (arena ronde sebelumnya peluangnya dikurangi).
-    // Kosong = selalu memakai arena dan SpawnPoint yang sudah diatur di GateSelectionRoom dan EnemySpawner.
+    // Opsional. Jika diisi, arena dipilih acak ber-seed tiap ronde (arena ronde sebelumnya peluangnya dikurangi).
+    // Kosong = selalu memakai titik masuk yang sudah diatur di GateSelectionRoom.
     [SerializeField] private ArenaSelector arenaSelector;
 
-    [Header("Waves")]
-    // Satu WaveData per ronde, urut dari ronde 1.
-    [SerializeField] private WaveData[] waves;
+    [Header("Rounds (PCG)")]
+    // Satu profil per ronde, urut dari ronde 1. Jumlah profil = jumlah ronde.
+    [SerializeField] private EnemyRoundProfile[] rounds = EnemyRoundProfile.Defaults();
 
     [Header("Between Rounds")]
     // TODO(desain): aturan heal antar ronde belum diputuskan. Sementara pulih 30% MaxHP.
@@ -55,17 +57,20 @@ public class RunManager : MonoBehaviour
     [SerializeField] private bool logEvents = true;
 
     private Coroutine pendingReturn;
+    private WaveData currentWave;
 
     public RunState State { get; private set; } = RunState.Idle;
 
     // Dimulai dari 1.
     public int CurrentRound { get; private set; }
 
-    public int TotalRounds => waves != null ? waves.Length : 0;
+    public int TotalRounds => rounds != null ? rounds.Length : 0;
 
-    // Wave ronde saat ini. Saat Preparing, ini wave yang akan dihadapi setelah memilih gate.
-    public WaveData CurrentWave =>
-        waves != null && CurrentRound >= 1 && CurrentRound <= waves.Length ? waves[CurrentRound - 1] : null;
+    // Wave ronde saat ini hasil PCG. Saat Preparing, ini wave yang akan dihadapi setelah memilih gate.
+    public WaveData CurrentWave => currentWave;
+
+    public EnemyRoundProfile CurrentProfile =>
+        rounds != null && CurrentRound >= 1 && CurrentRound <= rounds.Length ? rounds[CurrentRound - 1] : null;
 
     // Arena ronde saat ini. Null jika tidak memakai ArenaSelector.
     public Arena CurrentArena => arenaSelector != null ? arenaSelector.Current : null;
@@ -85,7 +90,7 @@ public class RunManager : MonoBehaviour
 
     public event Action<RunState> StateChanged;
 
-    // Run baru dimulai, sebelum arena dan wave ronde 1 disiapkan. PcgDirector membuat seed run di sini.
+    // Run baru dimulai, sebelum arena dan wave ronde 1 disiapkan (seed PCG sudah dibuat).
     public event Action RunStarted;
 
     public event Action<int> RoundStarted;
@@ -106,7 +111,7 @@ public class RunManager : MonoBehaviour
         }
 
         if (TotalRounds == 0)
-            Debug.LogError("RunManager: daftar Waves masih kosong.", this);
+            Debug.LogError("RunManager: daftar Rounds masih kosong.", this);
 
         // Gate dipilih sekali per ronde, jadi batas gate sama dengan jumlah ronde.
         gateRoom.UseExternalDriver(TotalRounds);
@@ -136,6 +141,12 @@ public class RunManager : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        if (currentWave != null)
+            Destroy(currentWave);
+    }
+
     private void Start()
     {
         if (startOnPlay)
@@ -161,12 +172,11 @@ public class RunManager : MonoBehaviour
         if (arenaSelector != null)
             arenaSelector.ResetHistory();
 
+        PcgDirector.BeginNewRun();
         RunStarted?.Invoke();
 
-        PrepareArena();
-
         // Wave diberikan dulu supaya kartu gate bisa menghitung ancaman.
-        gateRoom.SetUpcomingWave(CurrentWave);
+        PrepareRound();
 
         // Build kembali ke base dulu, baru HP dipulihkan supaya penuh terhadap MaxHP dasar.
         gateRoom.ResetRun();
@@ -212,7 +222,7 @@ public class RunManager : MonoBehaviour
 
         RoundStarted?.Invoke(CurrentRound);
 
-        battle.BeginBattle(spawner.SpawnWave(CurrentWave));
+        battle.BeginBattle(spawner.SpawnWave(CurrentWave, CurrentRound));
     }
 
     private void HandleAllEnemiesDead()
@@ -248,28 +258,53 @@ public class RunManager : MonoBehaviour
 
         CurrentRound++;
         spawner.ClearWave();
-        PrepareArena();
-        gateRoom.SetUpcomingWave(CurrentWave);
+        PrepareRound();
         gateRoom.ReturnToSafezone();
 
         SetState(RunState.Preparing);
     }
 
-    // Memilih arena ronde berikutnya, lalu mengarahkan teleport MC dan SpawnPoint musuh ke arena itu.
+    // Bagian PCG yang dibuat di Safezone: arena, lalu komposisi musuh. Posisi musuh baru dibuat saat ronde mulai.
+    private void PrepareRound()
+    {
+        PrepareArena();
+        GenerateWave();
+        gateRoom.SetUpcomingWave(CurrentWave);
+    }
+
+    // Memilih arena ronde berikutnya, lalu mengarahkan teleport MC dan spawner musuh ke arena itu.
     private void PrepareArena()
     {
         if (arenaSelector == null)
             return;
 
-        Arena arena = arenaSelector.PickNext();
+        Arena arena = arenaSelector.PickNext(PcgDirector.Stream(CurrentRound, PcgStream.Arena));
 
         if (arena == null)
             return;
 
-        spawner.UseSpawnPoints(arena.SpawnPoints);
+        spawner.UseArena(arena);
         gateRoom.SetArenaSpawn(arena.PlayerEntry);
 
         Log("ronde " + CurrentRound + " di arena " + arena.DisplayName);
+    }
+
+    private void GenerateWave()
+    {
+        if (currentWave != null)
+            Destroy(currentWave);
+
+        EnemyRoundProfile profile = CurrentProfile;
+        SeededRandom random = PcgDirector.Stream(CurrentRound, PcgStream.EnemyComposition);
+        // Arena sudah dipilih lebih dulu, jadi tema arena bisa ikut menentukan komposisi.
+        PcgSpawnArea area = spawner.CurrentArea;
+        IReadOnlyList<ArenaRoleBias> bias = area != null ? area.RoleBias : null;
+        WaveEntry[] entries = PcgEnemyComposition.Generate(profile, random, bias);
+        string label = profile != null && !string.IsNullOrEmpty(profile.label) ? profile.label : "Ronde " + CurrentRound;
+
+        currentWave = WaveData.CreateRuntime(label, entries);
+
+        Log("komposisi " + label + " (PCG" + (bias != null && bias.Count > 0 ? ", bias " + area.name : "") + "): " + currentWave.Describe());
     }
 
     private void HandlePlayerDied()

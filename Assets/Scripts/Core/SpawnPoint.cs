@@ -1,6 +1,7 @@
 using UnityEngine;
 
-// Titik muncul musuh di arena. Bisa dikhususkan untuk satu role atau menerima semua role.
+// Titik khusus role yang ditaruh desainer, mis. puncak menara untuk Shooter (Accept Any Role mati).
+// EnemySpawner memakainya dengan peluang Anchor Chance role itu. Titik yang menerima semua role tidak dipakai PCG.
 public class SpawnPoint : MonoBehaviour
 {
     [SerializeField] private bool acceptAnyRole = true;

@@ -68,7 +68,8 @@ public class ArenaSelector : MonoBehaviour
         return total > 0f ? WeightOf(arena) / total : 0f;
     }
 
-    public Arena PickNext()
+    // Random diisi aliran PCG supaya pilihan arena ikut seed run. Null = memakai UnityEngine.Random.
+    public Arena PickNext(SeededRandom random = null)
     {
         if (arenas == null || arenas.Length == 0)
             return null;
@@ -81,7 +82,7 @@ public class ArenaSelector : MonoBehaviour
 
         if (total > 0f)
         {
-            float roll = UnityEngine.Random.value * total;
+            float roll = (random != null ? random.Value : UnityEngine.Random.value) * total;
 
             foreach (Arena arena in arenas)
             {
@@ -101,7 +102,7 @@ public class ArenaSelector : MonoBehaviour
         else
         {
             // Semua bobot nol, pilih acak supaya run tetap jalan.
-            picked = arenas[UnityEngine.Random.Range(0, arenas.Length)];
+            picked = arenas[random != null ? random.Range(0, arenas.Length) : UnityEngine.Random.Range(0, arenas.Length)];
         }
 
         CurrentPickChance = picked != null ? ChanceOf(picked) : 0f;
