@@ -93,6 +93,9 @@ public class RunManager : MonoBehaviour
     // Run baru dimulai, sebelum arena dan wave ronde 1 disiapkan (seed PCG sudah dibuat).
     public event Action RunStarted;
 
+    // Arena dan komposisi ronde berikutnya selesai dibuat (masuk Safezone atau regenerate dari panel debug PCG).
+    public event Action<int> RoundPrepared;
+
     public event Action<int> RoundStarted;
 
     public event Action<int> RoundCleared;
@@ -265,20 +268,46 @@ public class RunManager : MonoBehaviour
     }
 
     // Bagian PCG yang dibuat di Safezone: arena, lalu komposisi musuh. Posisi musuh baru dibuat saat ronde mulai.
-    private void PrepareRound()
+    private void PrepareRound(bool repick = false)
     {
-        PrepareArena();
+        PrepareArena(repick);
         GenerateWave();
         gateRoom.SetUpcomingWave(CurrentWave);
+
+        RoundPrepared?.Invoke(CurrentRound);
+    }
+
+    // Debug PCG: membuat ulang ronde ini dari seed run yang sedang dipakai.
+    //   Di Safezone: arena dan komposisi dipilih ulang, kartu gate dihitung ulang.
+    //   Saat bertarung: komposisi tetap, musuh dan item dimunculkan ulang di posisi baru (HP musuh kembali penuh).
+    public bool CanRegenerate => State == RunState.Preparing || State == RunState.Battle;
+
+    public void RegenerateRound()
+    {
+        if (!Application.isPlaying)
+            return;
+
+        if (State == RunState.Preparing)
+        {
+            PrepareRound(true);
+            gateRoom.RefreshOfferCards();
+            Log("ronde " + CurrentRound + " dibuat ulang (Safezone)");
+        }
+        else if (State == RunState.Battle)
+        {
+            battle.BeginBattle(spawner.SpawnWave(CurrentWave, CurrentRound));
+            Log("ronde " + CurrentRound + " dibuat ulang (posisi musuh dan item)");
+        }
     }
 
     // Memilih arena ronde berikutnya, lalu mengarahkan teleport MC dan spawner musuh ke arena itu.
-    private void PrepareArena()
+    private void PrepareArena(bool repick = false)
     {
         if (arenaSelector == null)
             return;
 
-        Arena arena = arenaSelector.PickNext(PcgDirector.Stream(CurrentRound, PcgStream.Arena));
+        SeededRandom random = PcgDirector.Stream(CurrentRound, PcgStream.Arena);
+        Arena arena = repick ? arenaSelector.Repick(random) : arenaSelector.PickNext(random);
 
         if (arena == null)
             return;

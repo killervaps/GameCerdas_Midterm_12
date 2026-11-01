@@ -114479,6 +114479,7 @@ GameObject:
   - component: {fileID: 1898538369}
   - component: {fileID: 1898538368}
   - component: {fileID: 1898538370}
+  - component: {fileID: 1898538371}
   m_Layer: 0
   m_Name: PCGManager
   m_TagString: Untagged
@@ -114568,6 +114569,31 @@ MonoBehaviour:
     excludedNavMeshArea: archer_jump
   logSpawns: 1
   drawLastPlacement: 1
+--- !u!114 &1898538371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898538367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a975f4a492192649afc46391a0b430f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PcgDebugPanel
+  runManager: {fileID: 0}
+  enemySpawner: {fileID: 0}
+  itemSpawner: {fileID: 0}
+  showPanel: 1
+  followDebugToggle: 1
+  margin: {x: 900, y: 10}
+  width: 340
+  uiScale: 1.4
+  refreshInterval: 0.2
+  drawOverlay: 1
+  drawRejected: 1
+  drawThroughWalls: 1
+  hotkeys: 1
 --- !u!1001 &1901216353
 PrefabInstance:
   m_ObjectHideFlags: 0

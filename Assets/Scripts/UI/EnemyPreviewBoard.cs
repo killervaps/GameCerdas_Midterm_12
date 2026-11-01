@@ -32,7 +32,10 @@ public class EnemyPreviewBoard : MonoBehaviour
     private void OnEnable()
     {
         if (runManager != null)
+        {
             runManager.StateChanged += HandleStateChanged;
+            runManager.RoundPrepared += HandleRoundPrepared;
+        }
 
         if (playerStats != null)
             playerStats.StatsChanged += Refresh;
@@ -41,7 +44,10 @@ public class EnemyPreviewBoard : MonoBehaviour
     private void OnDisable()
     {
         if (runManager != null)
+        {
             runManager.StateChanged -= HandleStateChanged;
+            runManager.RoundPrepared -= HandleRoundPrepared;
+        }
 
         if (playerStats != null)
             playerStats.StatsChanged -= Refresh;
@@ -59,6 +65,11 @@ public class EnemyPreviewBoard : MonoBehaviour
     }
 
     private void HandleStateChanged(RunState state)
+    {
+        Refresh();
+    }
+
+    private void HandleRoundPrepared(int round)
     {
         Refresh();
     }

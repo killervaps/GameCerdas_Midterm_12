@@ -76,7 +76,8 @@ public class EnemySpawner : MonoBehaviour
 
     public PcgSpawnArea CurrentArea => area;
 
-    private PcgSpawnRules ActiveRules =>
+    // Aturan yang benar-benar dipakai musuh (milik sendiri atau Default Rules PcgDirector).
+    public PcgSpawnRules ActiveRules =>
         overrideRules || PcgDirector.Current == null ? rules : PcgDirector.Current.DefaultRules;
 
     // Dikirim setelah satu wave selesai dimunculkan. Didengar BattleManager dan TacticalCoordinator.

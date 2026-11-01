@@ -19,6 +19,8 @@ public class ArenaSelector : MonoBehaviour
     private readonly StringBuilder builder = new StringBuilder();
 
     private Arena previous;
+    // Arena ronde sebelumnya saat pemilihan terakhir dilakukan, untuk Repick.
+    private Arena previousBeforePick;
 
     public Arena Current { get; private set; }
 
@@ -74,6 +76,8 @@ public class ArenaSelector : MonoBehaviour
         if (arenas == null || arenas.Length == 0)
             return null;
 
+        previousBeforePick = previous;
+
         if (logPicks)
             LogChances();
 
@@ -115,6 +119,14 @@ public class ArenaSelector : MonoBehaviour
         ArenaPicked?.Invoke(picked);
 
         return picked;
+    }
+
+    // Mengulang pemilihan ronde ini (debug regenerate). Riwayat dikembalikan dulu, jadi arena yang barusan terpilih
+    // tidak terkena Repeat Penalty seolah-olah dipakai ronde sebelumnya.
+    public Arena Repick(SeededRandom random)
+    {
+        previous = previousBeforePick;
+        return PickNext(random);
     }
 
     private float TotalWeight()

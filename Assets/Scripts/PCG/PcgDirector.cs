@@ -34,6 +34,8 @@ public class PcgDirector : MonoBehaviour
     private readonly System.Collections.Generic.List<Vector3> previewOccupied = new System.Collections.Generic.List<Vector3>();
     private bool hasPreview;
     private bool hasRunSeed;
+    private bool hasQueuedSeed;
+    private int queuedSeed;
 
     public static PcgDirector Current { get; private set; }
 
@@ -86,7 +88,27 @@ public class PcgDirector : MonoBehaviour
     // Membuat seed untuk run baru.
     public void BeginRun()
     {
+        if (hasQueuedSeed)
+        {
+            hasQueuedSeed = false;
+            SetRunSeed(queuedSeed);
+            return;
+        }
+
         SetRunSeed(useRandomSeed ? NewRandomSeed() : fixedSeed);
+    }
+
+    // Seed untuk run berikutnya saja, mis. dari panel debug "Main ulang dengan seed". Setelah itu kembali ke aturan biasa.
+    public void QueueSeedForNextRun(int seed)
+    {
+        queuedSeed = seed;
+        hasQueuedSeed = true;
+    }
+
+    // Seed acak baru untuk sisa run ini. Ronde yang sudah lewat tidak berubah.
+    public void RerollSeed()
+    {
+        SetRunSeed(NewRandomSeed());
     }
 
     // Memakai seed tertentu, mis. dari panel debug untuk mengulang run yang sama.
@@ -96,7 +118,7 @@ public class PcgDirector : MonoBehaviour
         hasRunSeed = true;
 
         if (logSeeds)
-            Debug.Log("PcgDirector: seed run " + seed + (useRandomSeed ? " (acak)" : " (tetap)"), this);
+            Debug.Log("PcgDirector: seed run " + seed, this);
 
         SeedChanged?.Invoke(seed);
     }

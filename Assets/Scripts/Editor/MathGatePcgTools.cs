@@ -119,6 +119,34 @@ public static class MathGatePcgTools
         Debug.Log("MathGate: ItemSpawner di " + spawner.name + " siap, Health Orb masuk tabel item.", spawner);
     }
 
+    // Panel dan overlay debug PCG (ikut F1) di objek PcgDirector.
+    [MenuItem("MathGate/PCG/3. Add PCG Debug Panel To Scene")]
+    public static void AddDebugPanel()
+    {
+        PcgDebugPanel existing = Object.FindAnyObjectByType<PcgDebugPanel>(FindObjectsInactive.Include);
+
+        if (existing != null)
+        {
+            Debug.Log("MathGate: PcgDebugPanel sudah ada di " + existing.name + ".", existing);
+            Selection.activeObject = existing;
+            return;
+        }
+
+        PcgDirector director = Object.FindAnyObjectByType<PcgDirector>(FindObjectsInactive.Include);
+
+        if (director == null)
+        {
+            Debug.LogError("MathGate: PcgDirector tidak ditemukan di scene yang terbuka.");
+            return;
+        }
+
+        PcgDebugPanel panel = Undo.AddComponent<PcgDebugPanel>(director.gameObject);
+        EditorSceneManager.MarkSceneDirty(director.gameObject.scene);
+        Selection.activeObject = panel;
+
+        Debug.Log("MathGate: PcgDebugPanel ditambahkan ke " + director.name + ".", panel);
+    }
+
     private static Material CreateEmissiveMaterial(string path, Color color, float emission)
     {
         Material existing = AssetDatabase.LoadAssetAtPath<Material>(path);

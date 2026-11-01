@@ -220,6 +220,19 @@ public class GateSelectionRoom : MonoBehaviour
         SelectionOpened?.Invoke();
     }
 
+    // Menghitung ulang teks kartu gate yang sedang terbuka tanpa mengganti gate-nya, mis. setelah wave berikutnya berubah.
+    public void RefreshOfferCards()
+    {
+        if (!IsSelecting)
+            return;
+
+        for (int i = 0; i < portals.Length && i < offer.Count; i++)
+        {
+            if (portals[i] != null)
+                portals[i].Open(offer[i], GateTextFormatter.BuildCard(offer[i], playerStats, EvaluateThreat(offer[i])));
+        }
+    }
+
     private ThreatResult? EvaluateThreat(MathGateData gate)
     {
         if (threatEstimator == null || upcomingWave == null)
