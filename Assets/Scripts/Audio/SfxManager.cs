@@ -19,7 +19,8 @@ public enum SfxCue
     GuardianEnrage,
     ShooterShot,
     ShooterHit,
-    EnemyDeath
+    EnemyDeath,
+    ItemPickup
 }
 
 // Semua efek suara game di satu tempat. Script gameplay cukup memanggil SfxManager.Play(SfxCue.X).
@@ -83,6 +84,10 @@ public class SfxManager : MonoBehaviour
 
     [Header("Umum")]
     [SerializeField] private SfxEntry enemyDeath = new SfxEntry();
+
+    [Header("Item")]
+    // Item PCG diambil MC, mis. health orb.
+    [SerializeField] private SfxEntry itemPickup = new SfxEntry();
 
     private AudioSource[] pool;
     private AudioSource uiSource;
@@ -187,6 +192,7 @@ public class SfxManager : MonoBehaviour
             case SfxCue.ShooterShot: return shooterShot;
             case SfxCue.ShooterHit: return shooterHit;
             case SfxCue.EnemyDeath: return enemyDeath;
+            case SfxCue.ItemPickup: return itemPickup;
             default: return null;
         }
     }

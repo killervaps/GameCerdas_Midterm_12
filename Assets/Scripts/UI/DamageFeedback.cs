@@ -31,6 +31,7 @@ public class DamageFeedback : UIScreen
     private static readonly Color BigHitColor = new Color(1f, 0.6f, 0.15f);
     private static readonly Color BurstHitColor = new Color(0.78f, 0.6f, 1f);
     private static readonly Color PlayerHitColor = new Color(1f, 0.3f, 0.3f);
+    private static readonly Color HealColor = new Color(0.4f, 1f, 0.5f);
 
     private class Popup
     {
@@ -78,13 +79,19 @@ public class DamageFeedback : UIScreen
         player = ui.Health;
 
         if (player != null)
+        {
             player.Damaged += HandlePlayerDamaged;
+            player.Healed += HandlePlayerHealed;
+        }
     }
 
     private void OnDestroy()
     {
         if (player != null)
+        {
             player.Damaged -= HandlePlayerDamaged;
+            player.Healed -= HandlePlayerHealed;
+        }
 
         foreach (KeyValuePair<EnemyHealth, Action<float, DamageInfo>> pair in subscriptions)
         {
@@ -119,6 +126,14 @@ public class DamageFeedback : UIScreen
         float size = enemyFontSize * (big ? 1.35f : 1f);
 
         SpawnPopup(enemy.AimPoint + Vector3.up * 0.6f, FormatDamage(damage), color, size);
+    }
+
+    private void HandlePlayerHealed(float amount)
+    {
+        if (!IsVisible || player == null || amount <= 0f)
+            return;
+
+        SpawnPopup(player.AimPoint + Vector3.up * 0.9f, "+" + FormatDamage(amount), HealColor, playerFontSize);
     }
 
     private void HandlePlayerDamaged(float damage, DamageInfo info)

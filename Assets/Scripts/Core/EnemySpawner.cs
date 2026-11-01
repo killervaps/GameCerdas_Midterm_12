@@ -71,6 +71,9 @@ public class EnemySpawner : MonoBehaviour
 
     public int LastSeed { get; private set; }
 
+    // Posisi semua musuh ronde ini. ItemSpawner memakainya supaya item tidak muncul menempel musuh.
+    public IReadOnlyList<Vector3> Occupied => occupied;
+
     public PcgSpawnArea CurrentArea => area;
 
     private PcgSpawnRules ActiveRules =>

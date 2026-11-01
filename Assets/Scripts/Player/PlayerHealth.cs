@@ -36,6 +36,9 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     // Damage akhir setelah Defense beserta paket aslinya.
     public event Action<float, DamageInfo> Damaged;
 
+    // HP yang benar-benar bertambah (sudah dipotong batas MaxHP). Dipakai angka heal hijau di UI.
+    public event Action<float> Healed;
+
     private void Awake()
     {
         stats = GetComponent<PlayerStats>();
@@ -155,12 +158,20 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         Died?.Invoke();
     }
 
-    // Heal sebagian. Tidak berlaku untuk MC yang sudah mati.
-    public void Heal(float amount)
+    // Heal sebagian. Tidak berlaku untuk MC yang sudah mati. Mengembalikan HP yang benar-benar bertambah.
+    public float Heal(float amount)
     {
         if (IsDead || amount <= 0f)
-            return;
+            return 0f;
 
+        float before = CurrentHealth;
         CurrentHealth = Mathf.Min(CurrentHealth + amount, MaxHealth);
+
+        float healed = CurrentHealth - before;
+
+        if (healed > 0f)
+            Healed?.Invoke(healed);
+
+        return healed;
     }
 }
