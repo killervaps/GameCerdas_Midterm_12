@@ -27,6 +27,10 @@ public static class GameLayers
     public static LayerMask ObstacleMask =>
         LayerMask.GetMask(NavBlock);
 
+    // Lantai yang bisa dipijak. Dipakai PCG untuk mencari titik di permukaan arena.
+    public static LayerMask GroundMask =>
+        LayerMask.GetMask(Ground);
+
     public static LayerMask EnemyMask =>
         LayerMask.GetMask(Enemy);
 

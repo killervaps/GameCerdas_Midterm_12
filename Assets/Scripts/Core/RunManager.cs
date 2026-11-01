@@ -85,6 +85,9 @@ public class RunManager : MonoBehaviour
 
     public event Action<RunState> StateChanged;
 
+    // Run baru dimulai, sebelum arena dan wave ronde 1 disiapkan. PcgDirector membuat seed run di sini.
+    public event Action RunStarted;
+
     public event Action<int> RoundStarted;
 
     public event Action<int> RoundCleared;
@@ -157,6 +160,8 @@ public class RunManager : MonoBehaviour
 
         if (arenaSelector != null)
             arenaSelector.ResetHistory();
+
+        RunStarted?.Invoke();
 
         PrepareArena();
 

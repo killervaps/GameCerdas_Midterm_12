@@ -2847,6 +2847,7 @@ GameObject:
   m_Component:
   - component: {fileID: 55186987}
   - component: {fileID: 55186988}
+  - component: {fileID: 55186989}
   m_Layer: 0
   m_Name: arena_4_chg
   m_TagString: Untagged
@@ -2896,6 +2897,27 @@ MonoBehaviour:
   - {fileID: 1370823519}
   - {fileID: 892722207}
   baseWeight: 1
+--- !u!114 &55186989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55186986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a8f168c8023dc7488f31341282a7679, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PcgSpawnArea
+  center: {x: -4.200001, y: 0.00000011920929, z: 4}
+  size: {x: 18, y: 22}
+  fitMargin: 0.5
+  probeHeight: 10
+  probeDepth: 15
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 256
+  drawGizmos: 1
 --- !u!1001 &57208928
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -33650,6 +33672,7 @@ GameObject:
   m_Component:
   - component: {fileID: 569771814}
   - component: {fileID: 569771815}
+  - component: {fileID: 569771816}
   m_Layer: 0
   m_Name: arena_2_str
   m_TagString: Untagged
@@ -33700,6 +33723,27 @@ MonoBehaviour:
   - {fileID: 1652882824}
   - {fileID: 1623429423}
   baseWeight: 1
+--- !u!114 &569771816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 569771813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a8f168c8023dc7488f31341282a7679, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PcgSpawnArea
+  center: {x: -6.01, y: 0.00000011920929, z: 5.46}
+  size: {x: 10, y: 11}
+  fitMargin: 0.5
+  probeHeight: 10
+  probeDepth: 15
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 256
+  drawGizmos: 1
 --- !u!1 &571928375
 GameObject:
   m_ObjectHideFlags: 0
@@ -78220,6 +78264,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1293211533}
   - component: {fileID: 1293211534}
+  - component: {fileID: 1293211535}
   m_Layer: 0
   m_Name: arena_1
   m_TagString: Untagged
@@ -78266,6 +78311,27 @@ MonoBehaviour:
   - {fileID: 1038367433}
   - {fileID: 1743186712}
   baseWeight: 1
+--- !u!114 &1293211535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1293211532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a8f168c8023dc7488f31341282a7679, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PcgSpawnArea
+  center: {x: -5.0000005, y: 0.07000001, z: 5.500001}
+  size: {x: 10, y: 11.000003}
+  fitMargin: 0.5
+  probeHeight: 10
+  probeDepth: 15
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 256
+  drawGizmos: 1
 --- !u!1001 &1295217309
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -78881,7 +78947,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ab04448f748c6fb4590d1e0c8c5f32c5, type: 2}
   - {fileID: 11400000, guid: 5017206571060d14c98f3ab272ee50e4, type: 2}
   - {fileID: 11400000, guid: b6ce365127803d04d845ecf798aee7fe, type: 2}
-  healRule: 2
+  healRule: 1
   partialHealRatio: 0.3
   returnDelay: 2
   startOnPlay: 1
@@ -114328,6 +114394,71 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0103a40fcc55bc248a0f65fbcb04e8a7, type: 3}
   m_PrefabInstance: {fileID: 1896906893}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1898538367
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1898538369}
+  - component: {fileID: 1898538368}
+  m_Layer: 0
+  m_Name: PCGManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1898538368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898538367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15033f264da277a409d413e70cf692ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PcgDirector
+  useRandomSeed: 1
+  fixedSeed: 12345
+  runManager: {fileID: 1303698171}
+  defaultRules:
+    minDistanceFromPlayer: 4
+    checkRadius: 0.35
+    obstacleMask:
+      serializedVersion: 2
+      m_Bits: 256
+    minimumSpacing: 1.2
+    maxAttemptsPerObject: 50
+    allowElevated: 0
+    requireReachable: 1
+    navMeshSnapDistance: 0.6
+    excludedNavMeshArea: archer_jump
+  previewArea: {fileID: 1928172443}
+  previewSeed: 12345
+  previewCount: 12
+  drawPreview: 1
+  currentRunSeed: 0
+  logSeeds: 1
+--- !u!4 &1898538369
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898538367}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.88576, y: -0, z: 28.14094}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1901216353
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -115894,6 +116025,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1928172441}
   - component: {fileID: 1928172442}
+  - component: {fileID: 1928172443}
   m_Layer: 0
   m_Name: arena_3_grd
   m_TagString: Untagged
@@ -115944,6 +116076,27 @@ MonoBehaviour:
   - {fileID: 885340923}
   - {fileID: 972894284}
   baseWeight: 1
+--- !u!114 &1928172443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928172440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a8f168c8023dc7488f31341282a7679, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PcgSpawnArea
+  center: {x: 7, y: 0.00000011920929, z: 0.5}
+  size: {x: 14, y: 15}
+  fitMargin: 0.5
+  probeHeight: 10
+  probeDepth: 15
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 256
+  drawGizmos: 1
 --- !u!1001 &1928283110
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -129730,3 +129883,4 @@ SceneRoots:
   - {fileID: 55186987}
   - {fileID: 337206582}
   - {fileID: 1826922915}
+  - {fileID: 1898538369}
