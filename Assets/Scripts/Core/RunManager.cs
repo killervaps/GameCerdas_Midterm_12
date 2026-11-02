@@ -42,6 +42,8 @@ public class RunManager : MonoBehaviour
     [Header("Rounds (PCG)")]
     // Satu profil per ronde, urut dari ronde 1. Jumlah profil = jumlah ronde.
     [SerializeField] private EnemyRoundProfile[] rounds = EnemyRoundProfile.Defaults();
+    // Challenge 4: biaya tiap role untuk Difficulty Budget. Hanya dipakai profil ronde yang Difficulty Budget-nya > 0.
+    [SerializeField] private RoleCost[] roleCosts = RoleCost.Defaults();
 
     [Header("Between Rounds")]
     // TODO(desain): aturan heal antar ronde belum diputuskan. Sementara pulih 30% MaxHP.
@@ -68,6 +70,13 @@ public class RunManager : MonoBehaviour
 
     // Wave ronde saat ini hasil PCG. Saat Preparing, ini wave yang akan dihadapi setelah memilih gate.
     public WaveData CurrentWave => currentWave;
+
+    public IReadOnlyList<RoleCost> RoleCosts => roleCosts;
+
+    // Difficulty Budget ronde ini (0 = mati) dan total biaya musuh hasil PCG.
+    public int CurrentBudget { get; private set; }
+
+    public int CurrentBudgetSpent { get; private set; }
 
     public EnemyRoundProfile CurrentProfile =>
         rounds != null && CurrentRound >= 1 && CurrentRound <= rounds.Length ? rounds[CurrentRound - 1] : null;
@@ -328,12 +337,17 @@ public class RunManager : MonoBehaviour
         // Arena sudah dipilih lebih dulu, jadi tema arena bisa ikut menentukan komposisi.
         PcgSpawnArea area = spawner.CurrentArea;
         IReadOnlyList<ArenaRoleBias> bias = area != null ? area.RoleBias : null;
-        WaveEntry[] entries = PcgEnemyComposition.Generate(profile, random, bias);
+        WaveEntry[] entries = PcgEnemyComposition.Generate(profile, random, bias, roleCosts, out int spent);
         string label = profile != null && !string.IsNullOrEmpty(profile.label) ? profile.label : "Ronde " + CurrentRound;
+
+        CurrentBudget = profile != null ? profile.difficultyBudget : 0;
+        CurrentBudgetSpent = spent;
 
         currentWave = WaveData.CreateRuntime(label, entries);
 
-        Log("komposisi " + label + " (PCG" + (bias != null && bias.Count > 0 ? ", bias " + area.name : "") + "): " + currentWave.Describe());
+        string budgetText = CurrentBudget > 0 ? ", budget " + spent + "/" + CurrentBudget : ", biaya " + spent;
+
+        Log("komposisi " + label + " (PCG" + (bias != null && bias.Count > 0 ? ", bias " + area.name : "") + budgetText + "): " + currentWave.Describe());
     }
 
     private void HandlePlayerDied()

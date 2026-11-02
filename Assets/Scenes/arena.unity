@@ -78970,6 +78970,7 @@ MonoBehaviour:
   - label: Ronde 1
     minEnemies: 2
     maxEnemies: 3
+    difficultyBudget: 4
     roles:
     - role: 0
       weight: 3
@@ -78986,6 +78987,7 @@ MonoBehaviour:
   - label: Ronde 2
     minEnemies: 3
     maxEnemies: 4
+    difficultyBudget: 7
     roles:
     - role: 0
       weight: 2
@@ -79002,6 +79004,7 @@ MonoBehaviour:
   - label: Ronde 3
     minEnemies: 3
     maxEnemies: 5
+    difficultyBudget: 10
     roles:
     - role: 0
       weight: 2
@@ -79015,6 +79018,13 @@ MonoBehaviour:
       weight: 1
       min: 1
       max: 1
+  roleCosts:
+  - role: 0
+    cost: 2
+  - role: 1
+    cost: 2
+  - role: 2
+    cost: 3
   healRule: 1
   partialHealRatio: 0.3
   returnDelay: 2
@@ -79042,7 +79052,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1303698169}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -4.33988, y: 0, z: 10.54505}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -114480,6 +114490,8 @@ GameObject:
   - component: {fileID: 1898538368}
   - component: {fileID: 1898538370}
   - component: {fileID: 1898538371}
+  - component: {fileID: 1898538373}
+  - component: {fileID: 1898538372}
   m_Layer: 0
   m_Name: PCGManager
   m_TagString: Untagged
@@ -114581,9 +114593,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a975f4a492192649afc46391a0b430f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PcgDebugPanel
-  runManager: {fileID: 0}
-  enemySpawner: {fileID: 0}
-  itemSpawner: {fileID: 0}
+  runManager: {fileID: 1303698171}
+  enemySpawner: {fileID: 501934855}
+  itemSpawner: {fileID: 1898538370}
   showPanel: 1
   followDebugToggle: 1
   margin: {x: 900, y: 10}
@@ -114594,6 +114606,45 @@ MonoBehaviour:
   drawRejected: 1
   drawThroughWalls: 1
   hotkeys: 1
+--- !u!114 &1898538372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898538367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34849c3d60044f04a90e60351235f1c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PcgSeedHistory
+  maxRecent: 6
+  saveBetweenSessions: 1
+  runManager: {fileID: 1303698171}
+--- !u!114 &1898538373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898538367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06d8c9ca3fc496045b115c02bd30e219, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PcgLabPanel
+  runManager: {fileID: 1303698171}
+  enemySpawner: {fileID: 501934855}
+  history: {fileID: 1898538372}
+  showPanel: 1
+  followDebugToggle: 1
+  margin: {x: 1460, y: 285}
+  width: 440
+  height: 300
+  historyListHeight: 70
+  uiScale: 1
+  sampleSizes: 64000000f4010000e8030000i
+  logStatistics: 1
 --- !u!1001 &1901216353
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -130005,7 +130056,6 @@ SceneRoots:
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 1619466082}
-  - {fileID: 1293211533}
   - {fileID: 1987173368}
   - {fileID: 581620084}
   - {fileID: 1171026606}
@@ -130014,9 +130064,10 @@ SceneRoots:
   - {fileID: 1441237112}
   - {fileID: 998906539}
   - {fileID: 1447630697}
-  - {fileID: 1303698173}
   - {fileID: 125193467}
   - {fileID: 571928378}
+  - {fileID: 1303698173}
+  - {fileID: 1293211533}
   - {fileID: 569771814}
   - {fileID: 1928172441}
   - {fileID: 55186987}

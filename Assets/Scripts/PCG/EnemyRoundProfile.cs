@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 // Satu baris tabel role di profil ronde.
@@ -23,6 +24,50 @@ public class EnemySpawnEntry
         this.weight = weight;
         this.min = min;
         this.max = max;
+    }
+}
+
+// Challenge 4: biaya satu role dalam Difficulty Budget. Makin kuat role, makin mahal.
+[Serializable]
+public class RoleCost
+{
+    public EnemyRole role = EnemyRole.Charger;
+    [Min(1)] public int cost = 1;
+
+    public RoleCost()
+    {
+    }
+
+    public RoleCost(EnemyRole role, int cost)
+    {
+        this.role = role;
+        this.cost = cost;
+    }
+
+    // Role yang tidak ada di tabel dianggap berbiaya 1. Biaya minimal 1 supaya undian budget selalu berhenti.
+    public static int Of(EnemyRole role, IReadOnlyList<RoleCost> costs)
+    {
+        if (costs != null)
+        {
+            for (int i = 0; i < costs.Count; i++)
+            {
+                if (costs[i] != null && costs[i].role == role)
+                    return Math.Max(1, costs[i].cost);
+            }
+        }
+
+        return 1;
+    }
+
+    // Charger dan Shooter setara, Guardian (tank, HP 150) lebih mahal.
+    public static RoleCost[] Defaults()
+    {
+        return new[]
+        {
+            new RoleCost(EnemyRole.Charger, 2),
+            new RoleCost(EnemyRole.Shooter, 2),
+            new RoleCost(EnemyRole.Guardian, 3)
+        };
     }
 }
 
@@ -58,6 +103,10 @@ public class EnemyRoundProfile
     public string label = "Ronde";
     [Min(1)] public int minEnemies = 2;
     [Min(1)] public int maxEnemies = 3;
+    // Challenge 4: Difficulty Budget. Lebih dari 0 = jumlah musuh ditentukan budget (total biaya role, lihat Role Costs
+    // di RunManager), bukan Min/Max Enemies. Undian tetap weighted random, tapi hanya role yang biayanya masih muat.
+    // 0 = mati, memakai Min/Max Enemies seperti biasa.
+    [Min(0)] public int difficultyBudget;
     public EnemySpawnEntry[] roles = Array.Empty<EnemySpawnEntry>();
 
     public EnemyRoundProfile()
