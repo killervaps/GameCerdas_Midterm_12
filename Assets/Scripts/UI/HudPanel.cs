@@ -43,6 +43,10 @@ public class HudPanel : UIScreen
     private TextMeshProUGUI threatStampLabel;
     private TextMeshProUGUI threatRatioText;
     private RectTransform buildChips;
+    private GameObject vaultRow;
+    private Image vaultStamp;
+    private TextMeshProUGUI vaultStampLabel;
+    private VaultState shownVaultState = (VaultState)(-1);
     private TextMeshProUGUI hpText;
     private RectTransform hpFill;
     private Image hpFillImage;
@@ -247,6 +251,13 @@ public class HudPanel : UIScreen
         UIKit.Layout(buildChips, -1f, -1f, 1f);
         VerticalLayoutGroup chipColumn = UIKit.AddVertical(buildChips.gameObject, 10f);
         chipColumn.childForceExpandWidth = false;
+
+        // Baris 4 (Mode Dungeon): status vault ronde ini. Hilang setelah chest dibuka.
+        RectTransform vaultRect = UIKit.CreateRect("VaultRow", topLeft);
+        vaultRow = vaultRect.gameObject;
+        UIKit.AddHorizontal(vaultRow, 10f, null, TextAnchor.MiddleLeft);
+        vaultStamp = UIKit.CreateStamp("VaultStamp", vaultRect, 19f, -2f, out vaultStampLabel);
+        vaultRow.SetActive(false);
     }
 
     private void BuildSkill()
@@ -333,7 +344,7 @@ public class HudPanel : UIScreen
 
         PlayerStats stats = ui.Stats;
 
-        if (stats == null || stats.SelectedGates.Count == 0)
+        if (stats == null || stats.SelectedGates.Count + stats.VaultGates.Count == 0)
         {
             Image empty = UIKit.CreateStamp("EmptyChip", buildChips, 19f, 0f, out TextMeshProUGUI emptyLabel);
             empty.color = UIKit.Well;
@@ -342,41 +353,82 @@ public class HudPanel : UIScreen
             return;
         }
 
-        for (int i = 0; i < stats.SelectedGates.Count; i++)
-        {
-            MathGateData gate = stats.SelectedGates[i];
+        int index = 0;
 
-            if (gate == null)
+        foreach (MathGateData gate in stats.SelectedGates)
+            AddGateChip(gate, index++, false);
+
+        // Hadiah vault: hanya buff yang dipakai, jadi hanya buff yang ditampilkan.
+        foreach (MathGateData gate in stats.VaultGates)
+            AddGateChip(gate, index++, true);
+
+        UIKit.ForceRebuild(topLeft);
+    }
+
+    private void AddGateChip(MathGateData gate, int index, bool vault)
+    {
+        if (gate == null)
+            return;
+
+        // Baris 1 nama gate, baris 2 operasinya. Simbol, nilai, dan stat satu operasi digabung dengan
+        // spasi tak terputus (U+00A0) supaya "÷1.25 DMG" tidak terbelah saat teks dibungkus.
+        builder.Clear();
+        builder.Append(vault ? "Vault · " : string.Empty).Append(ShortGateName(gate.DisplayName)).Append("\n<size=82%>");
+
+        bool first = true;
+
+        for (int e = 0; e < gate.Effects.Count; e++)
+        {
+            ModifierEffect effect = gate.Effects[e];
+
+            if (vault && !effect.IsBuff)
                 continue;
 
-            // Baris 1 nama gate, baris 2 operasinya. Simbol, nilai, dan stat satu operasi digabung dengan
-            // spasi tak terputus (U+00A0) supaya "÷1.25 DMG" tidak terbelah saat teks dibungkus.
-            builder.Clear();
-            builder.Append(ShortGateName(gate.DisplayName)).Append("\n<size=82%>");
+            if (!first)
+                builder.Append("   ");
 
-            for (int e = 0; e < gate.Effects.Count; e++)
-            {
-                ModifierEffect effect = gate.Effects[e];
-
-                if (e > 0)
-                    builder.Append("   ");
-
-                builder.Append(effect.Symbol).Append(effect.value.ToString("0.##")).Append(' ').Append(UIKit.StatShort(effect.stat));
-            }
-
-            builder.Append("</size>");
-
-            // Kemiringan bergantian supaya tumpukan chip terasa ditempel tangan.
-            Image chip = UIKit.CreateStamp("GateChip", buildChips, 19f, i % 2 == 0 ? -2f : 2f, out TextMeshProUGUI chipLabel);
-            chipLabel.textWrappingMode = TextWrappingModes.Normal;
-            chipLabel.alignment = TextAlignmentOptions.Left;
-            chipLabel.lineSpacing = -10f;
-            UIKit.SetStamp(chip, chipLabel, builder.ToString(), UIKit.RarityColor(gate.Rarity));
-
-            if (GateRarityStyle.IsAnimated(gate.Rarity))
-                chip.gameObject.AddComponent<SigmaRainbow>().Bind(chip, chipLabel);
+            first = false;
+            builder.Append(effect.Symbol).Append(effect.value.ToString("0.##")).Append(' ').Append(UIKit.StatShort(effect.stat));
         }
 
+        builder.Append("</size>");
+
+        // Kemiringan bergantian supaya tumpukan chip terasa ditempel tangan.
+        Image chip = UIKit.CreateStamp(vault ? "VaultChip" : "GateChip", buildChips, 19f, index % 2 == 0 ? -2f : 2f, out TextMeshProUGUI chipLabel);
+        chipLabel.textWrappingMode = TextWrappingModes.Normal;
+        chipLabel.alignment = TextAlignmentOptions.Left;
+        chipLabel.lineSpacing = -10f;
+        UIKit.SetStamp(chip, chipLabel, builder.ToString(), UIKit.RarityColor(gate.Rarity));
+
+        if (GateRarityStyle.IsAnimated(gate.Rarity))
+            chip.gameObject.AddComponent<SigmaRainbow>().Bind(chip, chipLabel);
+    }
+
+    // Status vault Mode Dungeon selama ronde berjalan: cari kunci, buka pintu, buka chest.
+    private void RefreshVault(RunState state)
+    {
+        DungeonVault vault = DungeonVault.Active;
+        bool show = vault != null && vault.State != VaultState.Looted &&
+                    (state == RunState.Battle || state == RunState.RoundCleared);
+
+        if (vaultRow.activeSelf != show)
+        {
+            vaultRow.SetActive(show);
+            shownVaultState = (VaultState)(-1);
+            UIKit.ForceRebuild(topLeft);
+        }
+
+        if (!show || vault.State == shownVaultState)
+            return;
+
+        shownVaultState = vault.State;
+
+        string text = vault.State == VaultState.KeyFound ? "Kunci vault didapat · cari pintunya"
+            : vault.State == VaultState.Open ? "Vault terbuka · buka chest"
+            : "Vault terkunci · cari kuncinya";
+
+        Color fill = vault.State == VaultState.Locked ? UIKit.RarityColor(vault.MinRarity) : UIKit.RarityColor(GateRarity.Legendary);
+        UIKit.SetStamp(vaultStamp, vaultStampLabel, text, fill);
         UIKit.ForceRebuild(topLeft);
     }
 
@@ -417,6 +469,7 @@ public class HudPanel : UIScreen
         }
 
         RefreshStateTag(state, run);
+        RefreshVault(state);
 
         PlayerHealth health = ui.Health;
 

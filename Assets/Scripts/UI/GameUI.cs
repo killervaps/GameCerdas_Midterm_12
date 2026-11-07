@@ -44,6 +44,9 @@ public class GameUI : MonoBehaviour
     [SerializeField] private bool enemyHealthBars = true;
     // Crosshair auto-target dan lock-on di atas musuh yang sedang dibidik MC.
     [SerializeField] private bool lockOnReticle = true;
+    // Mode Dungeon: penanda arah portal Goal setelah ronde bersih. Mati = pemain mencari portal sendiri
+    // (kartu "Tahan E" di dekat portal tetap muncul).
+    [SerializeField] private bool showGoalIndicator = true;
     [SerializeField] private string playerActionMap = "Player";
 
     [Header("Tutorial")]
@@ -70,6 +73,8 @@ public class GameUI : MonoBehaviour
     private PauseScreen pause;
     private TutorialScreen tutorial;
     private SettingsScreen settings;
+    private ModeSelectScreen modeSelect;
+    private GoalIndicator goalIndicator;
     private ResultScreen result;
 
     private InputActionMap playerMap;
@@ -99,6 +104,8 @@ public class GameUI : MonoBehaviour
     public bool IsPaused { get; private set; }
     public bool IsTutorialOpen => tutorial != null && tutorial.IsVisible;
     public bool IsSettingsOpen => settings != null && settings.IsVisible;
+
+    public bool IsModeSelectOpen => modeSelect != null && modeSelect.IsVisible;
     public bool IsResultOpen => result != null && result.IsVisible;
 
     public RunState State => runManager != null ? runManager.State : RunState.Idle;
@@ -180,6 +187,8 @@ public class GameUI : MonoBehaviour
 
         if (playerStats != null)
             playerStats.StatsChanged += HandleStatsChanged;
+
+        DungeonVault.Changed += HandleVaultChanged;
     }
 
     private void OnDisable()
@@ -201,6 +210,8 @@ public class GameUI : MonoBehaviour
 
         if (playerStats != null)
             playerStats.StatsChanged -= HandleStatsChanged;
+
+        DungeonVault.Changed -= HandleVaultChanged;
 
         // Jangan tinggalkan game dalam keadaan beku atau tanpa input.
         if (IsPaused)
@@ -263,6 +274,12 @@ public class GameUI : MonoBehaviour
 
     private void HandleCancel()
     {
+        if (IsModeSelectOpen)
+        {
+            CloseModeSelect();
+            return;
+        }
+
         if (IsSettingsOpen)
         {
             CloseSettings();
@@ -296,11 +313,35 @@ public class GameUI : MonoBehaviour
 
     // ---------- Aksi dari tombol ----------
 
+    // Tombol MULAI: pilih mode dulu.
+    public void OpenModeSelect()
+    {
+        modeSelect.Show();
+    }
+
+    public void CloseModeSelect()
+    {
+        modeSelect.Hide();
+
+        if (IsMainMenuOpen)
+            mainMenu.FocusFirst();
+    }
+
+    public void StartGame(GameMode mode)
+    {
+        if (runManager != null)
+            runManager.SetMode(mode);
+
+        StartGame();
+    }
+
+    // Retry dan Main lagi memakai mode yang sedang dipakai.
     public void StartGame()
     {
         if (showcase != null)
             showcase.End();
 
+        modeSelect.Hide();
         mainMenu.Hide();
         result.Hide();
         CancelPendingResult();
@@ -457,7 +498,10 @@ public class GameUI : MonoBehaviour
         }
         else if (state == RunState.RoundCleared)
         {
-            ShowHint("cleared", "Ronde bersih! HP pulih sebagian, lalu kamu kembali ke Safezone untuk memilih gate berikutnya.");
+            if (runManager != null && runManager.Mode == GameMode.Dungeon)
+                ShowHint("cleared_dungeon", "Ronde bersih! Portal Goal terbuka. Berdiri di portal lalu tahan <b>E</b> untuk kembali ke Safezone.");
+            else
+                ShowHint("cleared", "Ronde bersih! HP pulih sebagian, lalu kamu kembali ke Safezone untuk memilih gate berikutnya.");
         }
 
         RefreshPanels();
@@ -479,7 +523,7 @@ public class GameUI : MonoBehaviour
         string title = final ? "KEMENANGAN!" : "RONDE BERSIH!";
         string subtitle = "Musuh dikalahkan dalam <b>" + UIKit.FormatTime(battleTime) + "</b>" +
                           (hp.Length > 0 ? "   |   " + hp : string.Empty) +
-                          (final ? string.Empty : "   |   kembali ke Safezone...");
+                          (final ? string.Empty : runManager.Mode == GameMode.Dungeon ? "   |   portal Goal terbuka" : "   |   kembali ke Safezone...");
 
         gateModal.Hide();
         hints.Hide();
@@ -523,6 +567,51 @@ public class GameUI : MonoBehaviour
         gateModal.Hide();
         enemyPreview.SetCompareGate(null);
         hud.RefreshBuild();
+    }
+
+    // Banner tengah untuk langkah vault Mode Dungeon. Hadiah ditampilkan dengan warna rarity dan buff-nya.
+    private void HandleVaultChanged(DungeonVault vault, VaultEvent vaultEvent)
+    {
+        if (hud == null)
+            return;
+
+        switch (vaultEvent)
+        {
+            case VaultEvent.KeyFound:
+                hud.Flash("KUNCI VAULT", "Cari pintu vault yang terkunci di dungeon ini.");
+                break;
+            case VaultEvent.DoorLocked:
+                hud.Flash("VAULT TERKUNCI", "Kuncinya ada di room lain. Jelajahi dungeon untuk menemukannya.");
+                break;
+            case VaultEvent.DoorOpened:
+                hud.Flash("VAULT TERBUKA", "Buka chest di dalamnya.");
+                break;
+            case VaultEvent.Looted:
+                MathGateData reward = vault.Reward;
+
+                if (reward == null)
+                {
+                    hud.Flash("CHEST KOSONG", "Pool gate tidak punya gate " + GateRarityStyle.Label(vault.MinRarity) + " ke atas.");
+                    break;
+                }
+
+                System.Text.StringBuilder buffs = new System.Text.StringBuilder();
+
+                foreach (ModifierEffect effect in reward.Effects)
+                {
+                    if (!effect.IsBuff)
+                        continue;
+
+                    if (buffs.Length > 0)
+                        buffs.Append("   ");
+
+                    buffs.Append(effect.Symbol).Append(effect.value.ToString("0.##")).Append(' ').Append(UIKit.StatShort(effect.stat));
+                }
+
+                hud.Flash(GateRarityStyle.Wrap(reward.Rarity, reward.DisplayName.ToUpperInvariant()),
+                    GateRarityStyle.RichLabel(reward.Rarity) + "   |   <color=" + UIKit.BuffHex + ">" + buffs + "</color>   |   tanpa trade-off");
+                break;
+        }
     }
 
     private void HandleStatsChanged()
@@ -580,6 +669,9 @@ public class GameUI : MonoBehaviour
         reticle.SetVisible(lockOnReticle && combat);
         damageFeedback.SetVisible(combat);
         enemyPreview.SetVisible(inGame && state == RunState.Preparing);
+        goalIndicator.ShowMarker = showGoalIndicator;
+        goalIndicator.SetVisible(inGame && !announcing && state == RunState.RoundCleared &&
+                                 runManager != null && runManager.Mode == GameMode.Dungeon);
 
         if (!inGame || ended)
             gateModal.Hide();
@@ -590,7 +682,7 @@ public class GameUI : MonoBehaviour
         if (playerMap == null)
             return;
 
-        bool allowed = !IsMainMenuOpen && !IsPaused && !IsTutorialOpen && !IsSettingsOpen && !IsResultOpen;
+        bool allowed = !IsMainMenuOpen && !IsPaused && !IsTutorialOpen && !IsSettingsOpen && !IsResultOpen && !IsModeSelectOpen;
 
         // Skrip gameplay meng-Enable action-nya sendiri di OnEnable, jadi saat input harus mati
         // map dicek ulang setiap frame.
@@ -657,6 +749,7 @@ public class GameUI : MonoBehaviour
         healthBars = CreateScreen<EnemyHealthBars>("EnemyHealthBars", false);
         reticle = CreateScreen<LockOnReticle>("LockOnReticle", false);
         damageFeedback = CreateScreen<DamageFeedback>("DamageFeedback", false);
+        goalIndicator = CreateScreen<GoalIndicator>("GoalIndicator", false);
         hud = CreateScreen<HudPanel>("HUD", false);
         enemyPreview = CreateScreen<EnemyPreviewPanel>("EnemyPreview", false);
         gateModal = CreateScreen<GateInfoModal>("GateInfoModal", false);
@@ -668,6 +761,7 @@ public class GameUI : MonoBehaviour
         mainMenu = CreateScreen<MainMenuScreen>("MainMenu", true);
         tutorial = CreateScreen<TutorialScreen>("Tutorial", true);
         settings = CreateScreen<SettingsScreen>("Settings", true);
+        modeSelect = CreateScreen<ModeSelectScreen>("ModeSelect", true);
     }
 
     private T CreateScreen<T>(string screenName, bool interactive) where T : UIScreen

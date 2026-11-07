@@ -13,6 +13,7 @@ public class PlayerStats : MonoBehaviour
 
     private readonly List<ModifierEffect> modifiers = new List<ModifierEffect>();
     private readonly List<MathGateData> selectedGates = new List<MathGateData>();
+    private readonly List<MathGateData> vaultGates = new List<MathGateData>();
 
     private readonly float[] baseValues = new float[StatTypes.Count];
     private readonly float[] clampMins = new float[StatTypes.Count];
@@ -24,6 +25,9 @@ public class PlayerStats : MonoBehaviour
     public event Action StatsChanged;
 
     public IReadOnlyList<MathGateData> SelectedGates => selectedGates;
+
+    // Gate hadiah chest vault (Mode Dungeon). Tidak dihitung sebagai gate pilihan, jadi batas gate Safezone tidak berubah.
+    public IReadOnlyList<MathGateData> VaultGates => vaultGates;
 
     public IReadOnlyList<ModifierEffect> Modifiers => modifiers;
 
@@ -67,10 +71,31 @@ public class PlayerStats : MonoBehaviour
         Recalculate();
     }
 
+    // Hadiah vault: hanya efek buff gate yang dipakai, trade-off dibuang.
+    public void ApplyVaultGate(MathGateData gate)
+    {
+        if (gate == null)
+            return;
+
+        vaultGates.Add(gate);
+
+        foreach (ModifierEffect effect in gate.Effects)
+        {
+            if (effect.IsBuff)
+                modifiers.Add(effect);
+        }
+
+        if (logChanges)
+            Debug.Log("PlayerStats: hadiah vault " + gate.DisplayName + " (buff saja)", this);
+
+        Recalculate();
+    }
+
     // Dipanggil saat run baru dimulai.
     public void ResetBuild()
     {
         selectedGates.Clear();
+        vaultGates.Clear();
         modifiers.Clear();
 
         if (logChanges)

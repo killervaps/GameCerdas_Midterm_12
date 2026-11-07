@@ -11,6 +11,10 @@ public enum PcgStream
     ItemSelection = 3,
     ItemPlacement = 4,
     Arena = 5,
+    Dungeon = 6,
+    Vault = 7,
+    // Dekorasi dungeon (variasi lantai). Terpisah dari layout supaya mengubahnya tidak menggeser room dan corridor.
+    Decor = 8,
     Preview = 99
 }
 

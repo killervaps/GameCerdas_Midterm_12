@@ -7,6 +7,22 @@ public class SpawnPoint : MonoBehaviour
     [SerializeField] private bool acceptAnyRole = true;
     // Dipakai hanya jika Accept Any Role dimatikan.
     [SerializeField] private EnemyRole role = EnemyRole.Charger;
+    // Selalu dipakai jika role ini muncul, tanpa melihat Anchor Chance di EnemySpawner.
+    // Contoh: Boss Room dungeon, Guardian hanya boleh muncul di room Goal (hard constraint).
+    [SerializeField] private bool alwaysUse;
+
+    // Untuk titik yang dibuat dari kode, mis. titik Boss Room di dungeon.
+    public void Configure(EnemyRole dedicatedRole, bool forced)
+    {
+        acceptAnyRole = false;
+        role = dedicatedRole;
+        alwaysUse = forced;
+    }
+
+    public bool IsForcedFor(EnemyRole candidate)
+    {
+        return alwaysUse && IsDedicatedTo(candidate);
+    }
 
     public bool Accepts(EnemyRole candidate)
     {

@@ -121,6 +121,28 @@ public class EnemyRoundProfile
         this.roles = roles;
     }
 
+    // Salinan dengan jumlah musuh dikali, dipakai Mode Dungeon karena area dungeon jauh lebih luas dari arena.
+    // Jumlah, budget, dan batas Max dikali. Jatah Min dan bobot tetap, jadi karakter ronde tidak berubah. Max 0 tetap 0.
+    public EnemyRoundProfile Scaled(float multiplier)
+    {
+        EnemyRoundProfile copy = (EnemyRoundProfile)MemberwiseClone();
+        copy.minEnemies = Math.Max(1, Mathf.RoundToInt(minEnemies * multiplier));
+        copy.maxEnemies = Math.Max(copy.minEnemies, Mathf.RoundToInt(maxEnemies * multiplier));
+        copy.difficultyBudget = Mathf.RoundToInt(difficultyBudget * multiplier);
+        copy.roles = new EnemySpawnEntry[roles != null ? roles.Length : 0];
+
+        for (int i = 0; i < copy.roles.Length; i++)
+        {
+            EnemySpawnEntry source = roles[i];
+
+            copy.roles[i] = source == null
+                ? null
+                : new EnemySpawnEntry(source.role, source.weight, source.min, source.max > 0 ? Mathf.CeilToInt(source.max * multiplier) : 0);
+        }
+
+        return copy;
+    }
+
     // Isi awal yang mendekati wave lama: R1 2 Charger, R2 Charger + Shooter, R3 satu tiap role.
     public static EnemyRoundProfile[] Defaults()
     {

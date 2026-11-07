@@ -10,6 +10,8 @@ using UnityEngine.Rendering;
 //   Overlay   digambar di dunia dengan GL: kotak area spawn (cyan), lingkaran aman MC (merah),
 //             musuh di lantai (hijau), musuh di titik khusus (ungu), item (biru muda),
 //             kandidat ditolak (silang, warna = aturan yang menolak).
+//   Dungeon   Mode Dungeon: seed dungeon, hasil BFS Validation, Metrics Dungeon, dan overlay jalur BFS Start-Goal (cyan),
+//             room (hijau), safe room (biru), titik Boss Room (warna role), vault (emas), pintu vault (biru), kunci (emas).
 //   Kontrol   F5 ulangi ronde dengan seed yang sama (hasil harus identik), F6 seed baru lalu ulangi ronde,
 //             kolom seed + tombol untuk memulai run baru dengan seed tertentu.
 public class PcgDebugPanel : MonoBehaviour
@@ -42,6 +44,11 @@ public class PcgDebugPanel : MonoBehaviour
     private static readonly Color EnemyColor = new Color(0.3f, 1f, 0.4f, 1f);
     private static readonly Color AnchorColor = new Color(0.75f, 0.45f, 1f, 1f);
     private static readonly Color ItemColor = new Color(0.4f, 0.85f, 1f, 1f);
+    private static readonly Color PathColor = new Color(0.3f, 0.95f, 1f, 1f);
+    private static readonly Color RoomColor = new Color(0.3f, 1f, 0.4f, 0.6f);
+    private static readonly Color SafeRoomColor = new Color(0.3f, 0.6f, 1f, 0.9f);
+    private static readonly Color VaultColor = new Color(1f, 0.78f, 0.25f, 1f);
+    private static readonly Color DoorColor = new Color(0.31f, 0.64f, 1f, 1f);
 
     private readonly StringBuilder builder = new StringBuilder();
 
@@ -51,6 +58,7 @@ public class PcgDebugPanel : MonoBehaviour
     private GUIStyle style;
     private string seedInput = string.Empty;
     private Material material;
+    private GateGenerator gateGenerator;
 
     private bool Visible => showPanel && (!followDebugToggle || AIDebugSettings.Enabled);
 
@@ -164,6 +172,7 @@ public class PcgDebugPanel : MonoBehaviour
             builder.Append("  <color=#aaaaaa>ronde ").Append(runManager.CurrentRound).Append('/').Append(runManager.TotalRounds).Append("</color>");
 
         AppendArena();
+        AppendDungeon();
 
         WaveData wave = runManager != null ? runManager.CurrentWave : null;
         Line("Komposisi: ").Append(wave != null ? wave.Describe() : "-");
@@ -181,6 +190,99 @@ public class PcgDebugPanel : MonoBehaviour
         Line("<color=#aaaaaa>[F5] ulangi seed  [F6] seed baru</color>");
 
         text = builder.ToString();
+    }
+
+    private DungeonGenerator ActiveDungeon =>
+        runManager != null && runManager.Mode == GameMode.Dungeon && runManager.Dungeon != null && runManager.Dungeon.HasLayout
+            ? runManager.Dungeon
+            : null;
+
+    private void AppendDungeon()
+    {
+        DungeonGenerator dungeon = ActiveDungeon;
+
+        if (dungeon == null)
+            return;
+
+        DungeonMetrics m = dungeon.Metrics;
+
+        Line("<b>Dungeon</b> seed ").Append(m.seed);
+
+        if (m.builtSeed != m.seed)
+            builder.Append(" -> ").Append(m.builtSeed);
+
+        builder.Append("  ").Append(m.valid ? "<color=#66ff88>VALID</color>" : "<color=#ff6655>TIDAK VALID</color>")
+            .Append(" <color=#aaaaaa>(").Append(m.attempts).Append(" percobaan)</color>");
+
+        Line("  ").Append(m.roomCount).Append(" room / ").Append(m.leafCount).Append(" leaf, floor ")
+            .Append(m.floorCells).Append(" (").Append(m.FloorPercent.ToString("0")).Append("%), corridor ").Append(m.corridorCells)
+            .Append(", wall ").Append(m.wallCells);
+
+        builder.Append(", obor ").Append(dungeon.TorchPositions.Count);
+
+        DungeonAtmosphere atmosphere = dungeon.GetComponent<DungeonAtmosphere>();
+
+        if (atmosphere != null)
+            builder.Append(", suasana ").Append(Mathf.RoundToInt(atmosphere.Weight * 100f)).Append('%');
+
+        if (dungeon.FloorVariantCells > 0)
+        {
+            builder.Append(", lantai varian ").Append(dungeon.FloorVariantCells).Append(" (")
+                .Append((100f * dungeon.FloorVariantCells / Mathf.Max(1, dungeon.FloorCellCount)).ToString("0")).Append("%)");
+        }
+
+        Line("  jalur Start-Goal <color=#4cf2ff>").Append(m.pathBfs).Append(" cell</color> (")
+            .Append((m.pathBfs * dungeon.TileSize).ToString("0")).Append(" m)  <color=#aaaaaa>A/B/C ")
+            .Append(m.pathLastRoom).Append('/').Append(m.pathGeometric).Append('/').Append(m.pathBfs).Append("</color>");
+
+        int enemies = enemySpawner != null ? enemySpawner.Spawned.Count : 0;
+        string density = enemies > 0 ? "1 per " + Mathf.RoundToInt((float)m.floorCells / enemies) + " cell" : "-";
+
+        Line("  musuh ").Append(enemies).Append(" (").Append(density).Append("), boss ").Append(dungeon.BossPoints.Count)
+            .Append(" titik, bangun ").Append((m.generateMs + m.buildMs).ToString("0")).Append(" ms, NavMesh ")
+            .Append(m.bakeMs.ToString("0")).Append(" ms");
+
+        AppendVault(dungeon);
+    }
+
+    private void AppendVault(DungeonGenerator dungeon)
+    {
+        Line("  <b>Vault</b> ").Append(dungeon.DeadEndRooms.Count).Append(" dead-end, ");
+
+        if (dungeon.VaultRoom == null)
+        {
+            builder.Append("<color=#aaaaaa>tidak ada (").Append(dungeon.VaultMessage).Append(")</color>");
+            return;
+        }
+
+        builder.Append("<color=#ffc040>").Append(dungeon.VaultMessage).Append("</color>");
+
+        DungeonVault vault = dungeon.Vault;
+
+        if (vault != null)
+            Line("  status ").Append(vault.StatusText());
+
+        // Peluang rarity chest: peluang gate biasa yang dinormalisasi ke rarity minimum ke atas.
+        if (gateGenerator == null)
+            gateGenerator = FindAnyObjectByType<GateGenerator>();
+
+        GateGenerator generator = gateGenerator;
+
+        if (generator == null)
+            return;
+
+        Line("  <color=#aaaaaa>chest</color>");
+
+        for (int r = (int)dungeon.VaultMinRarity; r < GateRarityStyle.Count; r++)
+        {
+            GateRarity rarity = (GateRarity)r;
+            float chance = DungeonVault.ChanceOf(generator, rarity, dungeon.VaultMinRarity);
+
+            if (chance <= 0f)
+                continue;
+
+            builder.Append(' ').Append("<color=#").Append(ColorUtility.ToHtmlStringRGB(GateRarityStyle.Color(rarity))).Append('>').Append(GateRarityStyle.Label(rarity)).Append("</color> ").Append(Mathf.RoundToInt(chance * 100f)).Append('%');
+        }
     }
 
     private void AppendArena()
@@ -324,6 +426,7 @@ public class PcgDebugPanel : MonoBehaviour
         GL.Begin(GL.LINES);
 
         DrawArea(area);
+        DrawDungeon(ActiveDungeon);
 
         Vector3? player = area.PlayerEntryPoint;
 
@@ -348,6 +451,57 @@ public class PcgDebugPanel : MonoBehaviour
 
         GL.End();
         GL.PopMatrix();
+    }
+
+    private static void DrawDungeon(DungeonGenerator dungeon)
+    {
+        if (dungeon == null)
+            return;
+
+        foreach (DungeonRoom room in dungeon.Rooms)
+            DrawBounds(dungeon.RoomBounds(room), room == dungeon.StartRoom ? SafeRoomColor : RoomColor);
+
+        GL.Color(PathColor);
+        IReadOnlyList<Vector2Int> path = dungeon.GoalPath;
+
+        for (int i = 1; i < path.Count; i++)
+            Segment(dungeon.CellToWorld(path[i - 1]) + Vector3.up * 0.1f, dungeon.CellToWorld(path[i]) + Vector3.up * 0.1f);
+
+        foreach (Vector3 point in dungeon.BossPoints)
+            Circle(point, dungeon.TileSize * 0.3f, AnchorColor);
+
+        // Vault (emas), pintunya (biru), dan kunci (lingkaran emas) selama kunci belum diambil.
+        if (dungeon.VaultRoom == null)
+            return;
+
+        DrawBounds(dungeon.RoomBounds(dungeon.VaultRoom), VaultColor);
+
+        foreach (Vector2Int cell in dungeon.VaultDoorCells)
+            Circle(dungeon.CellToWorld(cell), dungeon.TileSize * 0.45f, DoorColor);
+
+        DungeonVault vault = dungeon.Vault;
+
+        if (vault == null || vault.State == VaultState.Locked)
+        {
+            Vector3 key = dungeon.CellToWorld(dungeon.VaultKeyCell);
+            Circle(key, dungeon.TileSize * 0.35f, VaultColor);
+            Circle(key, dungeon.TileSize * 0.18f, VaultColor);
+        }
+    }
+
+    private static void DrawBounds(Bounds bounds, Color color)
+    {
+        float y = bounds.min.y + 1.05f;
+        Vector3 a = new Vector3(bounds.min.x, y, bounds.min.z);
+        Vector3 b = new Vector3(bounds.max.x, y, bounds.min.z);
+        Vector3 c = new Vector3(bounds.max.x, y, bounds.max.z);
+        Vector3 d = new Vector3(bounds.min.x, y, bounds.max.z);
+
+        GL.Color(color);
+        Segment(a, b);
+        Segment(b, c);
+        Segment(c, d);
+        Segment(d, a);
     }
 
     private static void DrawArea(PcgSpawnArea area)

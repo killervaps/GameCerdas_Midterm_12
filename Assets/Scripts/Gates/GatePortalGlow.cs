@@ -196,6 +196,29 @@ public class GatePortalGlow : MonoBehaviour
         return false;
     }
 
+    // Bagian gate pada model lain (mis. child "gate" di wall-gate): turunan root paling atas yang namanya diawali prefix,
+    // tanpa beda huruf besar/kecil. Root sendiri tidak ikut. Dipakai portal Goal dan pintu vault Mode Dungeon.
+    public static List<Transform> FindGateParts(Transform root, string prefix)
+    {
+        List<Transform> parts = new List<Transform>();
+
+        if (root != null && !string.IsNullOrEmpty(prefix))
+            CollectGateParts(root, prefix, parts);
+
+        return parts;
+    }
+
+    private static void CollectGateParts(Transform node, string prefix, List<Transform> parts)
+    {
+        foreach (Transform child in node)
+        {
+            if (child.name.StartsWith(prefix, System.StringComparison.OrdinalIgnoreCase))
+                parts.Add(child);
+            else
+                CollectGateParts(child, prefix, parts);
+        }
+    }
+
     private void CreateLight()
     {
         Bounds bounds = gateRenderers[0].bounds;

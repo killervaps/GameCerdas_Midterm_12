@@ -19,6 +19,18 @@ public class Arena : MonoBehaviour
 
     public Transform PlayerEntry => playerEntry;
 
+    // Arena hasil generate (dungeon): titik masuk MC dipindah setiap dungeon baru dibangun.
+    public void SetPlayerEntry(Transform entry)
+    {
+        playerEntry = entry;
+    }
+
+    // Titik khusus dicari ulang, mis. setelah dungeon baru membuat titik Boss Room.
+    public void RefreshSpawnPoints()
+    {
+        resolved = null;
+    }
+
     public float BaseWeight => baseWeight;
 
     private SpawnPoint[] resolved;

@@ -38,6 +38,9 @@ public class ArenaSelector : MonoBehaviour
         if (arenas == null || arenas.Length == 0)
             arenas = FindObjectsByType<Arena>(FindObjectsInactive.Include);
 
+        // Dungeon procedural juga memakai komponen Arena, tapi hanya dipakai Mode Dungeon, bukan diundi di sini.
+        arenas = System.Array.FindAll(arenas, arena => arena != null && arena.GetComponent<DungeonGenerator>() == null);
+
         if (arenas.Length == 0)
             Debug.LogError("ArenaSelector: belum ada Arena di scene.", this);
     }

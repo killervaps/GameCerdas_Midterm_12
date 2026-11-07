@@ -117,7 +117,7 @@ public class PauseScreen : UIScreen
 
     public static string BuildGatesText(PlayerStats stats, StringBuilder builder)
     {
-        if (stats == null || stats.SelectedGates.Count == 0)
+        if (stats == null || stats.SelectedGates.Count + stats.VaultGates.Count == 0)
             return "<color=" + UIKit.MutedHex + ">Belum ada gate.</color>";
 
         builder.Clear();
@@ -133,6 +133,19 @@ public class PauseScreen : UIScreen
                 builder.Append('\n');
 
             builder.Append(GateRarityStyle.Wrap(gate.Rarity, (i + 1) + ". " + gate.DisplayName));
+        }
+
+        // Hadiah vault tidak bernomor karena bukan gate pilihan, dan hanya buff-nya yang dipakai.
+        foreach (MathGateData gate in stats.VaultGates)
+        {
+            if (gate == null)
+                continue;
+
+            if (builder.Length > 0)
+                builder.Append('\n');
+
+            builder.Append(GateRarityStyle.Wrap(gate.Rarity, "Vault: " + gate.DisplayName))
+                .Append(" <color=").Append(UIKit.MutedHex).Append(">(buff saja)</color>");
         }
 
         return builder.ToString();

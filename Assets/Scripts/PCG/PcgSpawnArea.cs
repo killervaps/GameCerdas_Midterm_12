@@ -33,6 +33,8 @@ public class PcgSpawnArea : MonoBehaviour
     [SerializeField] private bool drawGizmos = true;
 
     private Arena arena;
+    // Zona dunia (XZ) yang tidak boleh berisi objek procedural, mis. Start room dungeon (safe room di modul).
+    private readonly List<Bounds> exclusions = new List<Bounds>();
 
     public Vector2 Size => size;
 
@@ -70,6 +72,34 @@ public class PcgSpawnArea : MonoBehaviour
         }
 
         point = flat;
+        return false;
+    }
+
+    // Mengatur area dari kode, mis. DungeonGenerator menyesuaikan area dengan ukuran grid setiap dungeon baru.
+    public void Configure(Vector3 worldCenter, Vector2 worldSize)
+    {
+        center = Quaternion.Inverse(YawRotation) * (worldCenter - transform.position);
+        size = worldSize;
+    }
+
+    public void SetExclusions(IEnumerable<Bounds> zones)
+    {
+        exclusions.Clear();
+
+        if (zones != null)
+            exclusions.AddRange(zones);
+    }
+
+    public IReadOnlyList<Bounds> Exclusions => exclusions;
+
+    public bool IsExcluded(Vector3 worldPoint)
+    {
+        foreach (Bounds zone in exclusions)
+        {
+            if (worldPoint.x >= zone.min.x && worldPoint.x <= zone.max.x && worldPoint.z >= zone.min.z && worldPoint.z <= zone.max.z)
+                return true;
+        }
+
         return false;
     }
 

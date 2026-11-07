@@ -13,10 +13,12 @@ public class ItemSpawnEntry : IWeightedEntry
     [Min(0)] public int maxPerRound = 2;
 
     [NonSerialized] public int count;
+    // Tambahan batas sementara untuk ronde ini, mis. Mode Dungeon.
+    [NonSerialized] public int bonusMax;
 
     public int Weight => prefab != null ? weight : 0;
 
-    public bool IsSelectable => prefab != null && count < maxPerRound;
+    public bool IsSelectable => prefab != null && count < maxPerRound + bonusMax;
 }
 
 // PCG item, alurnya sama dengan musuh dan modul praktikum:
@@ -34,6 +36,8 @@ public class ItemSpawner : MonoBehaviour
     [Header("Jumlah per Ronde")]
     [SerializeField, Min(0)] private int minItems = 1;
     [SerializeField, Min(0)] private int maxItems = 2;
+    // Tambahan item di Mode Dungeon, karena musuh lebih banyak dan area lebih luas.
+    [SerializeField, Min(0)] private int extraItemsInDungeon = 2;
 
     [Header("Tabel Item")]
     [SerializeField] private ItemSpawnEntry[] items = Array.Empty<ItemSpawnEntry>();
@@ -133,6 +137,15 @@ public class ItemSpawner : MonoBehaviour
             occupied.AddRange(enemySpawner.Occupied);
 
         int count = selection.Range(minItems, Mathf.Max(minItems, maxItems) + 1);
+        int bonus = runManager != null && runManager.Mode == GameMode.Dungeon ? extraItemsInDungeon : 0;
+
+        count += bonus;
+
+        foreach (ItemSpawnEntry entry in items)
+        {
+            if (entry != null)
+                entry.bonusMax = bonus;
+        }
         lastReport.Requested = count;
 
         for (int i = 0; i < count; i++)

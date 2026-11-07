@@ -143,6 +143,10 @@ public static class PcgPlacement
 
             PcgReject reason = onGround ? PcgReject.None : PcgReject.NoGround;
 
+            // Zona aman area (mis. Start room dungeon) dihitung sebagai Rule 1, safe zone pemain.
+            if (reason == PcgReject.None && area.IsExcluded(candidate))
+                reason = PcgReject.TooCloseToPlayer;
+
             // Titik dipindah ke NavMesh terdekat sebelum aturan lain dicek. NavMesh sudah dikikis sejauh radius agent
             // dari tembok, jadi posisi final tidak menempel atau menembus tembok walau collider tembok lebih tipis
             // dari tampilannya. Semua aturan dan Gizmos memakai posisi final ini.

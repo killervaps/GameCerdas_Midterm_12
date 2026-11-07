@@ -65,7 +65,7 @@ public class MainMenuScreen : UIScreen
         buttonsLayout.childForceExpandWidth = false;
 
         // Tombol utama paling besar dan sedikit miring, seperti stiker yang ditempel paling akhir.
-        Button play = UIKit.CreateButton("PlayButton", buttons, "MULAI", UIKit.Safe(ui.StartGame), PrimaryHeight, true);
+        Button play = UIKit.CreateButton("PlayButton", buttons, "MULAI", UIKit.Safe(ui.OpenModeSelect), PrimaryHeight, true);
         UIKit.Layout(play, PrimaryHeight, ButtonWidth, 0f);
         play.transform.localRotation = Quaternion.Euler(0f, 0f, -2f);
 

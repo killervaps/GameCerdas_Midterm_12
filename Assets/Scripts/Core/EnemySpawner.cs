@@ -205,7 +205,12 @@ public class EnemySpawner : MonoBehaviour
     {
         // Angka ini selalu diambil walau arena tidak punya titik khusus, supaya urutan acak tetap stabil.
         float roll = random.Value;
-        SpawnPoint anchor = roll < AnchorChance(role) ? PickFreeAnchor(role, random) : null;
+        // Titik Always Use (mis. Boss Room dungeon) wajib dipakai selama masih ada yang kosong.
+        bool forced = HasForcedAnchor(role);
+        SpawnPoint anchor = forced || roll < AnchorChance(role) ? PickFreeAnchor(role, random, forced) : null;
+
+        if (forced && anchor == null)
+            Debug.LogWarning("EnemySpawner: semua titik wajib untuk " + role + " sudah terisi, sisanya ditempatkan di lantai.", this);
 
         if (anchor != null)
         {
@@ -270,7 +275,21 @@ public class EnemySpawner : MonoBehaviour
     }
 
     // Titik khusus role ini di arena sekarang yang belum dipakai, dipilih acak (reservoir sampling ber-seed).
-    private SpawnPoint PickFreeAnchor(EnemyRole role, SeededRandom random)
+    private bool HasForcedAnchor(EnemyRole role)
+    {
+        if (arena == null)
+            return false;
+
+        foreach (SpawnPoint point in arena.SpawnPoints)
+        {
+            if (point != null && point.IsForcedFor(role))
+                return true;
+        }
+
+        return false;
+    }
+
+    private SpawnPoint PickFreeAnchor(EnemyRole role, SeededRandom random, bool forcedOnly = false)
     {
         if (arena == null)
             return null;
@@ -281,6 +300,9 @@ public class EnemySpawner : MonoBehaviour
         foreach (SpawnPoint point in arena.SpawnPoints)
         {
             if (point == null || !point.IsDedicatedTo(role) || usedAnchors.Contains(point))
+                continue;
+
+            if (forcedOnly && !point.IsForcedFor(role))
                 continue;
 
             seen++;

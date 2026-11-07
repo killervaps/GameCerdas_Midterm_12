@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 
 // Menu MathGate untuk aset dan objek PCG. Semua lewat API Editor, bukan edit YAML manual.
 public static class MathGatePcgTools
@@ -145,6 +146,86 @@ public static class MathGatePcgTools
         Selection.activeObject = panel;
 
         Debug.Log("MathGate: PcgDebugPanel ditambahkan ke " + director.name + ".", panel);
+    }
+
+    // Praktikum 10. Membuat atau melengkapi objek DungeonGenerator untuk Mode Dungeon. Aman dijalankan berulang:
+    //   - DungeonGenerator di (300, 0, 0), jauh dari Safezone dan arena supaya tidak bertumpuk
+    //   - komponen Arena (nama "Dungeon") dan PcgSpawnArea, supaya spawner memperlakukan dungeon seperti arena
+    //   - DungeonAtmosphere untuk suasana bawah tanah
+    //   - child PlayerEntry sebagai titik masuk MC (dipindah ke Start setiap dungeon dibangun)
+    //   - referensi Dungeon di RunManager
+    [MenuItem("MathGate/PCG/4. Setup Dungeon Mode")]
+    public static void SetupDungeonMode()
+    {
+        DungeonGenerator generator = Object.FindAnyObjectByType<DungeonGenerator>(FindObjectsInactive.Include);
+
+        if (generator == null)
+        {
+            PcgDirector director = Object.FindAnyObjectByType<PcgDirector>(FindObjectsInactive.Include);
+
+            GameObject created = new GameObject("DungeonGenerator");
+            Undo.RegisterCreatedObjectUndo(created, "Add Dungeon Generator");
+
+            if (director != null)
+                SceneManager.MoveGameObjectToScene(created, director.gameObject.scene);
+
+            created.transform.position = new Vector3(300f, 0f, 0f);
+            generator = Undo.AddComponent<DungeonGenerator>(created);
+        }
+
+        GameObject go = generator.gameObject;
+
+        Arena arena = go.GetComponent<Arena>();
+
+        if (arena == null)
+            arena = Undo.AddComponent<Arena>(go);
+
+        if (go.GetComponent<PcgSpawnArea>() == null)
+            Undo.AddComponent<PcgSpawnArea>(go);
+
+        // Lighting bawah tanah (fog, ambient, Volume, lentera MC) selama MC di dalam dungeon.
+        if (go.GetComponent<DungeonAtmosphere>() == null)
+            Undo.AddComponent<DungeonAtmosphere>(go);
+
+        Transform entry = go.transform.Find("PlayerEntry");
+
+        if (entry == null)
+        {
+            entry = new GameObject("PlayerEntry").transform;
+            Undo.RegisterCreatedObjectUndo(entry.gameObject, "Add Dungeon Player Entry");
+            entry.SetParent(go.transform, false);
+        }
+
+        SerializedObject arenaSo = new SerializedObject(arena);
+        arenaSo.FindProperty("displayName").stringValue = "Dungeon";
+        arenaSo.FindProperty("playerEntry").objectReferenceValue = entry;
+        // Dungeon tidak ikut undian arena, bobot 0 hanya pengaman.
+        arenaSo.FindProperty("baseWeight").floatValue = 0f;
+        arenaSo.ApplyModifiedProperties();
+
+        SerializedObject generatorSo = new SerializedObject(generator);
+        generatorSo.FindProperty("playerEntry").objectReferenceValue = entry;
+        generatorSo.ApplyModifiedProperties();
+
+        RunManager runManager = Object.FindAnyObjectByType<RunManager>(FindObjectsInactive.Include);
+
+        if (runManager != null)
+        {
+            SerializedObject runSo = new SerializedObject(runManager);
+            runSo.FindProperty("dungeon").objectReferenceValue = generator;
+            runSo.ApplyModifiedProperties();
+            EditorSceneManager.MarkSceneDirty(runManager.gameObject.scene);
+        }
+        else
+        {
+            Debug.LogWarning("MathGate: RunManager tidak ditemukan di scene yang terbuka. Isi field Dungeon di RunManager secara manual.");
+        }
+
+        EditorSceneManager.MarkSceneDirty(go.scene);
+        Selection.activeObject = generator;
+
+        Debug.Log("MathGate: Mode Dungeon siap di " + go.name + " (" + go.transform.position + "). " +
+                  "Klik titik tiga DungeonGenerator > Generate Preview untuk melihat dungeon, lalu simpan scene.", generator);
     }
 
     private static Material CreateEmissiveMaterial(string path, Color color, float emission)
