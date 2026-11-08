@@ -46931,8 +46931,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 795765111}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.14718378, z: -0, w: 0.98910916}
-  m_LocalPosition: {x: 11.5, y: 0.051900312, z: 16.5}
+  m_LocalRotation: {x: -0, y: 0.530611, z: -0, w: 0.8476155}
+  m_LocalPosition: {x: 19.5, y: 0.05844896, z: 16.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -93075,6 +93075,107 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c740507715ce3645b730a4bb59c305d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonGenerator
+  decoration: 1
+  storageThemeWeight: 4
+  ruinsThemeWeight: 3.5
+  hallThemeWeight: 2.5
+  hallMinSize: 8
+  ruinsFloorBonus: 0.25
+  storageProps:
+  - prefab: {fileID: 919132149155446097, guid: 59f7b882411ae9843b7e017eccd76688, type: 3}
+    weight: 3
+    scale: 1
+    offset: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+    randomYaw: 1
+    blocking: 1
+  - prefab: {fileID: 919132149155446097, guid: 91148f0213d335b4f954246fd9aca781, type: 3}
+    weight: 2
+    scale: 1
+    offset: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+    randomYaw: 1
+    blocking: 1
+  - prefab: {fileID: 919132149155446097, guid: f68af8e908b6fb84abf321e5c66b588b, type: 3}
+    weight: 1
+    scale: 1
+    offset: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+    randomYaw: 0
+    blocking: 1
+  - prefab: {fileID: 919132149155446097, guid: 5001a50a4dc580548adc5530679d6fac, type: 3}
+    weight: 0.6
+    scale: 1
+    offset: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+    randomYaw: 0
+    blocking: 1
+  columnProps:
+  - prefab: {fileID: 919132149155446097, guid: 17c4266963e6ba44abd1bf79545a9c1c, type: 3}
+    weight: 1
+    scale: 1
+    offset: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+    randomYaw: 0
+    blocking: 1
+  rubbleProps:
+  - prefab: {fileID: 919132149155446097, guid: 73bf07dec8e17634e874639154ee61d5, type: 3}
+    weight: 2
+    scale: 1
+    offset: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+    randomYaw: 1
+    blocking: 1
+  - prefab: {fileID: 919132149155446097, guid: bde621aaa8fe1b94c94b8f7cf4de31fd, type: 3}
+    weight: 3
+    scale: 1
+    offset: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+    randomYaw: 1
+    blocking: 1
+  - prefab: {fileID: 919132149155446097, guid: 8e8c8d002176f85449e56769c39c69c2, type: 3}
+    weight: 2
+    scale: 1
+    offset: {x: 0, y: -0.8, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+    randomYaw: 1
+    blocking: 0
+  treasureProps:
+  - prefab: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+    weight: 3
+    scale: 0.3
+    offset: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+    randomYaw: 1
+    blocking: 0
+  - prefab: {fileID: 919132149155446097, guid: 91148f0213d335b4f954246fd9aca781, type: 3}
+    weight: 1
+    scale: 1
+    offset: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+    randomYaw: 1
+    blocking: 1
+  wallProps:
+  - prefab: {fileID: 919132149155446097, guid: cd130699376f6534286f682d2e03102c, type: 3}
+    weight: 1
+    scale: 1
+    offset: {x: 0, y: 0, z: 0.5}
+    rotation: {x: 0, y: 0, z: 0}
+    randomYaw: 0
+    blocking: 1
+  corridorProps:
+  - prefab: {fileID: 919132149155446097, guid: bcf5d893bf661c94d8009a277216088a, type: 3}
+    weight: 1
+    scale: 1
+    offset: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+    randomYaw: 0
+    blocking: 1
+  storageDensity: 0.18
+  rubbleDensity: 0.05
+  columnSpacing: 3
+  wallPropsPerRoom: 2
+  corridorPropSpacing: 6
   mapWidth: 64
   mapHeight: 50
   tileSize: 1
@@ -93153,7 +93254,7 @@ MonoBehaviour:
   - {x: 40, y: 30}
   - {x: 60, y: 40}
   - {x: 80, y: 60}
-  previewSeed: 123461
+  previewSeed: 123464
   drawGizmos: 1
   drawLeaves: 1
   logGeneration: 1

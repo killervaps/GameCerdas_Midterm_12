@@ -220,6 +220,24 @@ public class PcgDebugPanel : MonoBehaviour
 
         builder.Append(", obor ").Append(dungeon.TorchPositions.Count);
 
+        Line("  dekorasi ").Append(dungeon.PropCount).Append(" props (penghalang ").Append(dungeon.BlockingPropCount)
+            .Append(", ditolak BFS ").Append(dungeon.RejectedPropCount).Append(")  <color=#aaaaaa>tema");
+
+        for (RoomTheme theme = RoomTheme.Storage; theme <= RoomTheme.Hall; theme++)
+        {
+            int count = 0;
+
+            foreach (RoomTheme roomTheme in dungeon.RoomThemes)
+            {
+                if (roomTheme == theme)
+                    count++;
+            }
+
+            builder.Append(' ').Append(DungeonGenerator.ThemeLabel(theme)).Append(' ').Append(count);
+        }
+
+        builder.Append("</color>");
+
         DungeonAtmosphere atmosphere = dungeon.GetComponent<DungeonAtmosphere>();
 
         if (atmosphere != null)

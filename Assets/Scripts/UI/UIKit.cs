@@ -520,6 +520,11 @@ public static class UIKit
     }
 
     private static Sprite roundedOutline;
+    private static Sprite roundedOutlineSmall;
+
+    // Bingkai dalam tipis untuk chip (radius 6, garis 2), mis. tanda chip hadiah vault yang bebas trade-off.
+    public static Sprite RoundedOutlineSmall =>
+        roundedOutlineSmall != null ? roundedOutlineSmall : roundedOutlineSmall = CreateRoundedOutlineSprite(64, 6, 2);
 
     // Garis tepi kotak membulat (tengah transparan), dipakai bingkai fokus tombol.
     public static Sprite RoundedOutline

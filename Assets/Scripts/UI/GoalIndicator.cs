@@ -39,23 +39,37 @@ public class GoalIndicator : UIScreen
         content = marker.gameObject.AddComponent<CanvasGroup>();
         content.blocksRaycasts = false;
 
-        Image arrowImage = UIKit.CreateImage("Arrow", marker, UIKit.Accent, false);
-        arrowImage.sprite = ReticleSprites.Triangle;
-        arrow = arrowImage.rectTransform;
-        arrow.sizeDelta = new Vector2(arrowSize, arrowSize);
+        // Panah dan belah ketupat diberi lapisan tinta di bawahnya (pola yang sama dengan LockOnReticle), dan
+        // label berupa stiker emas bertinta. Emas polos di atas lantai pasir hanya 1.09:1, jadi tanpa tinta
+        // penanda ini tidak terbaca di lantai terang.
+        arrow = CreateInkedShape("Arrow", ReticleSprites.TriangleInk, ReticleSprites.Triangle, arrowSize);
+        diamond = CreateInkedShape("Diamond", ReticleSprites.DiamondInk, ReticleSprites.Diamond, diamondSize);
 
-        Image diamondImage = UIKit.CreateImage("Diamond", marker, UIKit.Accent, false);
-        diamondImage.sprite = ReticleSprites.Diamond;
-        diamond = diamondImage.rectTransform;
-        diamond.sizeDelta = new Vector2(diamondSize, diamondSize);
-
-        label = UIKit.UseDisplayFont(UIKit.CreateText("Label", marker, "GOAL", 22f, UIKit.Accent, TextAlignmentOptions.Center, true));
-        label.textWrappingMode = TextWrappingModes.NoWrap;
-        RectTransform labelRect = label.rectTransform;
-        labelRect.sizeDelta = new Vector2(220f, 30f);
-        labelRect.anchoredPosition = new Vector2(0f, -(arrowSize * 0.5f + 16f));
+        Image labelStamp = UIKit.CreateFreeStamp("Label", marker, "GOAL", 20f, UIKit.Accent, 0f, out label);
+        RectTransform labelRect = labelStamp.rectTransform;
+        labelRect.anchorMin = new Vector2(0.5f, 0.5f);
+        labelRect.anchorMax = new Vector2(0.5f, 0.5f);
+        labelRect.pivot = new Vector2(0.5f, 1f);
+        labelRect.anchoredPosition = new Vector2(0f, -(arrowSize * 0.5f + 6f));
 
         BuildPrompt();
+    }
+
+    // Wadah berisi siluet tinta (lebih besar) di bawah dan bentuk emas di atasnya, ukurannya sama.
+    private RectTransform CreateInkedShape(string shapeName, Sprite inkSprite, Sprite fillSprite, float size)
+    {
+        RectTransform root = UIKit.CreateRect(shapeName, marker);
+        root.sizeDelta = new Vector2(size, size);
+
+        Image ink = UIKit.CreateImage("Ink", root, UIKit.Ink, false);
+        ink.sprite = inkSprite;
+        UIKit.Stretch(ink.rectTransform);
+
+        Image fill = UIKit.CreateImage("Fill", root, UIKit.Accent, false);
+        fill.sprite = fillSprite;
+        UIKit.Stretch(fill.rectTransform);
+
+        return root;
     }
 
     // Kaki kartu sama dengan GateInfoModal: tutup tombol [E] emas + bar progress.
@@ -71,7 +85,8 @@ public class GoalIndicator : UIScreen
         promptGroup.alpha = 0f;
 
         promptText = UIKit.CreateText("Text", prompt, string.Empty, 20f, UIKit.Text, TextAlignmentOptions.Left);
-        promptNote = UIKit.CreateText("Note", prompt, string.Empty, 18f, UIKit.Accent, TextAlignmentOptions.Left);
+        // Peringatan memakai kuning "Sedang" (tanda hati-hati), bukan emas aksen yang khusus untuk aksi.
+        promptNote = UIKit.CreateText("Note", prompt, string.Empty, 18f, UIKit.ThreatColor(ThreatLevel.Medium), TextAlignmentOptions.Left);
 
         RectTransform row = UIKit.CreateRect("ConfirmRow", prompt);
         UIKit.AddHorizontal(row.gameObject, 10f, null, TextAnchor.MiddleLeft);

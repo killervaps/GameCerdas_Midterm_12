@@ -205,6 +205,14 @@ public static class MathGatePcgTools
 
         SerializedObject generatorSo = new SerializedObject(generator);
         generatorSo.FindProperty("playerEntry").objectReferenceValue = entry;
+
+        // Dekorasi bawaan dari Kenney Mini Dungeon, hanya untuk list yang masih kosong.
+        FillDecor(generatorSo, "storageProps", ("barrel", 3f, true), ("pot", 2f, true), ("table", 1f, false), ("chair", 0.6f, false));
+        FillDecor(generatorSo, "columnProps", ("column", 1f, false));
+        FillDecor(generatorSo, "rubbleProps", ("rocks", 2f, true), ("stones", 2f, true), ("dirt", 1f, true));
+        FillDecor(generatorSo, "treasureProps", ("coin", 3f, true), ("pot", 1f, true));
+        FillDecor(generatorSo, "wallProps", ("banner", 1f, false));
+        FillDecor(generatorSo, "corridorProps", ("wood-support", 1f, false));
         generatorSo.ApplyModifiedProperties();
 
         RunManager runManager = Object.FindAnyObjectByType<RunManager>(FindObjectsInactive.Include);
@@ -226,6 +234,34 @@ public static class MathGatePcgTools
 
         Debug.Log("MathGate: Mode Dungeon siap di " + go.name + " (" + go.transform.position + "). " +
                   "Klik titik tiga DungeonGenerator > Generate Preview untuk melihat dungeon, lalu simpan scene.", generator);
+    }
+
+    private static void FillDecor(SerializedObject so, string field, params (string model, float weight, bool randomYaw)[] items)
+    {
+        SerializedProperty list = so.FindProperty(field);
+
+        if (list == null || !list.isArray || list.arraySize > 0)
+            return;
+
+        foreach ((string model, float weight, bool randomYaw) in items)
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Models/Dungeon/" + model + ".fbx");
+
+            if (prefab == null)
+                continue;
+
+            int index = list.arraySize;
+            list.InsertArrayElementAtIndex(index);
+            SerializedProperty element = list.GetArrayElementAtIndex(index);
+            element.FindPropertyRelative("prefab").objectReferenceValue = prefab;
+            element.FindPropertyRelative("weight").floatValue = weight;
+            element.FindPropertyRelative("scale").floatValue = 1f;
+            element.FindPropertyRelative("offset").vector3Value = Vector3.zero;
+            element.FindPropertyRelative("rotation").vector3Value = Vector3.zero;
+            element.FindPropertyRelative("randomYaw").boolValue = randomYaw;
+            // Model Kenney berukuran besar (dirt pun berupa gundukan), jadi props lantai menghalangi.
+            element.FindPropertyRelative("blocking").boolValue = true;
+        }
     }
 
     private static Material CreateEmissiveMaterial(string path, Color color, float emission)

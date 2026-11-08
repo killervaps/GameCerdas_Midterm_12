@@ -25,6 +25,9 @@ public class VaultDoor : MonoBehaviour
 
     public bool IsOpen { get; private set; }
 
+    // MC berada dalam radius pintu yang belum terbuka. Dipakai kartu "pintu terkunci" di HUD.
+    public bool PlayerNear { get; private set; }
+
     public void Setup(DungeonVault owner, Transform visualRoot, IReadOnlyList<Transform> openParts, Vector3 size, float radius)
     {
         vault = owner;
@@ -87,6 +90,8 @@ public class VaultDoor : MonoBehaviour
             return;
         }
 
+        PlayerNear = false;
+
         if (vault == null || IsOpen)
             return;
 
@@ -100,6 +105,8 @@ public class VaultDoor : MonoBehaviour
 
         if (offset.sqrMagnitude > triggerRadius * triggerRadius)
             return;
+
+        PlayerNear = true;
 
         if (vault.State == VaultState.KeyFound)
         {

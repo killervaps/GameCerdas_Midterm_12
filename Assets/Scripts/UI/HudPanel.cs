@@ -15,6 +15,8 @@ public class HudPanel : UIScreen
     [SerializeField] private float refreshInterval = 0.1f;
     [SerializeField] private float threatInterval = 0.25f;
     [SerializeField] private float bannerDuration = 2.2f;
+    // Lama toast kecil langkah vault (kunci didapat, pintu terbuka) di Mode Dungeon.
+    [SerializeField] private float vaultToastDuration = 2.2f;
 
     [Header("HP Kritis")]
     // Di bawah rasio HP ini, tepi layar berdenyut merah seperti detak jantung.
@@ -43,10 +45,21 @@ public class HudPanel : UIScreen
     private TextMeshProUGUI threatStampLabel;
     private TextMeshProUGUI threatRatioText;
     private RectTransform buildChips;
+    private RectTransform vaultChips;
+    private GameObject vaultBuildRow;
     private GameObject vaultRow;
-    private Image vaultStamp;
-    private TextMeshProUGUI vaultStampLabel;
+    private readonly Image[] vaultSteps = new Image[3];
+    private readonly TextMeshProUGUI[] vaultStepLabels = new TextMeshProUGUI[3];
+    private Image vaultRarityCap;
+    private TextMeshProUGUI vaultRarityLabel;
     private VaultState shownVaultState = (VaultState)(-1);
+    private RectTransform vaultToast;
+    private CanvasGroup vaultToastGroup;
+    private Image vaultToastStamp;
+    private TextMeshProUGUI vaultToastTitle;
+    private TextMeshProUGUI vaultToastBody;
+    private float vaultToastTime;
+    private CanvasGroup lockedCard;
     private TextMeshProUGUI hpText;
     private RectTransform hpFill;
     private Image hpFillImage;
@@ -64,9 +77,12 @@ public class HudPanel : UIScreen
     private float skillPunch;
     private RectTransform previewHost;
 
+    private RectTransform banner;
     private CanvasGroup bannerGroup;
+    private Image bannerStamp;
     private TextMeshProUGUI bannerTitle;
-    private TextMeshProUGUI bannerSubtitle;
+    private Image bannerFinal;
+    private RectTransform bannerTokens;
     private float bannerTime;
 
     private AuraBurst auraBurst;
@@ -142,24 +158,113 @@ public class HudPanel : UIScreen
             skillRoot.gameObject.SetActive(false);
 
         // ---------- Banner tengah ----------
-        RectTransform banner = UIKit.CreateRect("Banner", rect);
-        UIKit.Place(banner, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 180f), new Vector2(1000f, 160f));
+        // "RONDE N" sebagai stiker krem miring (momen kunci, jadi tetap kapital dengan spacing), plus pita berisi
+        // token role musuh ronde ini (C, S, G dengan ×N) menggantikan kalimat komposisi wave.
+        banner = UIKit.CreateRect("Banner", rect);
+        UIKit.Place(banner, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 180f), Vector2.zero);
+        VerticalLayoutGroup bannerLayout = UIKit.AddVertical(banner.gameObject, 16f, null, TextAnchor.MiddleCenter);
+        bannerLayout.childForceExpandWidth = false;
+        ContentSizeFitter bannerFit = banner.gameObject.AddComponent<ContentSizeFitter>();
+        bannerFit.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+        bannerFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         bannerGroup = banner.gameObject.AddComponent<CanvasGroup>();
         bannerGroup.alpha = 0f;
         bannerGroup.blocksRaycasts = false;
         bannerGroup.interactable = false;
 
-        // Banner "RONDE N" adalah momen kunci, jadi tetap kapital dengan spacing.
-        bannerTitle = UIKit.UseDisplayFont(UIKit.CreateText("Title", banner, string.Empty, 84f, UIKit.Text, TextAlignmentOptions.Center, true));
-        bannerTitle.characterSpacing = 10f;
-        bannerTitle.outlineWidth = 0.25f;
-        bannerTitle.outlineColor = UIKit.Ink;
-        UIKit.Stretch(bannerTitle.rectTransform, 0f, 0f, 0f, 50f);
+        RectTransform titleRow = UIKit.CreateRect("TitleRow", banner);
+        UIKit.AddHorizontal(titleRow.gameObject, 14f, null, TextAnchor.MiddleCenter);
 
-        bannerSubtitle = UIKit.CreateText("Subtitle", banner, string.Empty, 28f, UIKit.Text, TextAlignmentOptions.Center, true);
-        bannerSubtitle.outlineWidth = 0.15f;
-        bannerSubtitle.outlineColor = new Color32(0, 0, 0, 200);
-        UIKit.Stretch(bannerSubtitle.rectTransform, 0f, 0f, 112f, 0f);
+        bannerStamp = UIKit.CreateStamp("Title", titleRow, 72f, -3f, out bannerTitle);
+        bannerTitle.characterSpacing = 6f;
+        UIKit.SetShadowDistance(bannerStamp, new Vector2(7f, -8f));
+
+        bannerFinal = UIKit.CreateStamp("Final", titleRow, 28f, 6f, out TextMeshProUGUI finalLabel);
+        UIKit.SetStamp(bannerFinal, finalLabel, "Final", UIKit.TradeOff);
+
+        Image tape = UIKit.SetCorners(UIKit.CreateImage("Tape", banner, UIKit.Panel), UIKit.InkMedium);
+        UIKit.AddHardShadow(tape, UIKit.ButtonShadow);
+        UIKit.AddHorizontal(tape.gameObject, 10f, new RectOffset(16, 20, 8, 10), TextAnchor.MiddleCenter);
+        bannerTokens = tape.rectTransform;
+
+        BuildVaultNotices();
+    }
+
+    // Mode Dungeon: toast kecil untuk langkah vault (kunci didapat, pintu terbuka) dan kartu kontekstual selama MC
+    // berdiri di depan pintu vault yang masih terkunci. Menggantikan banner besar "RONDE N" untuk kejadian kecil,
+    // jadi pandangan tidak tertutup saat bertarung.
+    private void BuildVaultNotices()
+    {
+        Image toast = UIKit.CreatePanel("VaultToast", rect, UIKit.Panel);
+        vaultToast = toast.rectTransform;
+        // Di bawah toast Tips (yang menempel di atas layar), supaya keduanya tidak bertumpuk.
+        UIKit.Place(vaultToast, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -150f), Vector2.zero);
+        UIKit.AddHorizontal(toast.gameObject, 12f, new RectOffset(14, 18, 10, 12), TextAnchor.MiddleLeft);
+        ContentSizeFitter toastFit = toast.gameObject.AddComponent<ContentSizeFitter>();
+        toastFit.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+        toastFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        vaultToast.localRotation = Quaternion.Euler(0f, 0f, -1f);
+        vaultToastGroup = toast.gameObject.AddComponent<CanvasGroup>();
+        vaultToastGroup.blocksRaycasts = false;
+        vaultToastGroup.interactable = false;
+        vaultToastGroup.alpha = 0f;
+
+        vaultToastStamp = UIKit.CreateStamp("Title", vaultToast, 22f, -4f, out vaultToastTitle);
+        vaultToastBody = UIKit.CreateText("Body", vaultToast, string.Empty, 20f, new Color(0.87f, 0.89f, 0.93f));
+        vaultToastBody.textWrappingMode = TextWrappingModes.NoWrap;
+
+        Image card = UIKit.CreatePanel("VaultLockedCard", rect, UIKit.Panel);
+        UIKit.Place(card.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 150f), new Vector2(440f, 0f));
+        UIKit.AddVertical(card.gameObject, 4f, new RectOffset(20, 20, 12, 14));
+        UIKit.FitHeight(card.gameObject);
+        lockedCard = card.gameObject.AddComponent<CanvasGroup>();
+        lockedCard.blocksRaycasts = false;
+        lockedCard.interactable = false;
+        lockedCard.alpha = 0f;
+
+        UIKit.UseDisplayFont(UIKit.CreateText("Title", card.transform, "Pintu vault terkunci", 24f, UIKit.Text, TextAlignmentOptions.Left, true));
+        UIKit.CreateText("Body", card.transform, "Kuncinya ada di room lain. Jelajahi dungeon dulu.", 19f, UIKit.TextMuted);
+    }
+
+    // Toast kecil di atas tengah, mis. "Kunci vault!" + "Cari pintu vault yang terkunci".
+    public void ShowVaultToast(string title, string body)
+    {
+        UIKit.SetStamp(vaultToastStamp, vaultToastTitle, title, UIKit.Cream);
+        vaultToastBody.text = body;
+        vaultToastTime = vaultToastDuration;
+        UIKit.ForceRebuild(vaultToast);
+    }
+
+    // Baris chip hadiah vault di kiri atas. Kartu hadiah chest meluncur ke sini.
+    public RectTransform VaultChipsRect => (RectTransform)vaultBuildRow.transform;
+
+    private void UpdateVaultNotices()
+    {
+        float dt = Time.unscaledDeltaTime;
+
+        if (vaultToastTime > 0f)
+        {
+            if (!ui.IsPaused)
+                vaultToastTime -= dt;
+
+            float elapsed = vaultToastDuration - vaultToastTime;
+            float fadeIn = Mathf.Clamp01(elapsed / 0.2f);
+            float fadeOut = Mathf.Clamp01(vaultToastTime / 0.4f);
+            vaultToastGroup.alpha = Mathf.Min(fadeIn, fadeOut);
+
+            float scale = Mathf.Lerp(1.15f, 1f, fadeIn);
+            vaultToast.localScale = new Vector3(scale, scale, 1f);
+        }
+        else
+        {
+            vaultToastGroup.alpha = 0f;
+        }
+
+        DungeonVault vault = DungeonVault.Active;
+        RunState state = ui.State;
+        bool showLocked = vault != null && vault.State == VaultState.Locked && vault.Door != null && vault.Door.PlayerNear &&
+                          (state == RunState.Battle || state == RunState.RoundCleared);
+        lockedCard.alpha = Mathf.MoveTowards(lockedCard.alpha, showLocked ? 1f : 0f, 8f * dt);
     }
 
     // Posisi panel HP (tengah bawah). Dipakai juga sebagai titik diam saat panel bergetar.
@@ -252,11 +357,58 @@ public class HudPanel : UIScreen
         VerticalLayoutGroup chipColumn = UIKit.AddVertical(buildChips.gameObject, 10f);
         chipColumn.childForceExpandWidth = false;
 
-        // Baris 4 (Mode Dungeon): status vault ronde ini. Hilang setelah chest dibuka.
+        // Baris 4 (Mode Dungeon): hadiah vault di baris sendiri berlabel krem, terpisah dari gate pilihan
+        // Safezone karena hadiah vault bebas trade-off.
+        RectTransform vaultBuild = UIKit.CreateRect("VaultBuildRow", topLeft);
+        vaultBuildRow = vaultBuild.gameObject;
+        UIKit.AddHorizontal(vaultBuildRow, 10f, null, TextAnchor.UpperLeft);
+
+        Image vaultLabel = UIKit.CreateStamp("VaultLabel", vaultBuild, 19f, 0f, out TextMeshProUGUI vaultLabelText);
+        UIKit.SetStamp(vaultLabel, vaultLabelText, "Vault", UIKit.Cream);
+
+        vaultChips = UIKit.CreateRect("Chips", vaultBuild);
+        UIKit.Layout(vaultChips, -1f, -1f, 1f);
+        VerticalLayoutGroup vaultColumn = UIKit.AddVertical(vaultChips.gameObject, 10f);
+        vaultColumn.childForceExpandWidth = false;
+        vaultBuildRow.SetActive(false);
+
+        // Baris 5 (Mode Dungeon): pelacak vault ronde ini, Kunci -> Pintu -> Chest, seperti token ronde.
+        // Hilang setelah chest dibuka.
         RectTransform vaultRect = UIKit.CreateRect("VaultRow", topLeft);
         vaultRow = vaultRect.gameObject;
-        UIKit.AddHorizontal(vaultRow, 10f, null, TextAnchor.MiddleLeft);
-        vaultStamp = UIKit.CreateStamp("VaultStamp", vaultRect, 19f, -2f, out vaultStampLabel);
+        VerticalLayoutGroup vaultLayout = UIKit.AddVertical(vaultRow, 6f, null, TextAnchor.UpperLeft);
+        vaultLayout.childForceExpandWidth = false;
+
+        RectTransform steps = UIKit.CreateRect("Steps", vaultRect);
+        UIKit.AddHorizontal(steps.gameObject, 6f, null, TextAnchor.MiddleLeft);
+
+        Image trackerLabel = UIKit.CreateStamp("Label", steps, 19f, 0f, out TextMeshProUGUI trackerLabelText);
+        trackerLabel.color = UIKit.Panel;
+        trackerLabelText.text = "Vault";
+        trackerLabelText.color = UIKit.Text;
+
+        string[] stepNames = { "Kunci", "Pintu", "Chest" };
+
+        for (int i = 0; i < stepNames.Length; i++)
+        {
+            if (i > 0)
+            {
+                // Panah di atas lantai arena, jadi diberi outline tinta supaya terbaca di lantai terang.
+                TextMeshProUGUI arrowText = UIKit.UseDisplayFont(UIKit.CreateText("Arrow", steps, "→", 20f, UIKit.Text, TextAlignmentOptions.Center, true));
+                arrowText.textWrappingMode = TextWrappingModes.NoWrap;
+                arrowText.outlineWidth = 0.3f;
+                arrowText.outlineColor = UIKit.Ink;
+            }
+
+            vaultSteps[i] = UIKit.CreateStamp("Step" + i, steps, 16f, 0f, out vaultStepLabels[i]);
+            vaultStepLabels[i].text = stepNames[i];
+        }
+
+        // Cap rarity minimum hadiah, menjorok sejajar langkah pertama.
+        RectTransform capRow = UIKit.CreateRect("CapRow", vaultRect);
+        UIKit.AddHorizontal(capRow.gameObject, 0f, new RectOffset(78, 0, 0, 0), TextAnchor.MiddleLeft);
+        vaultRarityCap = UIKit.CreateStamp("RarityCap", capRow, 15f, 2f, out vaultRarityLabel);
+
         vaultRow.SetActive(false);
     }
 
@@ -329,43 +481,77 @@ public class HudPanel : UIScreen
         Refresh();
     }
 
-    // Banner besar di tengah layar, mis. "RONDE 2" + komposisi wave.
-    public void Flash(string title, string subtitle)
+    // Banner besar di tengah layar saat ronde dimulai: stiker "RONDE N" (+ cap "Final" di ronde terakhir) dan
+    // pita token role musuh. Pita disembunyikan jika wave kosong.
+    public void FlashRound(int round, int totalRounds, WaveData wave)
     {
-        bannerTitle.text = title;
-        bannerSubtitle.text = subtitle;
+        UIKit.SetStamp(bannerStamp, bannerTitle, "RONDE " + round, UIKit.Cream);
+        bannerFinal.gameObject.SetActive(totalRounds > 0 && round >= totalRounds);
+
+        UIKit.ClearChildren(bannerTokens);
+        bool anyEnemy = false;
+
+        if (wave != null)
+        {
+            foreach (WaveEntry entry in wave.Entries)
+            {
+                if (entry.count <= 0)
+                    continue;
+
+                anyEnemy = true;
+                UIKit.CreateToken("Role_" + entry.role, bannerTokens, 40f, RoleColors.Get(entry.role),
+                    EnemyPreviewBoard.RoleBadgeLetter(entry.role), out _);
+
+                TextMeshProUGUI count = UIKit.UseDisplayFont(UIKit.CreateText("Count", bannerTokens, "×" + entry.count, 30f,
+                    UIKit.Text, TextAlignmentOptions.Left, true));
+                count.textWrappingMode = TextWrappingModes.NoWrap;
+            }
+        }
+
+        bannerTokens.gameObject.SetActive(anyEnemy);
         bannerTime = bannerDuration;
+        UIKit.ForceRebuild(banner);
     }
 
     // Satu chip per gate, warna rarity, berisi nama dan operasinya (mis. "Pembagi   +40 HP   ÷2 DMG").
+    // Gate pilihan Safezone di baris Build, hadiah vault di baris Vault sendiri.
     public void RefreshBuild()
     {
         UIKit.ClearChildren(buildChips);
+        UIKit.ClearChildren(vaultChips);
 
         PlayerStats stats = ui.Stats;
+        int selected = stats != null ? stats.SelectedGates.Count : 0;
+        int vaultCount = stats != null ? stats.VaultGates.Count : 0;
+        int index = 0;
 
-        if (stats == null || stats.SelectedGates.Count + stats.VaultGates.Count == 0)
+        if (selected == 0)
         {
             Image empty = UIKit.CreateStamp("EmptyChip", buildChips, 19f, 0f, out TextMeshProUGUI emptyLabel);
             empty.color = UIKit.Well;
             emptyLabel.text = "belum ada gate";
             emptyLabel.color = UIKit.TextMuted;
-            return;
+        }
+        else
+        {
+            foreach (MathGateData gate in stats.SelectedGates)
+                AddGateChip(gate, index++, false, buildChips);
         }
 
-        int index = 0;
-
-        foreach (MathGateData gate in stats.SelectedGates)
-            AddGateChip(gate, index++, false);
+        if (vaultBuildRow.activeSelf != vaultCount > 0)
+            vaultBuildRow.SetActive(vaultCount > 0);
 
         // Hadiah vault: hanya buff yang dipakai, jadi hanya buff yang ditampilkan.
-        foreach (MathGateData gate in stats.VaultGates)
-            AddGateChip(gate, index++, true);
+        if (vaultCount > 0)
+        {
+            foreach (MathGateData gate in stats.VaultGates)
+                AddGateChip(gate, index++, true, vaultChips);
+        }
 
         UIKit.ForceRebuild(topLeft);
     }
 
-    private void AddGateChip(MathGateData gate, int index, bool vault)
+    private void AddGateChip(MathGateData gate, int index, bool vault, RectTransform parent)
     {
         if (gate == null)
             return;
@@ -373,7 +559,7 @@ public class HudPanel : UIScreen
         // Baris 1 nama gate, baris 2 operasinya. Simbol, nilai, dan stat satu operasi digabung dengan
         // spasi tak terputus (U+00A0) supaya "÷1.25 DMG" tidak terbelah saat teks dibungkus.
         builder.Clear();
-        builder.Append(vault ? "Vault · " : string.Empty).Append(ShortGateName(gate.DisplayName)).Append("\n<size=82%>");
+        builder.Append(ShortGateName(gate.DisplayName)).Append("\n<size=82%>");
 
         bool first = true;
 
@@ -394,17 +580,32 @@ public class HudPanel : UIScreen
         builder.Append("</size>");
 
         // Kemiringan bergantian supaya tumpukan chip terasa ditempel tangan.
-        Image chip = UIKit.CreateStamp(vault ? "VaultChip" : "GateChip", buildChips, 19f, index % 2 == 0 ? -2f : 2f, out TextMeshProUGUI chipLabel);
+        Image chip = UIKit.CreateStamp(vault ? "VaultChip" : "GateChip", parent, 19f, index % 2 == 0 ? -2f : 2f, out TextMeshProUGUI chipLabel);
         chipLabel.textWrappingMode = TextWrappingModes.Normal;
         chipLabel.alignment = TextAlignmentOptions.Left;
         chipLabel.lineSpacing = -10f;
         UIKit.SetStamp(chip, chipLabel, builder.ToString(), UIKit.RarityColor(gate.Rarity));
 
+        if (vault)
+        {
+            // Bingkai dalam krem: tanda hadiah vault bebas trade-off. Padding dilebarkan supaya teks tidak
+            // menyentuh bingkai.
+            chip.GetComponent<HorizontalLayoutGroup>().padding = new RectOffset(15, 15, 8, 10);
+
+            Image frame = UIKit.CreateImage("NoTradeOffFrame", chip.transform, UIKit.Cream, false);
+            frame.sprite = UIKit.RoundedOutlineSmall;
+            frame.type = Image.Type.Sliced;
+            frame.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+            UIKit.Stretch(frame.rectTransform, 4f, 4f, 4f, 4f);
+        }
+
         if (GateRarityStyle.IsAnimated(gate.Rarity))
             chip.gameObject.AddComponent<SigmaRainbow>().Bind(chip, chipLabel);
     }
 
-    // Status vault Mode Dungeon selama ronde berjalan: cari kunci, buka pintu, buka chest.
+    // Pelacak vault Mode Dungeon selama ronde berjalan: Kunci -> Pintu -> Chest. Langkah selesai = slate,
+    // langkah sekarang = krem, besar, dan miring, langkah berikutnya = sumur redup. Cap di bawahnya menunjukkan
+    // rarity minimum hadiah chest.
     private void RefreshVault(RunState state)
     {
         DungeonVault vault = DungeonVault.Active;
@@ -423,12 +624,26 @@ public class HudPanel : UIScreen
 
         shownVaultState = vault.State;
 
-        string text = vault.State == VaultState.KeyFound ? "Kunci vault didapat · cari pintunya"
-            : vault.State == VaultState.Open ? "Vault terbuka · buka chest"
-            : "Vault terkunci · cari kuncinya";
+        // Locked = cari kunci, KeyFound = cari pintu, Open = buka chest.
+        int current = Mathf.Clamp((int)vault.State, 0, vaultSteps.Length - 1);
 
-        Color fill = vault.State == VaultState.Locked ? UIKit.RarityColor(vault.MinRarity) : UIKit.RarityColor(GateRarity.Legendary);
-        UIKit.SetStamp(vaultStamp, vaultStampLabel, text, fill);
+        for (int i = 0; i < vaultSteps.Length; i++)
+        {
+            bool done = i < current;
+            bool now = i == current;
+            Color fill = now ? UIKit.Cream : done ? UIKit.PanelLight : UIKit.Well;
+
+            UIKit.SetStamp(vaultSteps[i], vaultStepLabels[i], vaultStepLabels[i].text, fill);
+
+            if (!now)
+                vaultStepLabels[i].color = done ? UIKit.Text : UIKit.TextMuted;
+
+            vaultStepLabels[i].fontSize = now ? 19f : 16f;
+            vaultSteps[i].rectTransform.localRotation = Quaternion.Euler(0f, 0f, now ? -4f : 0f);
+        }
+
+        UIKit.SetStamp(vaultRarityCap, vaultRarityLabel, "hadiah min. " + GateRarityStyle.Label(vault.MinRarity),
+            UIKit.RarityColor(vault.MinRarity));
         UIKit.ForceRebuild(topLeft);
     }
 
@@ -447,6 +662,7 @@ public class HudPanel : UIScreen
             return;
 
         UpdateBanner();
+        UpdateVaultNotices();
         UpdateHpBar();
         UpdateSkill();
 

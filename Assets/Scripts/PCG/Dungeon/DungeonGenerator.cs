@@ -30,7 +30,7 @@ using UnityEngine.AI;
 // dengan ukuran grid, dan NavMesh di-bake ulang (pengembangan Runtime NavMesh di modul).
 // Preview di Editor: menu titik tiga komponen > Generate Preview (tanpa Play, hasilnya tidak ikut tersimpan di scene).
 [DisallowMultipleComponent]
-public class DungeonGenerator : MonoBehaviour
+public partial class DungeonGenerator : MonoBehaviour
 {
     private const string LevelRootName = "GeneratedLevel";
 
@@ -655,7 +655,10 @@ public class DungeonGenerator : MonoBehaviour
             smallestRoomSide = int.MaxValue,
             deadEndCount = deadEndRooms.Count,
             hasVault = VaultRoom != null,
-            keyDistance = VaultKeyDistance
+            keyDistance = VaultKeyDistance,
+            propCount = PropCount,
+            blockingProps = BlockingPropCount,
+            rejectedProps = RejectedPropCount
         };
 
         int roomArea = 0;
@@ -718,7 +721,8 @@ public class DungeonGenerator : MonoBehaviour
                leafNodes.Count + " leaf, " + rooms.Count + " room (" + ReachableRooms + " terjangkau), " + FloorCellCount + " cell floor, " +
                "jalur Start-Goal " + PathLength + " cell (" + (PathLength * tileSize).ToString("0") + " m), " +
                builtObjects + " objek dibangun" + (bakeNavMesh ? ", bake NavMesh " + LastBakeMilliseconds.ToString("0") + " ms" : string.Empty) +
-               ", obor " + torchPositions.Count + ", lantai varian " + FloorVariantCells + " cell (" + (FloorCellCount > 0 ? 100f * FloorVariantCells / FloorCellCount : 0f).ToString("0") + "%)" +
+               ", obor " + torchPositions.Count + ", props " + PropCount + " (" + BlockingPropCount + " penghalang, " + RejectedPropCount + " ditolak BFS)" +
+               ", lantai varian " + FloorVariantCells + " cell (" + (FloorCellCount > 0 ? 100f * FloorVariantCells / FloorCellCount : 0f).ToString("0") + "%)" +
                ", " + deadEndRooms.Count + " dead-end, vault " + (VaultRoom != null ? VaultMessage : "tidak ada (" + VaultMessage + ")");
     }
 
@@ -1072,6 +1076,7 @@ public class DungeonGenerator : MonoBehaviour
 
         builtObjects = 0;
         FloorCellCount = 0;
+        AssignRoomThemes();
         PlanFloorVariation();
 
         int groundLayer = LayerMask.NameToLayer(GameLayers.Ground);
@@ -1093,6 +1098,7 @@ public class DungeonGenerator : MonoBehaviour
         BuildBossRoom();
         BuildVault();
         BuildTorches();
+        BuildDecoration();
     }
 
     private void BuildVault()
@@ -1309,6 +1315,7 @@ public class DungeonGenerator : MonoBehaviour
     private void BuildTorches()
     {
         torchPositions.Clear();
+        torchCells.Clear();
 
         if (!torches || rooms.Count == 0)
             return;
@@ -1509,6 +1516,7 @@ public class DungeonGenerator : MonoBehaviour
         root.AddComponent<TorchFlicker>().Setup(light, flame, torchFlicker, torchFlickerSpeed, decor.Range(0f, 100f));
 
         torchPositions.Add(position);
+        torchCells.Add(slot.cell);
         builtObjects++;
     }
 
@@ -1670,10 +1678,19 @@ public class DungeonGenerator : MonoBehaviour
             chance *= Mathf.Lerp(1f, 2f * noise, floorClusterStrength);
         }
 
-        if (!IsInsideAnyRoom(new Vector2Int(x, y)))
+        Vector2Int cell = new Vector2Int(x, y);
+
+        if (!IsInsideAnyRoom(cell))
+        {
             chance += corridorVariantBonus;
-        else if (TouchesWall(x, y))
-            chance += wallEdgeVariantBonus;
+        }
+        else
+        {
+            if (TouchesWall(x, y))
+                chance += wallEdgeVariantBonus;
+
+            chance += ThemeFloorBonus(cell);
+        }
 
         return Mathf.Clamp01(chance);
     }
@@ -1973,6 +1990,7 @@ public class DungeonGenerator : MonoBehaviour
         deadEndRooms.Clear();
         vaultDoorCells.Clear();
         torchPositions.Clear();
+        ClearDecoration();
         VaultRoom = null;
         Vault = null;
         VaultKeyDistance = -1;
@@ -2319,6 +2337,8 @@ public class DungeonGenerator : MonoBehaviour
 
         foreach (Vector3 torch in torchPositions)
             Gizmos.DrawWireSphere(torch, tileSize * 0.15f);
+
+        DrawDecorGizmos();
 
         if (VaultRoom == null)
             return;

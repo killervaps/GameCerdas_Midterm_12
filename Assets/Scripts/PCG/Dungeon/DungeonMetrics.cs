@@ -34,6 +34,11 @@ public struct DungeonMetrics
     public bool hasVault;
     public int keyDistance;
 
+    // Dekorasi: semua props, yang menghalangi jalan, dan yang dibatalkan karena memutus jalur BFS.
+    public int propCount;
+    public int blockingProps;
+    public int rejectedProps;
+
     public int builtObjects;
     public float generateMs;
     public float buildMs;
@@ -42,10 +47,10 @@ public struct DungeonMetrics
     public float FloorPercent => totalCells > 0 ? floorCells * 100f / totalCells : 0f;
 
     public static string TableHeader =>
-        "| Seed | Valid | Percobaan | Leaf | Room | Floor | Floor % | Wall | Corridor | Start-Goal (A / B / C) | Dead-end | Vault (kunci) | Objek | Generate + Build ms |";
+        "| Seed | Valid | Percobaan | Leaf | Room | Floor | Floor % | Wall | Corridor | Start-Goal (A / B / C) | Dead-end | Vault (kunci) | Props (blok / ditolak) | Objek | Generate + Build ms |";
 
     public static string TableDivider =>
-        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |";
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |";
 
     public string TableRow()
     {
@@ -62,6 +67,7 @@ public struct DungeonMetrics
             .Append(" | ").Append(pathLastRoom).Append(" / ").Append(pathGeometric).Append(" / ").Append(pathBfs)
             .Append(" | ").Append(deadEndCount)
             .Append(" | ").Append(hasVault ? "Ya (" + keyDistance + ")" : "-")
+            .Append(" | ").Append(propCount).Append(" (").Append(blockingProps).Append(" / ").Append(rejectedProps).Append(')')
             .Append(" | ").Append(builtObjects)
             .Append(" | ").Append((generateMs + buildMs).ToString("0.0"))
             .Append(" |");

@@ -70,6 +70,11 @@ public class GameUI : MonoBehaviour
     private EnemyPreviewPanel enemyPreview;
     private GateInfoModal gateModal;
     private HintToast hints;
+    private VaultRewardCard rewardCard;
+    // Stat MC saat pintu vault terbuka. Kartu hadiah memakai ini sebagai nilai "sebelum", karena hadiah sudah
+    // masuk ke stat saat event Looted dikirim.
+    private StatSnapshot vaultBaseline;
+    private bool hasVaultBaseline;
     private PauseScreen pause;
     private TutorialScreen tutorial;
     private SettingsScreen settings;
@@ -346,6 +351,7 @@ public class GameUI : MonoBehaviour
         result.Hide();
         CancelPendingResult();
         announcement.Stop();
+        rewardCard.Stop();
 
         if (runManager != null)
             runManager.StartRun();
@@ -396,6 +402,7 @@ public class GameUI : MonoBehaviour
         Resume();
         CancelPendingResult();
         announcement.Stop();
+        rewardCard.Stop();
 
         if (runManager != null)
             runManager.StopRun();
@@ -533,9 +540,7 @@ public class GameUI : MonoBehaviour
 
     private void HandleRoundStarted(int round)
     {
-        hud.Flash("RONDE " + round, runManager != null && runManager.CurrentWave != null
-            ? runManager.CurrentWave.Describe()
-            : string.Empty);
+        hud.FlashRound(round, runManager != null ? runManager.TotalRounds : 0, runManager != null ? runManager.CurrentWave : null);
     }
 
     private void HandlePortalFocused(GatePortal portal)
@@ -569,7 +574,9 @@ public class GameUI : MonoBehaviour
         hud.RefreshBuild();
     }
 
-    // Banner tengah untuk langkah vault Mode Dungeon. Hadiah ditampilkan dengan warna rarity dan buff-nya.
+    // Langkah vault Mode Dungeon. Langkah kecil memakai toast kecil di HUD, pintu terkunci memakai kartu kontekstual
+    // di HUD (selama MC dekat pintu, jadi event DoorLocked tidak perlu ditampilkan lagi), dan hadiah chest memakai
+    // kartu hadiah yang meluncur ke baris Vault.
     private void HandleVaultChanged(DungeonVault vault, VaultEvent vaultEvent)
     {
         if (hud == null)
@@ -578,38 +585,19 @@ public class GameUI : MonoBehaviour
         switch (vaultEvent)
         {
             case VaultEvent.KeyFound:
-                hud.Flash("KUNCI VAULT", "Cari pintu vault yang terkunci di dungeon ini.");
-                break;
-            case VaultEvent.DoorLocked:
-                hud.Flash("VAULT TERKUNCI", "Kuncinya ada di room lain. Jelajahi dungeon untuk menemukannya.");
+                hud.ShowVaultToast("Kunci vault!", "Cari pintu vault yang terkunci");
                 break;
             case VaultEvent.DoorOpened:
-                hud.Flash("VAULT TERBUKA", "Buka chest di dalamnya.");
+                hasVaultBaseline = playerStats != null;
+
+                if (hasVaultBaseline)
+                    vaultBaseline = playerStats.GetSnapshot();
+
+                hud.ShowVaultToast("Vault terbuka!", "Buka chest di dalamnya");
                 break;
             case VaultEvent.Looted:
-                MathGateData reward = vault.Reward;
-
-                if (reward == null)
-                {
-                    hud.Flash("CHEST KOSONG", "Pool gate tidak punya gate " + GateRarityStyle.Label(vault.MinRarity) + " ke atas.");
-                    break;
-                }
-
-                System.Text.StringBuilder buffs = new System.Text.StringBuilder();
-
-                foreach (ModifierEffect effect in reward.Effects)
-                {
-                    if (!effect.IsBuff)
-                        continue;
-
-                    if (buffs.Length > 0)
-                        buffs.Append("   ");
-
-                    buffs.Append(effect.Symbol).Append(effect.value.ToString("0.##")).Append(' ').Append(UIKit.StatShort(effect.stat));
-                }
-
-                hud.Flash(GateRarityStyle.Wrap(reward.Rarity, reward.DisplayName.ToUpperInvariant()),
-                    GateRarityStyle.RichLabel(reward.Rarity) + "   |   <color=" + UIKit.BuffHex + ">" + buffs + "</color>   |   tanpa trade-off");
+                rewardCard.Play(vault, hasVaultBaseline, vaultBaseline);
+                hasVaultBaseline = false;
                 break;
         }
     }
@@ -754,6 +742,7 @@ public class GameUI : MonoBehaviour
         enemyPreview = CreateScreen<EnemyPreviewPanel>("EnemyPreview", false);
         gateModal = CreateScreen<GateInfoModal>("GateInfoModal", false);
         hints = CreateScreen<HintToast>("HintToast", false);
+        rewardCard = CreateScreen<VaultRewardCard>("VaultRewardCard", false);
         announcement = CreateScreen<RoundAnnouncement>("RoundAnnouncement", false);
         announcement.Finished += RefreshPanels;
         result = CreateScreen<ResultScreen>("ResultScreen", true);
