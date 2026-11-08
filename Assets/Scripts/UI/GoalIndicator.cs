@@ -118,6 +118,7 @@ public class GoalIndicator : UIScreen
 
         float progress = portal.ConfirmProgress;
         UIKit.SetBarFill(promptFill, progress);
+        ControlGlyphs.Apply(promptText);
         promptText.text = progress > 0.01f
             ? "Kembali ke Safezone... <b>" + Mathf.RoundToInt(progress * 100f) + "%</b>"
             : "Tahan <b>" + ControlHints.Glyph(PadAction.Interact) + "</b> untuk kembali ke Safezone";

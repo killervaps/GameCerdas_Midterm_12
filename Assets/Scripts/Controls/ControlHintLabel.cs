@@ -33,6 +33,8 @@ public class ControlHintLabel : MonoBehaviour
             return;
 
         version = ControlHints.Version;
+        // Ikon tombol gamepad ditulis sebagai <sprite name=...>, jadi label butuh sprite asset ikon.
+        ControlGlyphs.Apply(label);
         label.text = builder();
     }
 

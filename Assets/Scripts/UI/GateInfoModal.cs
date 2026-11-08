@@ -278,6 +278,7 @@ public class GateInfoModal : UIScreen
 
         float progress = ui.GateRoom != null ? ui.GateRoom.ConfirmProgress : 0f;
         UIKit.SetBarFill(confirmFill, progress);
+        ControlGlyphs.Apply(confirmText);
         confirmText.text = progress > 0.01f
             ? "Memilih... <b>" + Mathf.RoundToInt(progress * 100f) + "%</b>"
             : "Tahan <b>" + ControlHints.Glyph(PadAction.Interact) + "</b> untuk memilih gate ini";

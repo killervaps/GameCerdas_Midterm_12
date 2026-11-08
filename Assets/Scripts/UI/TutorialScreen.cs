@@ -102,7 +102,7 @@ public class TutorialScreen : UIScreen
             18f, UIKit.TextMuted);
         keys.textWrappingMode = TextWrappingModes.NoWrap;
         ControlHintLabel.Bind(keys, () => ControlHints.IsGamepad
-            ? "<b>(LB) / (RB)</b> atau <b>" + ControlHints.Navigate + "</b> untuk ganti halaman   |   <b>" +
+            ? "<b>" + ControlHints.Icon("LB", "LB") + " / " + ControlHints.Icon("RB", "RB") + "</b> atau <b>" + ControlHints.Navigate + "</b> untuk ganti halaman   |   <b>" +
               ControlHints.Back + "</b> untuk menutup"
             : "<b>A / D</b> atau <b>panah kiri / kanan</b> untuk ganti halaman   |   <b>Esc</b> untuk menutup");
         UIKit.Place(keys.rectTransform, new Vector2(0f, 0f), new Vector2(0f, 0.5f), new Vector2(56f, 22f), new Vector2(1008f, 26f));
@@ -153,6 +153,7 @@ public class TutorialScreen : UIScreen
 
         Page page = pages[index];
         pageTitle.text = page.title;
+        ControlGlyphs.Apply(pageBody);
         pageBody.text = page.body;
         counter.text = (index + 1) + " / " + pages.Length;
 
@@ -244,7 +245,7 @@ public class TutorialScreen : UIScreen
                 "<b>" + ControlHints.Glyph(PadAction.AuraBurst) + "</b>  Aura Burst: damage area di sekitar MC, ada cooldown\n" +
                 "<b>Tahan " + ControlHints.Glyph(PadAction.Interact) + "</b>  Memilih gate (dan portal Goal) saat berdiri di depannya\n" +
                 "<b>" + ControlHints.Glyph(PadAction.Pause) + "</b>  Jeda\n\n" +
-                "<size=85%><color=" + UIKit.MutedHex + ">Tombol gamepad bisa diubah di Pengaturan > Kontroler.</color></size>"),
+                "<size=85%><color=" + UIKit.MutedHex + ">Tombol bisa diubah di Pengaturan, tab Keyboard dan Kontroler.</color></size>"),
 
             new Page("Gate & Trade-off",
                 "Setiap gate adalah operasi matematika pada stat: <b>+  -  " + "×" + "  " + "÷" + "</b>.\n" +

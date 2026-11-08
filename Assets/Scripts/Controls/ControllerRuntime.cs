@@ -30,6 +30,7 @@ public class ControllerRuntime : MonoBehaviour
     private void Awake()
     {
         ControllerBindings.EnsureLoaded();
+        KeyboardBindings.EnsureLoaded();
     }
 
     private void OnEnable()

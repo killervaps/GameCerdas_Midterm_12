@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 // Teks petunjuk yang ditulis langsung di scene (mis. "Tahan (E)" melayang di depan gate) ikut skema kontrol.
 // Setiap scene dimuat, semua teks TMP yang memuat "(E)" diikat ke ControlHintLabel:
-//   keyboard  "Tahan (E)"     gamepad  "Tahan (RT)" (tombol Interaksi saat ini, berwarna)
+//   keyboard  "Tahan (E)" (tombol Interaksi keyboard saat ini)     gamepad  "Tahan" + ikon tombol Interaksi (mis. RT)
 public static class WorldHintTexts
 {
     private const string KeyboardToken = "(E)";
@@ -37,9 +37,9 @@ public static class WorldHintTexts
             if (string.IsNullOrEmpty(template) || !template.Contains(KeyboardToken))
                 continue;
 
-            ControlHintLabel.Bind(text, () => ControlHints.IsGamepad
-                ? template.Replace(KeyboardToken, ControlHints.PadGlyph(PadAction.Interact))
-                : template);
+            ControlHintLabel.Bind(text, () => template.Replace(KeyboardToken, ControlHints.IsGamepad
+                ? ControlHints.PadGlyph(PadAction.Interact)
+                : "(" + ControlHints.KeyboardLabel(PadAction.Interact) + ")"));
         }
     }
 }

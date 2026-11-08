@@ -261,7 +261,7 @@ public class GameUI : MonoBehaviour
         if (!started)
             return;
 
-        if (!ControllerBindings.BlocksMenuInput)
+        if (!ControllerBindings.BlocksMenuInput && !KeyboardBindings.BlocksMenuInput)
         {
             if (CancelPressed())
                 HandleCancel();
@@ -277,11 +277,9 @@ public class GameUI : MonoBehaviour
 
     private static bool CancelPressed()
     {
-        bool keyboard = Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame;
-        // Tombol Jeda gamepad (default Menu) bisa diubah di Pengaturan > Kontroler.
+        // Tombol Jeda (default Esc dan Menu) bisa diubah di Pengaturan > Keyboard dan Pengaturan > Kontroler.
         InputAction pauseAction = ControllerBindings.PauseAction;
-        bool gamepad = pauseAction != null && pauseAction.WasPressedThisFrame();
-        return keyboard || gamepad;
+        return pauseAction != null && pauseAction.WasPressedThisFrame();
     }
 
     // Kembali (default B): hanya di menu. Menutup layar teratas, atau melanjutkan game dari menu jeda.

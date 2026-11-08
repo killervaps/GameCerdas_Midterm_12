@@ -151,6 +151,8 @@ public static class ControllerBindings
 
         pauseAction = menuMap.AddAction("Pause", InputActionType.Button);
         pauseAction.AddBinding(DefaultPausePath).WithGroup("Gamepad");
+        // Tombol keyboard Jeda bisa diubah di Pengaturan > Keyboard (KeyboardBindings).
+        pauseAction.AddBinding("<Keyboard>/escape").WithGroup("Keyboard&Mouse");
 
         // Enter tetap memilih di keyboard. Binding gamepad yang bisa di-rebind.
         selectAction = menuMap.AddAction("Select", InputActionType.Button);
@@ -160,6 +162,8 @@ public static class ControllerBindings
 
         backAction = menuMap.AddAction("Back", InputActionType.Button);
         backAction.AddBinding(DefaultBackPath).WithGroup("Gamepad");
+        // Esc selalu menutup menu, walau tombol Jeda keyboard sudah dipindah.
+        backAction.AddBinding("<Keyboard>/escape").WithGroup("Keyboard&Mouse");
 
         foreach (PadAction action in All)
         {
@@ -247,7 +251,7 @@ public static class ControllerBindings
     {
         EnsureLoaded();
 
-        if (IsRebinding || !TryGet(action, out InputAction inputAction, out int index))
+        if (IsRebinding || KeyboardBindings.IsRebinding || !TryGet(action, out InputAction inputAction, out int index))
             return false;
 
         string oldPath = inputAction.bindings[index].effectivePath;
