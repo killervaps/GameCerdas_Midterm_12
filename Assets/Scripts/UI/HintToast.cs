@@ -23,7 +23,7 @@ public class HintToast : UIScreen
     // Diingat selama aplikasi berjalan, juga melewati "Ulangi Run" dan "Menu Utama".
     private static readonly HashSet<string> seenThisSession = new HashSet<string>();
 
-    private readonly Queue<string> queue = new Queue<string>();
+    private readonly Queue<System.Func<string>> queue = new Queue<System.Func<string>>();
 
     private TextMeshProUGUI label;
     private RectTransform timerFill;
@@ -60,7 +60,7 @@ public class HintToast : UIScreen
         UIKit.SetBarFill(timerFill, 1f);
     }
 
-    public void ShowOnce(string key, string message, bool remember)
+    public void ShowOnce(string key, System.Func<string> message, bool remember)
     {
         if (seenThisSession.Contains(key))
             return;
@@ -104,7 +104,8 @@ public class HintToast : UIScreen
             return;
         }
 
-        label.text = queue.Dequeue();
+        // Teks ditulis ulang otomatis jika pemain berganti keyboard <-> gamepad saat toast tampil.
+        ControlHintLabel.Bind(label, queue.Dequeue());
         remaining = duration;
         UIKit.SetBarFill(timerFill, 1f);
         FitWidth();

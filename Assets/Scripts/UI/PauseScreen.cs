@@ -68,6 +68,9 @@ public class PauseScreen : UIScreen
 
         TextMeshProUGUI footer = UIKit.CreateText("Footer", rect, "<b>[Esc]</b> lanjutkan", 20f, UIKit.TextMuted, TextAlignmentOptions.Center);
         UIKit.Place(footer.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 1f), new Vector2(0f, -340f), new Vector2(600f, 30f));
+        ControlHintLabel.Bind(footer, () => ControlHints.IsGamepad
+            ? "<b>" + ControlHints.Glyph(PadAction.Pause) + "</b> / <b>" + ControlHints.Back + "</b> lanjutkan"
+            : "<b>" + ControlHints.Glyph(PadAction.Pause) + "</b> lanjutkan");
     }
 
     protected override void OnShow()

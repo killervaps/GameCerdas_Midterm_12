@@ -25,6 +25,8 @@ public class GateInfoModal : UIScreen
     private GameObject threatSection;
     private TextMeshProUGUI confirmText;
     private RectTransform confirmFill;
+    private Image confirmKeyCap;
+    private TextMeshProUGUI confirmKeyLabel;
 
     private float slide;
     private bool animatedRarity;
@@ -88,6 +90,8 @@ public class GateInfoModal : UIScreen
         TextMeshProUGUI keyLabel = UIKit.UseDisplayFont(UIKit.CreateText("Key", keyCap.transform, "E", 24f,
             new Color(0.23f, 0.15f, 0.02f), TextAlignmentOptions.Center, true));
         UIKit.Stretch(keyLabel.rectTransform);
+        confirmKeyCap = keyCap;
+        confirmKeyLabel = keyLabel;
 
         RectTransform bar = UIKit.CreateBar("ConfirmBar", confirmRow, UIKit.Ink, UIKit.Accent, out Image fill);
         UIKit.Layout(bar, 14f, -1f, 1f);
@@ -276,6 +280,9 @@ public class GateInfoModal : UIScreen
         UIKit.SetBarFill(confirmFill, progress);
         confirmText.text = progress > 0.01f
             ? "Memilih... <b>" + Mathf.RoundToInt(progress * 100f) + "%</b>"
-            : "Tahan <b>E</b> untuk memilih gate ini";
+            : "Tahan <b>" + ControlHints.Glyph(PadAction.Interact) + "</b> untuk memilih gate ini";
+
+        // Tutup tombol ikut skema kontrol: "E" emas di keyboard, "RT" (atau tombol hasil rebind) di gamepad.
+        ControlHints.StyleCap(confirmKeyCap, confirmKeyLabel, PadAction.Interact);
     }
 }

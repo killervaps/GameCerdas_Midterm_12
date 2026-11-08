@@ -167,12 +167,13 @@ public class MainMenuScreen : UIScreen
 
         UIKit.UseDisplayFont(UIKit.CreateText("Heading", card.transform, "Alur satu ronde", 22f, UIKit.Text, TextAlignmentOptions.Left, true));
 
-        string[] steps =
+        // Fungsi, bukan string, supaya tombol "tahan [E]" / "tahan (RT)" ikut skema kontrol aktif.
+        System.Func<string>[] steps =
         {
-            "Di <b>Safezone</b>, lihat musuh ronde berikutnya dan tingkat ancamannya.",
-            "Dekati gate untuk membaca <color=" + UIKit.BuffHex + ">buff</color> dan " +
-            "<color=" + UIKit.TradeOffHex + ">trade-off</color>-nya, lalu <b>tahan [E]</b>.",
-            "Kalahkan semua musuh di arena. Build menumpuk tiap ronde."
+            () => "Di <b>Safezone</b>, lihat musuh ronde berikutnya dan tingkat ancamannya.",
+            () => "Dekati gate untuk membaca <color=" + UIKit.BuffHex + ">buff</color> dan " +
+                  "<color=" + UIKit.TradeOffHex + ">trade-off</color>-nya, lalu <b>tahan " + ControlHints.Glyph(PadAction.Interact) + "</b>.",
+            () => "Kalahkan semua musuh di arena. Build menumpuk tiap ronde."
         };
 
         for (int i = 0; i < steps.Length; i++)
@@ -182,7 +183,8 @@ public class MainMenuScreen : UIScreen
 
             UIKit.CreateToken("Number", row, 28f, UIKit.Cream, (i + 1).ToString(), out _);
 
-            TextMeshProUGUI text = UIKit.CreateText("Text", row, steps[i], 18f, UIKit.Text);
+            TextMeshProUGUI text = UIKit.CreateText("Text", row, string.Empty, 18f, UIKit.Text);
+            ControlHintLabel.Bind(text, steps[i]);
             UIKit.Layout(text, -1f, -1f, 1f);
         }
     }

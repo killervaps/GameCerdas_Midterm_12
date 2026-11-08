@@ -173,6 +173,9 @@ public class AuraBurst : MonoBehaviour
             Debug.Log("AuraBurst: kena " + damagedThisBurst.Count + " musuh, damage " + damage.ToString("0.#"), this);
 
         Burst?.Invoke(damagedThisBurst.Count);
+
+        // Getaran kuat saat ledakan mendarat.
+        GamepadRumble.AuraBurst();
     }
 
     private void OnDrawGizmos()

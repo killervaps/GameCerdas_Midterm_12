@@ -108,7 +108,16 @@ public abstract class UIScreen : MonoBehaviour
             gameObject.SetActive(false);
 
         if (IsVisible)
+        {
+            // Layar di bawah menu bertumpuk (mis. menu utama di bawah Pengaturan) tidak boleh bisa dipilih
+            // lewat navigasi D-pad/panah, jadi tombolnya dimatikan selama tertutup layar lain.
+            bool usable = interactive && !IsCoveredByLaterScreen();
+
+            if (group.interactable != usable)
+                group.interactable = usable;
+
             KeepFocus();
+        }
     }
 
     // Klik di area kosong (backdrop) membuat EventSystem melepas seleksi, sehingga panah dan Enter

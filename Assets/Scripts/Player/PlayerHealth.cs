@@ -112,6 +112,10 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
         Damaged?.Invoke(finalDamage, info);
 
+        // Getaran gamepad: lemah untuk damage kecil, sedang untuk damage besar (relatif ke HP maksimum).
+        if (finalDamage > 0f)
+            GamepadRumble.Damage(finalDamage / Mathf.Max(1f, MaxHealth));
+
         if (CurrentHealth <= 0f)
         {
             if (logDamage)

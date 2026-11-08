@@ -30,6 +30,8 @@ public class GoalIndicator : UIScreen
     private TextMeshProUGUI promptText;
     private TextMeshProUGUI promptNote;
     private RectTransform promptFill;
+    private Image promptKeyCap;
+    private TextMeshProUGUI promptKeyLabel;
 
     protected override void Build()
     {
@@ -97,6 +99,8 @@ public class GoalIndicator : UIScreen
         TextMeshProUGUI keyLabel = UIKit.UseDisplayFont(UIKit.CreateText("Key", keyCap.transform, "E", 24f,
             new Color(0.23f, 0.15f, 0.02f), TextAlignmentOptions.Center, true));
         UIKit.Stretch(keyLabel.rectTransform);
+        promptKeyCap = keyCap;
+        promptKeyLabel = keyLabel;
 
         RectTransform bar = UIKit.CreateBar("ConfirmBar", row, UIKit.Ink, UIKit.Accent, out Image fill);
         UIKit.Layout(bar, 14f, -1f, 1f);
@@ -116,7 +120,8 @@ public class GoalIndicator : UIScreen
         UIKit.SetBarFill(promptFill, progress);
         promptText.text = progress > 0.01f
             ? "Kembali ke Safezone... <b>" + Mathf.RoundToInt(progress * 100f) + "%</b>"
-            : "Tahan <b>E</b> untuk kembali ke Safezone";
+            : "Tahan <b>" + ControlHints.Glyph(PadAction.Interact) + "</b> untuk kembali ke Safezone";
+        ControlHints.StyleCap(promptKeyCap, promptKeyLabel, PadAction.Interact);
 
         DungeonVault vault = DungeonVault.Active;
         bool vaultLeft = vault != null && vault.State != VaultState.Looted;

@@ -261,8 +261,13 @@ public class GameUI : MonoBehaviour
         if (!started)
             return;
 
-        if (CancelPressed())
-            HandleCancel();
+        if (!ControllerBindings.BlocksMenuInput)
+        {
+            if (CancelPressed())
+                HandleCancel();
+            else if (BackPressed())
+                HandleBack();
+        }
 
         ApplyInputGate(false);
 
@@ -273,8 +278,30 @@ public class GameUI : MonoBehaviour
     private static bool CancelPressed()
     {
         bool keyboard = Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame;
-        bool gamepad = Gamepad.current != null && Gamepad.current.startButton.wasPressedThisFrame;
+        // Tombol Jeda gamepad (default Menu) bisa diubah di Pengaturan > Kontroler.
+        InputAction pauseAction = ControllerBindings.PauseAction;
+        bool gamepad = pauseAction != null && pauseAction.WasPressedThisFrame();
         return keyboard || gamepad;
+    }
+
+    // Kembali (default B): hanya di menu. Menutup layar teratas, atau melanjutkan game dari menu jeda.
+    // Saat bermain, di menu utama, dan di layar hasil tidak melakukan apa-apa.
+    private static bool BackPressed()
+    {
+        InputAction backAction = ControllerBindings.BackAction;
+        return backAction != null && backAction.WasPressedThisFrame();
+    }
+
+    private void HandleBack()
+    {
+        if (IsModeSelectOpen)
+            CloseModeSelect();
+        else if (IsSettingsOpen)
+            CloseSettings();
+        else if (IsTutorialOpen)
+            CloseTutorial();
+        else if (IsPaused)
+            Resume();
     }
 
     private void HandleCancel()
@@ -497,18 +524,21 @@ public class GameUI : MonoBehaviour
         if (state == RunState.Preparing)
         {
             enemyPreview.Refresh();
-            ShowHint("safezone", "Dekati salah satu gate untuk membaca efeknya. <b>Tahan [E]</b> untuk memilih.");
+            ShowHint("safezone", () => "Dekati salah satu gate untuk membaca efeknya. <b>Tahan " + ControlHints.Glyph(PadAction.Interact) + "</b> untuk memilih.");
         }
         else if (state == RunState.Battle)
         {
-            ShowHint("battle", "<b>WASD</b> bergerak  |  <b>Tahan Klik Kiri</b> menembak  |  <b>Tab</b> ganti target  |  <b>Space</b> Aura Burst");
+            ShowHint("battle", () => "<b>" + ControlHints.Move + "</b> bergerak  |  <b>Tahan " + ControlHints.Glyph(PadAction.Attack) +
+                               "</b> menembak  |  <b>" + ControlHints.Glyph(PadAction.CycleTarget) + "</b> ganti target  |  <b>" +
+                               ControlHints.Glyph(PadAction.AuraBurst) + "</b> Aura Burst");
         }
         else if (state == RunState.RoundCleared)
         {
             if (runManager != null && runManager.Mode == GameMode.Dungeon)
-                ShowHint("cleared_dungeon", "Ronde bersih! Portal Goal terbuka. Berdiri di portal lalu tahan <b>E</b> untuk kembali ke Safezone.");
+                ShowHint("cleared_dungeon", () => "Ronde bersih! Portal Goal terbuka. Berdiri di portal lalu <b>tahan " +
+                                                 ControlHints.Glyph(PadAction.Interact) + "</b> untuk kembali ke Safezone.");
             else
-                ShowHint("cleared", "Ronde bersih! HP pulih sebagian, lalu kamu kembali ke Safezone untuk memilih gate berikutnya.");
+                ShowHint("cleared", () => "Ronde bersih! HP pulih sebagian, lalu kamu kembali ke Safezone untuk memilih gate berikutnya.");
         }
 
         RefreshPanels();
@@ -521,6 +551,9 @@ public class GameUI : MonoBehaviour
             return;
 
         bool final = round >= runManager.TotalRounds;
+
+        // Getaran perayaan: 3 detik sangat kuat saat menang di ronde terakhir, 2 detik di ronde sebelumnya.
+        GamepadRumble.RoundCleared(final);
         float battleTime = battle != null ? Time.time - battle.BattleStartTime : 0f;
         string hp = playerHealth != null
             ? "HP tersisa " + Mathf.CeilToInt(playerHealth.CurrentHealth) + " / " + Mathf.CeilToInt(playerHealth.MaxHealth)
@@ -551,7 +584,7 @@ public class GameUI : MonoBehaviour
         gateModal.Open(portal.Gate);
         enemyPreview.SetCompareGate(portal.Gate);
 
-        ShowHint("gate", "<color=" + UIKit.BuffHex + ">Hijau</color> = buff, <color=" + UIKit.TradeOffHex +
+        ShowHint("gate", () => "<color=" + UIKit.BuffHex + ">Hijau</color> = buff, <color=" + UIKit.TradeOffHex +
                          ">merah</color> = trade-off. Perhatikan perubahan <b>Ancaman</b> di panel kiri.");
     }
 
@@ -632,7 +665,8 @@ public class GameUI : MonoBehaviour
         }
     }
 
-    private void ShowHint(string key, string message)
+    // Pesan berupa fungsi supaya petunjuk tombol di dalamnya ikut berganti saat skema kontrol berubah.
+    private void ShowHint(string key, System.Func<string> message)
     {
         if (!contextualHints || IsMainMenuOpen || IsAnnouncing)
             return;

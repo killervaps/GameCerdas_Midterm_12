@@ -897,7 +897,7 @@ public static class UIKit
         knob.rectTransform.sizeDelta = new Vector2(knobSize, 0f);
         AddHardShadow(knob, new Vector2(2f, -3f));
 
-        Slider slider = root.gameObject.AddComponent<Slider>();
+        Slider slider = root.gameObject.AddComponent<TriggerSlider>();
         slider.fillRect = fill.rectTransform;
         slider.handleRect = knob.rectTransform;
         slider.targetGraphic = knob;

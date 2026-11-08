@@ -150,6 +150,7 @@ public class HudPanel : UIScreen
 
         TextMeshProUGUI pauseHint = UIKit.CreateText("PauseHint", timerCard.transform, "<b>[Esc]</b> Jeda", 17f, UIKit.TextMuted, TextAlignmentOptions.Center);
         UIKit.Stretch(pauseHint.rectTransform, 0f, 0f, 56f, 8f);
+        ControlHintLabel.Bind(pauseHint, () => "<b>" + ControlHints.Glyph(PadAction.Pause) + "</b> Jeda");
 
         // ---------- Kanan bawah: Aura Burst (cooldown lingkaran) ----------
         BuildSkill();
@@ -467,12 +468,16 @@ public class HudPanel : UIScreen
         skillCountdown.outlineColor = new Color32(0, 0, 0, 230);
         UIKit.Stretch(skillCountdown.rectTransform);
 
-        // Label di bawah ikon.
-        TextMeshProUGUI skillName = UIKit.CreateText("Name", skillRoot, "Aura Burst", 21f, UIKit.Text, TextAlignmentOptions.Center, true);
-        UIKit.Place(skillName.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -circleSize - 6f), new Vector2(170f, 28f));
+        // Nama skill dengan latar kapsul hitam transparan, supaya tetap terbaca di atas lantai terang.
+        Image nameBackdrop = UIKit.SetCorners(UIKit.CreateImage("NameBackdrop", skillRoot, new Color(0f, 0f, 0f, 0.45f)), UIKit.Rounded);
+        UIKit.Place(nameBackdrop.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -circleSize - 6f), new Vector2(140f, 30f));
 
-        TextMeshProUGUI key = UIKit.CreateText("Key", skillRoot, "[Space]", 18f, UIKit.TextMuted, TextAlignmentOptions.Center, true);
-        UIKit.Place(key.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -circleSize - 34f), new Vector2(170f, 26f));
+        TextMeshProUGUI skillName = UIKit.CreateText("Name", nameBackdrop.transform, "Aura Burst", 21f, UIKit.Text, TextAlignmentOptions.Center, true);
+        skillName.textWrappingMode = TextWrappingModes.NoWrap;
+        UIKit.Stretch(skillName.rectTransform);
+
+        // Petunjuk tombol: lingkaran gelap berisi "Y" berwarna di gamepad, kapsul "[Space]" di keyboard.
+        ControlHintBadge.Create("KeyBadge", skillRoot, PadAction.AuraBurst, -circleSize - 42f);
     }
 
     protected override void OnShow()

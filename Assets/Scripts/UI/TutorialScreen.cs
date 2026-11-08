@@ -21,6 +21,8 @@ public class TutorialScreen : UIScreen
 
     private Page[] pages;
     private int index;
+    // Versi ControlHints saat halaman dibangun. Halaman dibangun ulang jika pemain berganti keyboard <-> gamepad.
+    private int hintVersion = -1;
 
     private TextMeshProUGUI pageTitle;
     private TextMeshProUGUI pageBody;
@@ -99,6 +101,10 @@ public class TutorialScreen : UIScreen
             "<b>A / D</b> atau <b>panah kiri / kanan</b> untuk ganti halaman   |   <b>Esc</b> untuk menutup",
             18f, UIKit.TextMuted);
         keys.textWrappingMode = TextWrappingModes.NoWrap;
+        ControlHintLabel.Bind(keys, () => ControlHints.IsGamepad
+            ? "<b>(LB) / (RB)</b> atau <b>" + ControlHints.Navigate + "</b> untuk ganti halaman   |   <b>" +
+              ControlHints.Back + "</b> untuk menutup"
+            : "<b>A / D</b> atau <b>panah kiri / kanan</b> untuk ganti halaman   |   <b>Esc</b> untuk menutup");
         UIKit.Place(keys.rectTransform, new Vector2(0f, 0f), new Vector2(0f, 0.5f), new Vector2(56f, 22f), new Vector2(1008f, 26f));
     }
 
@@ -111,6 +117,7 @@ public class TutorialScreen : UIScreen
     public void Open(int page)
     {
         pages = BuildPages();
+        hintVersion = ControlHints.Version;
         index = Mathf.Clamp(page, 0, pages.Length - 1);
 
         RebuildDots();
@@ -179,6 +186,13 @@ public class TutorialScreen : UIScreen
         if (!IsVisible)
             return;
 
+        if (hintVersion != ControlHints.Version)
+        {
+            pages = BuildPages();
+            hintVersion = ControlHints.Version;
+            ShowPage();
+        }
+
         if (NextPressed())
             Next();
         else if (PreviousPressed())
@@ -224,19 +238,20 @@ public class TutorialScreen : UIScreen
                 "Efek gate <b>menumpuk</b> sepanjang run. Jika HP habis, run berakhir."),
 
             new Page("Kontrol",
-                "<b>WASD</b>  Bergerak\n" +
-                "<b>Tahan Klik Kiri</b>  Menembak Bola Aura ke target (MC melambat saat menembak)\n" +
-                "<b>Tab</b>  Ganti target\n" +
-                "<b>Space</b>  Aura Burst: damage area di sekitar MC, ada cooldown\n" +
-                "<b>Tahan E</b>  Memilih gate saat berdiri di depannya\n" +
-                "<b>Esc</b>  Jeda"),
+                "<b>" + ControlHints.Move + "</b>  Bergerak\n" +
+                "<b>Tahan " + ControlHints.Glyph(PadAction.Attack) + "</b>  Menembak Bola Aura ke target (MC melambat saat menembak)\n" +
+                "<b>" + ControlHints.Glyph(PadAction.CycleTarget) + "</b>  Ganti target\n" +
+                "<b>" + ControlHints.Glyph(PadAction.AuraBurst) + "</b>  Aura Burst: damage area di sekitar MC, ada cooldown\n" +
+                "<b>Tahan " + ControlHints.Glyph(PadAction.Interact) + "</b>  Memilih gate (dan portal Goal) saat berdiri di depannya\n" +
+                "<b>" + ControlHints.Glyph(PadAction.Pause) + "</b>  Jeda\n\n" +
+                "<size=85%><color=" + UIKit.MutedHex + ">Tombol gamepad bisa diubah di Pengaturan > Kontroler.</color></size>"),
 
             new Page("Gate & Trade-off",
                 "Setiap gate adalah operasi matematika pada stat: <b>+  -  " + "×" + "  " + "÷" + "</b>.\n" +
                 "Tidak ada gate yang gratis: selalu ada <color=" + UIKit.BuffHex + "><b>buff</b></color> " +
                 "dan <color=" + UIKit.TradeOffHex + "><b>trade-off</b></color>.\n\n" +
                 "Berdiri di depan gate untuk membuka <b>kartu detail</b>: deskripsi, efek, perubahan stat, " +
-                "dan ancaman ronde berikutnya jika gate itu dipilih. Tahan <b>E</b> untuk memilih.\n\n" +
+                "dan ancaman ronde berikutnya jika gate itu dipilih. Tahan <b>" + ControlHints.Glyph(PadAction.Interact) + "</b> untuk memilih.\n\n" +
                 "Ingat urutan operasi: " + "×" + "2 lalu +10 hasilnya berbeda dengan +10 lalu " + "×" + "2."),
 
             new Page("Membaca Ancaman",
