@@ -14,6 +14,13 @@ public class EnemyHealthBars : UIScreen
     // Turunnya bar "ghost" (damage yang baru diterima) per detik, dalam fraksi HP.
     [SerializeField] private float ghostSpeed = 0.6f;
 
+    [Header("Kamera Orang Ketiga")]
+    // Hanya berlaku saat kamera Third Person (dari atas semua musuh memang terlihat).
+    // Bar disembunyikan jika musuh tertutup tembok (NavBlock) dari kamera.
+    [SerializeField] private bool hideWhenOccluded = true;
+    // Bar disembunyikan jika musuh lebih jauh dari ini dari kamera. 0 = tanpa batas.
+    [SerializeField] private float maxDistance = 18f;
+
     private class Bar
     {
         public EnemyHealth health;
@@ -38,6 +45,7 @@ public class EnemyHealthBars : UIScreen
     private static readonly Color FrameColor = new Color(0.04f, 0.05f, 0.08f, 0.85f);
 
     private Camera cam;
+    private TopDownCameraFollow cameraMode;
 
     protected override void Build()
     {
@@ -137,8 +145,24 @@ public class EnemyHealthBars : UIScreen
             ? Color.Lerp(new Color(1f, 0.82f, 0.25f), UIKit.Buff, (ratio - 0.5f) * 2f)
             : Color.Lerp(UIKit.TradeOff, new Color(1f, 0.82f, 0.25f), ratio * 2f);
 
-        float targetAlpha = !onScreen || hiddenForDebug || health.IsDead ? 0f : 1f;
+        float targetAlpha = !onScreen || hiddenForDebug || health.IsDead || HiddenByThirdPerson(anchor) ? 0f : 1f;
         bar.group.alpha = Mathf.MoveTowards(bar.group.alpha, targetAlpha, (health.IsDead ? 2f : 8f) * dt);
+    }
+
+    private bool HiddenByThirdPerson(Vector3 anchor)
+    {
+        if (cameraMode == null)
+            cameraMode = cam.GetComponent<TopDownCameraFollow>();
+
+        if (cameraMode == null || cameraMode.Mode != GameplayCameraMode.ThirdPerson)
+            return false;
+
+        Vector3 eye = cam.transform.position;
+
+        if (maxDistance > 0f && (anchor - eye).sqrMagnitude > maxDistance * maxDistance)
+            return true;
+
+        return hideWhenOccluded && Physics.Linecast(eye, anchor, GameLayers.ObstacleMask, QueryTriggerInteraction.Ignore);
     }
 
     private Bar Acquire(EnemyHealth health)
