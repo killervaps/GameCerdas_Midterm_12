@@ -7,6 +7,7 @@ using UnityEngine.Rendering;
 // Kamera orang ketiga ala Genshin dengan Cinemachine 3. Dipasang lewat menu MathGate > Camera > Setup Third Person Camera.
 //   Orbit   mouse (tahan klik kanan) atau stik kanan memutar kamera di sekitar MC (CinemachineOrbitalFollow).
 //   Tembok  CinemachineDeoccluder menarik kamera ke depan tembok (layer NavBlock dan Ground): masuk cepat, keluar pelan.
+//   Lock    saat TargetSelector mengunci musuh, kamera berputar sendiri ke belakang MC menghadap musuh itu.
 //   Zoom    scroll mouse mendekat/menjauh (RadialAxis Orbital Follow, pengali Radius).
 //   Fade    jika kamera terlalu dekat dengan MC, renderer MC diubah ke Shadows Only: badan hilang, bayangan tetap ada.
 // Hanya bekerja jika TopDownCameraFollow di kamera utama memakai mode Third Person. TopDownCameraFollow yang
@@ -28,6 +29,16 @@ public class ThirdPersonCameraRig : MonoBehaviour
     // Derajat per detik saat stik kanan ditekan penuh (horizontal, vertikal).
     [SerializeField] private Vector2 stickSpeed = new Vector2(180f, 110f);
     [SerializeField] private bool invertY;
+
+    [Header("Lock-On")]
+    // Saat musuh dikunci (tombol CycleTarget), kamera berputar sendiri ke belakang MC menghadap musuh itu.
+    [SerializeField] private bool followLockedTarget = true;
+    // Waktu kejar arah musuh. Kecil = kamera langsung menghadap, besar = berputar lebih halus.
+    [SerializeField] private float lockSmoothTime = 0.15f;
+    // Selama lock, putaran kiri-kanan dari mouse/stik diabaikan (naik-turun dan zoom tetap bisa).
+    [SerializeField] private bool blockManualYawWhileLocked = true;
+    // Musuh lebih dekat dari ini (jarak datar) tidak dikejar, supaya kamera tidak berputar liar saat musuh menempel.
+    [SerializeField] private float lockMinDistance = 1.2f;
 
     [Header("Zoom")]
     // Pengali Radius Orbital Follow. 1 = Radius apa adanya, 0,6 = 60% lebih dekat.
@@ -59,9 +70,27 @@ public class ThirdPersonCameraRig : MonoBehaviour
     private CursorLockMode previousLockState;
     private bool previousCursorVisible;
     private Vector3 lastTargetPosition;
+    private TargetSelector targetSelector;
+    private float lockYawVelocity;
     private bool hasLastTargetPosition;
 
     public bool IsDriving => driving;
+
+    // Kamera utama yang sedang digerakkan rig ini (null jika tidak aktif).
+    public Transform OutputCamera => driving ? outputCamera : null;
+
+    // Musuh yang sedang diikuti kamera, atau null.
+    public EnemyHealth LockedEnemy
+    {
+        get
+        {
+            if (!followLockedTarget || targetSelector == null || !targetSelector.IsLocked)
+                return null;
+
+            EnemyHealth enemy = targetSelector.LockedTarget;
+            return enemy != null && !enemy.IsDead ? enemy : null;
+        }
+    }
 
     public bool IsTargetHidden => hidden;
 
@@ -93,6 +122,12 @@ public class ThirdPersonCameraRig : MonoBehaviour
 
         if (target != null && Rig.Target.TrackingTarget == null)
             Rig.Target.TrackingTarget = target;
+
+        if (target != null)
+            targetSelector = target.GetComponentInChildren<TargetSelector>();
+
+        if (targetSelector == null)
+            targetSelector = FindAnyObjectByType<TargetSelector>();
 
         lookAction = InputSystem.actions != null ? InputSystem.actions.FindAction(lookActionName) : null;
 
@@ -144,6 +179,7 @@ public class ThirdPersonCameraRig : MonoBehaviour
         {
             ReadLook();
             ReadZoom();
+            UpdateLockOn();
             UpdateFade();
         }
 
@@ -191,6 +227,9 @@ public class ThirdPersonCameraRig : MonoBehaviour
             delta = Vector2.Scale(value, stickSpeed) * Time.unscaledDeltaTime;
         }
 
+        if (blockManualYawWhileLocked && LockedEnemy != null)
+            delta.x = 0f;
+
         InputAxis horizontal = Orbit.HorizontalAxis;
         horizontal.Value = horizontal.ClampValue(horizontal.Value + delta.x);
         Orbit.HorizontalAxis = horizontal;
@@ -199,6 +238,31 @@ public class ThirdPersonCameraRig : MonoBehaviour
         InputAxis vertical = Orbit.VerticalAxis;
         vertical.Value = vertical.ClampValue(vertical.Value + (invertY ? delta.y : -delta.y));
         Orbit.VerticalAxis = vertical;
+    }
+
+    // Yaw orbit = arah dari MC ke musuh, jadi kamera berada di belakang MC dan memandang ke arah musuh.
+    private void UpdateLockOn()
+    {
+        EnemyHealth enemy = LockedEnemy;
+
+        if (enemy == null || target == null || Time.timeScale <= 0f)
+        {
+            lockYawVelocity = 0f;
+            return;
+        }
+
+        Vector3 toEnemy = enemy.transform.position - target.position;
+        toEnemy.y = 0f;
+
+        if (toEnemy.magnitude < lockMinDistance)
+            return;
+
+        float desiredYaw = Mathf.Atan2(toEnemy.x, toEnemy.z) * Mathf.Rad2Deg;
+
+        InputAxis horizontal = Orbit.HorizontalAxis;
+        float yaw = Mathf.SmoothDampAngle(horizontal.Value, desiredYaw, ref lockYawVelocity, lockSmoothTime);
+        horizontal.Value = horizontal.ClampValue(yaw);
+        Orbit.HorizontalAxis = horizontal;
     }
 
     private void ReadZoom()

@@ -2864,7 +2864,7 @@ Transform:
   m_GameObject: {fileID: 55186986}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.5, y: 0, z: -16.5}
+  m_LocalPosition: {x: -2.5, y: 0, z: -36.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -33745,7 +33745,7 @@ Transform:
   m_GameObject: {fileID: 569771813}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -17.289999, y: 0, z: 2.54}
+  m_LocalPosition: {x: -17.289999, y: 0, z: -17.460001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -78380,7 +78380,7 @@ Transform:
   m_GameObject: {fileID: 1293211532}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.7468, y: 0, z: 2.36497}
+  m_LocalPosition: {x: -1.7468, y: 0, z: -17.63503}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -99492,6 +99492,7 @@ GameObject:
   - component: {fileID: 1650376320}
   - component: {fileID: 1650376319}
   - component: {fileID: 1650376318}
+  - component: {fileID: 1650376324}
   m_Layer: 0
   m_Name: ThirdPersonCamera
   m_TagString: Untagged
@@ -99517,6 +99518,10 @@ MonoBehaviour:
   mouseSensitivity: 0.15
   stickSpeed: {x: 180, y: 110}
   invertY: 0
+  followLockedTarget: 1
+  lockSmoothTime: 0.15
+  blockManualYawWhileLocked: 1
+  lockMinDistance: 1.2
   zoomRange: {x: 0.6, y: 1.5}
   zoomStep: 0.1
   fadeWhenClose: 1
@@ -99636,9 +99641,9 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: 20
-    Center: 20
-    Range: {x: -5, y: 65}
+    Value: 2
+    Center: 2
+    Range: {x: 0, y: 2}
     Wrap: 0
     Recentering:
       Enabled: 0
@@ -99706,13 +99711,35 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1650376317}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.17395993, y: 0.000068658315, z: -0.000012128723, w: 0.9847528}
-  m_LocalPosition: {x: -6.809922, y: 2.4620805, z: 8.126839}
+  m_LocalRotation: {x: 0.01746631, y: 0.00007349375, z: -0.0000012838598, w: 0.9998475}
+  m_LocalPosition: {x: -6.809922, y: 1.233598, z: 7.8880453}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1650376324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1650376317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ace70e1f125568e47b3730128a4b9d07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ThirdPersonFog
+  fog: 1
+  style: 1
+  fogStart: 12
+  fogEnd: 32
+  cullBeyondFog: 1
+  fadeDuration: 0.6
+  fogColor: {r: 0.16, g: 0.18, b: 0.26, a: 1}
+  fogColoredBackground: 1
+  skyResolution: 1024
+  flipY: 0
 --- !u!1001 &1651859396
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -116859,7 +116886,7 @@ Transform:
   m_GameObject: {fileID: 1928172440}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.5, y: 0, z: 7.5}
+  m_LocalPosition: {x: 4.5, y: 0, z: -12.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

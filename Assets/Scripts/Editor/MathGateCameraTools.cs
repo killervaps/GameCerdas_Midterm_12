@@ -135,6 +135,9 @@ public static class MathGateCameraTools
         clampData.ApplyModifiedProperties();
 
         ThirdPersonCameraRig rig = GetOrAdd<ThirdPersonCameraRig>(go);
+
+        // Kabut jarak di arena dan Safezone (dungeon memakai DungeonAtmosphere).
+        GetOrAdd<ThirdPersonFog>(go);
         SerializedObject rigData = new SerializedObject(rig);
         rigData.FindProperty("target").objectReferenceValue = player.transform;
         rigData.ApplyModifiedProperties();
@@ -153,6 +156,41 @@ public static class MathGateCameraTools
         EditorGUIUtility.PingObject(go);
 
         Debug.Log("MathGate: kamera orang ketiga siap (" + go.name + "). Tekan Play, tahan klik kanan untuk memutar, F8 untuk ganti mode.", go);
+    }
+
+    private const string SkyFogMaterialPath = "Assets/Materials/SkyFog.mat";
+
+    // Material untuk Full Screen Pass Renderer Feature. Feature-nya ditambahkan manual di renderer URP.
+    [MenuItem("MathGate/Camera/Create Sky Fog Material")]
+    public static void CreateSkyFogMaterial()
+    {
+        Material existing = AssetDatabase.LoadAssetAtPath<Material>(SkyFogMaterialPath);
+
+        if (existing != null)
+        {
+            EditorGUIUtility.PingObject(existing);
+            Debug.Log("MathGate: " + SkyFogMaterialPath + " sudah ada.", existing);
+            return;
+        }
+
+        Shader shader = Shader.Find("MathGate/SkyFog");
+
+        if (shader == null)
+        {
+            Debug.LogError("MathGate: shader MathGate/SkyFog tidak ditemukan (Assets/Shaders/SkyFog.shader). Cek error compile shader.");
+            return;
+        }
+
+        if (!AssetDatabase.IsValidFolder("Assets/Materials"))
+            AssetDatabase.CreateFolder("Assets", "Materials");
+
+        Material material = new Material(shader) { name = "SkyFog" };
+        AssetDatabase.CreateAsset(material, SkyFogMaterialPath);
+        AssetDatabase.SaveAssets();
+
+        EditorGUIUtility.PingObject(material);
+        Debug.Log("MathGate: material Sky Fog dibuat di " + SkyFogMaterialPath +
+                  ". Tambahkan Full Screen Pass Renderer Feature di Assets/Settings/PC_Renderer dengan material ini.", material);
     }
 
     [MenuItem("MathGate/Camera/Use Top Down Camera")]
