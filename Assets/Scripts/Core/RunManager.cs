@@ -465,8 +465,15 @@ public class RunManager : MonoBehaviour
 
         EnemyRoundProfile profile = CurrentProfile;
 
-        if (profile != null && Mode == GameMode.Dungeon && dungeonEnemyMultiplier > 1f)
-            profile = profile.Scaled(dungeonEnemyMultiplier);
+        // Pengali Mode Dungeon dan faktor DDA digabung lalu dibulatkan sekali, supaya pembulatan tidak bertumpuk.
+        float multiplier = Mode == GameMode.Dungeon && dungeonEnemyMultiplier > 1f ? dungeonEnemyMultiplier : 1f;
+        DifficultyModel dda = DifficultyModel.Current;
+        float ddaMultiplier = dda != null ? dda.EnemyMultiplier : 1f;
+
+        multiplier *= ddaMultiplier;
+
+        if (profile != null && !Mathf.Approximately(multiplier, 1f))
+            profile = profile.Scaled(multiplier);
 
         SeededRandom random = PcgDirector.Stream(CurrentRound, PcgStream.EnemyComposition);
         // Arena sudah dipilih lebih dulu, jadi tema arena bisa ikut menentukan komposisi.
@@ -481,8 +488,9 @@ public class RunManager : MonoBehaviour
         currentWave = WaveData.CreateRuntime(label, entries);
 
         string budgetText = CurrentBudget > 0 ? ", budget " + spent + "/" + CurrentBudget : ", biaya " + spent;
+        string ddaText = dda != null ? ", DDA " + dda.Mode + " x" + ddaMultiplier.ToString("0.00") : "";
 
-        Log("komposisi " + label + " (PCG" + (bias != null && bias.Count > 0 ? ", bias " + area.name : "") + budgetText + "): " + currentWave.Describe());
+        Log("komposisi " + label + " (PCG" + (bias != null && bias.Count > 0 ? ", bias " + area.name : "") + budgetText + ddaText + "): " + currentWave.Describe());
     }
 
     private void HandlePlayerDied()
@@ -507,7 +515,10 @@ public class RunManager : MonoBehaviour
                 playerHealth.RestoreFull();
                 break;
             case HealRule.Partial:
-                playerHealth.Heal(playerHealth.MaxHealth * partialHealRatio);
+                // DDA aktif menggantikan Partial Heal Ratio, mode Off memakai nilai Inspector.
+                DifficultyModel dda = DifficultyModel.Current;
+                float ratio = dda != null && dda.Active ? dda.HealRatio : partialHealRatio;
+                playerHealth.Heal(playerHealth.MaxHealth * ratio);
                 break;
         }
     }

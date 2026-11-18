@@ -138,13 +138,16 @@ public class ItemSpawner : MonoBehaviour
 
         int count = selection.Range(minItems, Mathf.Max(minItems, maxItems) + 1);
         int bonus = runManager != null && runManager.Mode == GameMode.Dungeon ? extraItemsInDungeon : 0;
+        DifficultyModel dda = DifficultyModel.Current;
+        int ddaBonus = dda != null ? dda.ItemBonus : 0;
 
-        count += bonus;
+        count = Mathf.Max(0, count + bonus + ddaBonus);
 
+        // Batas per item ikut dinaikkan, supaya tambahan item tidak terpotong Max Per Round.
         foreach (ItemSpawnEntry entry in items)
         {
             if (entry != null)
-                entry.bonusMax = bonus;
+                entry.bonusMax = bonus + Mathf.Max(0, ddaBonus);
         }
         lastReport.Requested = count;
 

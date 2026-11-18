@@ -60,7 +60,45 @@ public class AttackTokenManager : IAttackTokenProvider
 
     public int MaxTokens => maxTokens;
 
+    public int MaxChargerTokens => maxChargerTokens;
+
     public float Timeout => timeout;
+
+    // Nilai Inspector, dicatat saat DDA pertama kali mengubah batas.
+    [NonSerialized] private bool hasDefaultLimits;
+    [NonSerialized] private int defaultMaxTokens;
+    [NonSerialized] private int defaultChargerTokens;
+
+    // Dipakai DDA. Dengan tiga token atau lebih, dua Charger boleh menyerang bersamaan.
+    // Penyerang yang sudah memegang token tidak dicabut, batas baru berlaku untuk permintaan berikutnya.
+    public void SetMaxTokens(int total)
+    {
+        CaptureDefaultLimits();
+
+        maxTokens = Mathf.Max(1, total);
+        maxChargerTokens = maxTokens >= 3 ? Mathf.Max(defaultChargerTokens, 2) : defaultChargerTokens;
+
+        Log("batas token DDA " + maxTokens + " (Charger " + maxChargerTokens + ")");
+    }
+
+    public void RestoreDefaultLimits()
+    {
+        if (!hasDefaultLimits)
+            return;
+
+        maxTokens = defaultMaxTokens;
+        maxChargerTokens = defaultChargerTokens;
+    }
+
+    private void CaptureDefaultLimits()
+    {
+        if (hasDefaultLimits)
+            return;
+
+        hasDefaultLimits = true;
+        defaultMaxTokens = maxTokens;
+        defaultChargerTokens = maxChargerTokens;
+    }
 
     public bool Request(EnemyController requester)
     {

@@ -78999,6 +78999,10 @@ GameObject:
   - component: {fileID: 1303698175}
   - component: {fileID: 1303698170}
   - component: {fileID: 1303698174}
+  - component: {fileID: 1303698179}
+  - component: {fileID: 1303698178}
+  - component: {fileID: 1303698177}
+  - component: {fileID: 1303698176}
   m_Layer: 0
   m_Name: RunSystem
   m_TagString: Untagged
@@ -79174,6 +79178,75 @@ MonoBehaviour:
   - {fileID: 55186988}
   repeatPenalty: 0.2
   logPicks: 1
+--- !u!114 &1303698176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303698169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16384336dd7c5414d8fbc82775cfd17d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DdaDebugPanel
+  tracker: {fileID: 1303698178}
+  runManager: {fileID: 1303698171}
+  showPanel: 1
+  followDebugToggle: 0
+  margin: {x: 10, y: 10}
+  width: 330
+  uiScale: 1.5
+  refreshInterval: 0.1
+  shiftWhenAIDebug: 570
+  hotkeys: 1
+  debugDamage: 25
+--- !u!114 &1303698177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303698169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a467c40beec48f47b02fa4c45f149f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DdaLogger
+  model: {fileID: 0}
+  fileName: dda_log.csv
+  writeFile: 1
+--- !u!114 &1303698178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303698169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eadd4ad68605521409c98d2ad10c92e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerPerformanceTracker
+  runManager: {fileID: 1303698171}
+  battle: {fileID: 1303698172}
+  playerHealth: {fileID: 1987173382}
+--- !u!114 &1303698179
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303698169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c820a9b1e1793874486fcd2a8aa10ed6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DifficultyModel
+  profile: {fileID: 11400000, guid: f73b1cb125484a24e816d37f87e6ae35, type: 2}
+  runManager: {fileID: 1303698171}
+  mode: 1
+  logRounds: 1
 --- !u!1001 &1305922410
 PrefabInstance:
   m_ObjectHideFlags: 0
