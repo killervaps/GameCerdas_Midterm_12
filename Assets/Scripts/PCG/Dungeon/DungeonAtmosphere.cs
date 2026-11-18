@@ -56,6 +56,9 @@ public class DungeonAtmosphere : MonoBehaviour
     private float weight;
     private bool applied;
 
+    // True selama suasana dungeon terpasang. ThirdPersonFog berhenti menulis fog selama ini supaya tidak berebut.
+    public bool IsApplied => applied;
+
     private Light sun;
     private float baseSunIntensity;
     private Color baseSunColor;
