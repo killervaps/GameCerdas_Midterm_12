@@ -29,6 +29,8 @@ public class ThirdPersonCameraRig : MonoBehaviour
     // Derajat per detik saat stik kanan ditekan penuh (horizontal, vertikal).
     [SerializeField] private Vector2 stickSpeed = new Vector2(180f, 110f);
     [SerializeField] private bool invertY;
+    // Deadzone untuk stik Joystick generik (stik Gamepad sudah punya deadzone sendiri).
+    [SerializeField] private float stickDeadzone = 0.15f;
 
     [Header("Lock-On")]
     // Saat musuh dikunci (tombol CycleTarget), kamera berputar sendiri ke belakang MC menghadap musuh itu.
@@ -46,12 +48,20 @@ public class ThirdPersonCameraRig : MonoBehaviour
     // Perubahan pengali per satu klik scroll.
     [SerializeField] private float zoomStep = 0.1f;
 
+    [Header("Tembok")]
+    // Saat Play: tambahkan CameraWallClamp jika belum ada, dan matikan Deoccluder/Decollider (diganti CameraWallClamp).
+    [SerializeField] private bool enforceWallHandling = true;
+    // Selama kamera ditahan tembok dekat MC, putaran kamera KE arah tembok diperlambat (mouse/stik/lock-on).
+    // Putaran keluar dari tembok tetap normal. Besarnya diatur di CameraWallClamp (Sensitivitas Dekat Tembok).
+    [SerializeField] private bool slowRotationAgainstWall = true;
+
     [Header("Fade Saat Kamera Dekat")]
     [SerializeField] private bool fadeWhenClose = true;
-    // Jarak kamera ke titik fokus MC. Di bawah Hide Distance badan disembunyikan, muncul lagi di atas Show Distance
+    // Jarak kamera ke permukaan badan MC (bounds renderer). Badan hanya disembunyikan saat lensa hampir masuk ke badan,
+    // supaya MC tetap terlihat saat kamera ditahan tembok dekat MC. Muncul lagi di atas Show Margin
     // (dua batas supaya tidak berkedip saat kamera tepat di batas).
-    [SerializeField] private float hideDistance = 1.0f;
-    [SerializeField] private float showDistance = 1.3f;
+    [SerializeField] private float hideMargin = 0.12f;
+    [SerializeField] private float showMargin = 0.25f;
     // Saat pindah arena (teleport), kamera diputar ke belakang MC.
     [SerializeField] private bool snapBehindTargetOnTeleport = true;
     // MC dianggap teleport jika berpindah sejauh ini sejak frame sebelumnya.
@@ -73,6 +83,8 @@ public class ThirdPersonCameraRig : MonoBehaviour
     private TargetSelector targetSelector;
     private float lockYawVelocity;
     private bool hasLastTargetPosition;
+    private CameraWallClamp wallClamp;
+    private List<Renderer> bodyRenderers;
 
     public bool IsDriving => driving;
 
@@ -93,6 +105,9 @@ public class ThirdPersonCameraRig : MonoBehaviour
     }
 
     public bool IsTargetHidden => hidden;
+
+    // Kamera sedang benar-benar ditahan tembok (CameraWallClamp), bukan sisa damping saat kembali.
+    public bool IsAgainstWall => wallClamp != null && wallClamp.isActiveAndEnabled && wallClamp.IsHoldingCamera;
 
     public float FieldOfView => Rig.Lens.FieldOfView;
 
@@ -129,10 +144,39 @@ public class ThirdPersonCameraRig : MonoBehaviour
         if (targetSelector == null)
             targetSelector = FindAnyObjectByType<TargetSelector>();
 
+        EnsureWallHandling();
+
         lookAction = InputSystem.actions != null ? InputSystem.actions.FindAction(lookActionName) : null;
 
         if (lookAction == null)
             Debug.LogWarning("ThirdPersonCameraRig: action '" + lookActionName + "' tidak ditemukan, kamera tidak bisa diputar.", this);
+    }
+
+    // CameraWallClamp adalah satu-satunya pemecah tabrakan kamera TPP. Scene lama belum punya komponen ini,
+    // jadi ditambahkan saat Play. Deoccluder/Decollider dimatikan karena koreksinya selalu diganti CameraWallClamp
+    // (Deoccluder di scene lama memeriksa dari kaki MC dan menarik kamera turun ke lantai).
+    private void EnsureWallHandling()
+    {
+        wallClamp = GetComponent<CameraWallClamp>();
+
+        if (!enforceWallHandling)
+            return;
+
+        if (wallClamp == null)
+        {
+            wallClamp = gameObject.AddComponent<CameraWallClamp>();
+            wallClamp.Configure(Orbit.TargetOffset.y);
+        }
+
+        CinemachineDeoccluder deoccluder = GetComponent<CinemachineDeoccluder>();
+
+        if (deoccluder != null)
+            deoccluder.enabled = false;
+
+        CinemachineDecollider decollider = GetComponent<CinemachineDecollider>();
+
+        if (decollider != null)
+            decollider.enabled = false;
     }
 
     private void OnEnable()
@@ -203,34 +247,28 @@ public class ThirdPersonCameraRig : MonoBehaviour
         // Kursor dikunci hanya selama klik kanan ditahan, lalu dikembalikan seperti semula.
         SetCursorLocked(mouseRequiresRightButton && rightHeld && !paused);
 
-        if (lookAction == null || paused)
+        // Map Player dimatikan GameUI saat menu/jeda: kamera juga tidak diputar.
+        if (lookAction == null || paused || !lookAction.enabled)
             return;
 
-        Vector2 value = lookAction.ReadValue<Vector2>();
-
-        if (value.sqrMagnitude < 0.000001f)
-            return;
-
-        InputControl control = lookAction.activeControl;
-        Vector2 delta;
+        ReadLookControls(rightHeld, out Vector2 mouse, out Vector2 stick);
 
         // Mouse memberi pergeseran piksel per frame, stik memberi nilai -1..1 yang dikali waktu.
-        if (control != null && control.device is Pointer)
-        {
-            if (mouseRequiresRightButton && !rightHeld)
-                return;
+        Vector2 delta = mouse * mouseSensitivity + Vector2.Scale(stick, stickSpeed) * Time.unscaledDeltaTime;
 
-            delta = value * mouseSensitivity;
-        }
-        else
-        {
-            delta = Vector2.Scale(value, stickSpeed) * Time.unscaledDeltaTime;
-        }
+        if (delta.sqrMagnitude < 0.0000001f)
+            return;
 
         if (blockManualYawWhileLocked && LockedEnemy != null)
             delta.x = 0f;
 
         InputAxis horizontal = Orbit.HorizontalAxis;
+        delta.x = ResistWallYaw(horizontal.Value, delta.x);
+
+        // Naik-turun ikut diperlambat selama kamera menempel tembok dekat MC.
+        if (slowRotationAgainstWall && IsAgainstWall)
+            delta.y *= wallClamp.SensitivityScale;
+
         horizontal.Value = horizontal.ClampValue(horizontal.Value + delta.x);
         Orbit.HorizontalAxis = horizontal;
 
@@ -238,6 +276,59 @@ public class ThirdPersonCameraRig : MonoBehaviour
         InputAxis vertical = Orbit.VerticalAxis;
         vertical.Value = vertical.ClampValue(vertical.Value + (invertY ? delta.y : -delta.y));
         Orbit.VerticalAxis = vertical;
+    }
+
+    // Membaca setiap kontrol yang terikat ke action Look satu per satu, bukan lookAction.ReadValue().
+    // Action Look bertipe Value: ia hanya mengikuti SATU kontrol (yang nilainya paling besar). Binding <Joystick>/stick
+    // pada controller generik adalah stik kiri (stik jalan), jadi saat MC berjalan action dikuasai stik kiri dan
+    // stik kanan maupun mouse diabaikan, sehingga kamera terasa tidak responsif.
+    private void ReadLookControls(bool rightHeld, out Vector2 mouse, out Vector2 stick)
+    {
+        mouse = Vector2.zero;
+        stick = Vector2.zero;
+
+        // Joystick generik sudah dicerminkan ke Gamepad virtual oleh JoystickGamepadBridge (stik kanan yang benar),
+        // jadi binding Joystick hanya dipakai jika tidak ada Gamepad sama sekali.
+        bool hasGamepad = Gamepad.all.Count > 0;
+
+        foreach (InputControl control in lookAction.controls)
+        {
+            if (!(control is InputControl<Vector2> vectorControl))
+                continue;
+
+            InputDevice device = control.device;
+
+            if (device is Pointer)
+            {
+                if (!mouseRequiresRightButton || rightHeld)
+                    mouse += vectorControl.ReadValue();
+
+                continue;
+            }
+
+            if (device is Joystick && hasGamepad)
+                continue;
+
+            Vector2 value = vectorControl.ReadValue();
+
+            // Stik Gamepad sudah punya deadzone bawaan, stik Joystick generik belum (drift kecil memutar kamera).
+            if (!(device is Gamepad))
+                value = ApplyDeadzone(value, stickDeadzone);
+
+            if (value.sqrMagnitude > stick.sqrMagnitude)
+                stick = value;
+        }
+    }
+
+    private static Vector2 ApplyDeadzone(Vector2 value, float deadzone)
+    {
+        float magnitude = value.magnitude;
+
+        if (magnitude <= deadzone)
+            return Vector2.zero;
+
+        float scaled = Mathf.Clamp01((magnitude - deadzone) / (1f - deadzone));
+        return value / magnitude * scaled;
     }
 
     // Yaw orbit = arah dari MC ke musuh, jadi kamera berada di belakang MC dan memandang ke arah musuh.
@@ -261,8 +352,18 @@ public class ThirdPersonCameraRig : MonoBehaviour
 
         InputAxis horizontal = Orbit.HorizontalAxis;
         float yaw = Mathf.SmoothDampAngle(horizontal.Value, desiredYaw, ref lockYawVelocity, lockSmoothTime);
+        yaw = horizontal.Value + ResistWallYaw(horizontal.Value, Mathf.DeltaAngle(horizontal.Value, yaw));
         horizontal.Value = horizontal.ClampValue(yaw);
         Orbit.HorizontalAxis = horizontal;
+    }
+
+    // Putaran yaw yang menekan kamera makin masuk ke tembok (dekat MC) diperlambat; putaran keluar tetap normal.
+    private float ResistWallYaw(float yaw, float delta)
+    {
+        if (!slowRotationAgainstWall || !IsAgainstWall || !wallClamp.YawMovesIntoWall(yaw, delta))
+            return delta;
+
+        return delta * wallClamp.SensitivityScale;
     }
 
     private void ReadZoom()
@@ -290,12 +391,50 @@ public class ThirdPersonCameraRig : MonoBehaviour
             return;
         }
 
-        float distance = Vector3.Distance(outputCamera.position, FocusPoint);
-
-        if (!hidden && distance < hideDistance)
-            SetHidden(true);
-        else if (hidden && distance > showDistance)
+        if (!TryGetBodyBounds(out Bounds body))
+        {
             SetHidden(false);
+            return;
+        }
+
+        float distance = Mathf.Sqrt(body.SqrDistance(outputCamera.position));
+
+        if (!hidden && distance < hideMargin)
+            SetHidden(true);
+        else if (hidden && distance > showMargin)
+            SetHidden(false);
+    }
+
+    private bool TryGetBodyBounds(out Bounds bounds)
+    {
+        bounds = default;
+        bool any = false;
+
+        if (bodyRenderers == null)
+        {
+            bodyRenderers = new List<Renderer>();
+
+            foreach (Renderer renderer in target.GetComponentsInChildren<Renderer>(true))
+            {
+                if (renderer is MeshRenderer || renderer is SkinnedMeshRenderer)
+                    bodyRenderers.Add(renderer);
+            }
+        }
+
+        foreach (Renderer renderer in bodyRenderers)
+        {
+            if (renderer == null || !renderer.enabled || !renderer.gameObject.activeInHierarchy)
+                continue;
+
+            if (any)
+                bounds.Encapsulate(renderer.bounds);
+            else
+                bounds = renderer.bounds;
+
+            any = true;
+        }
+
+        return any;
     }
 
     // Shadows Only: renderer tidak digambar kamera, tapi bayangannya tetap jatuh di lantai.
@@ -360,12 +499,12 @@ public class ThirdPersonCameraRig : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        if (target == null)
+        if (target == null || !Application.isPlaying || !TryGetBodyBounds(out Bounds body))
             return;
 
         Gizmos.color = new Color(1f, 0.4f, 0.4f, 0.6f);
-        Gizmos.DrawWireSphere(FocusPoint, hideDistance);
+        Gizmos.DrawWireCube(body.center, body.size + Vector3.one * (hideMargin * 2f));
         Gizmos.color = new Color(0.4f, 1f, 0.4f, 0.6f);
-        Gizmos.DrawWireSphere(FocusPoint, showDistance);
+        Gizmos.DrawWireCube(body.center, body.size + Vector3.one * (showMargin * 2f));
     }
 }
