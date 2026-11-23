@@ -25,6 +25,13 @@ public class GateSelectionRoom : MonoBehaviour
     // Action Interact memakai interaction Hold, jadi perlu ditahan sebentar. Mencegah salah pilih saat lewat.
     [SerializeField] private string confirmActionName = "Player/Interact";
 
+    [Header("Gate Focus")]
+    // Aktif = gate dipilih dari jarak datar MC ke gate (tinggi diabaikan), bukan dari trigger collider.
+    // Trigger gate kecil dan rendah sehingga hanya tersentuh di titik tertentu, jarak datar tidak bergantung pada itu.
+    [SerializeField] private bool focusByDistance = true;
+    // Radius area depan gate = setengah ukuran collider gate (X/Z) + nilai ini. Lingkaran kuning di Scene view.
+    [SerializeField, Min(0f)] private float focusMargin = 0.35f;
+
     [Header("Rules")]
     // Jika ada RunManager, nilai ini ditimpa jumlah ronde.
     [SerializeField] private int maxGatesPerRun = 3;
@@ -132,6 +139,9 @@ public class GateSelectionRoom : MonoBehaviour
 
     private void Update()
     {
+        if (IsSelecting)
+            RefreshFocus();
+
         if (IsSelecting &&
             activePortal != null &&
             activePortal.IsOpen &&
@@ -278,31 +288,79 @@ public class GateSelectionRoom : MonoBehaviour
         GateChosen?.Invoke(gate);
     }
 
+    // Gate yang trigger-nya sedang dimasuki MC. Bisa lebih dari satu karena gate bersebelahan dan trigger-nya bertumpuk.
+    private readonly HashSet<GatePortal> occupiedPortals = new HashSet<GatePortal>();
+
     public void NotifyPortalEnter(GatePortal portal, Collider other)
     {
         if (!IsPlayer(other))
             return;
 
-        // Gate bersebelahan. Yang terakhir dimasuki yang aktif.
-        if (activePortal != null && activePortal != portal)
-        {
-            GatePortal previous = activePortal;
-            previous.SetHighlighted(false);
-            PortalUnfocused?.Invoke(previous);
-        }
-
-        activePortal = portal;
-        portal.SetHighlighted(true);
-
-        PortalFocused?.Invoke(portal);
+        occupiedPortals.Add(portal);
+        RefreshFocus();
     }
 
     public void NotifyPortalExit(GatePortal portal, Collider other)
     {
-        if (!IsPlayer(other) || activePortal != portal)
+        if (!IsPlayer(other))
             return;
 
-        ClearActivePortal();
+        occupiedPortals.Remove(portal);
+        RefreshFocus();
+    }
+
+    // Gate aktif = gate terbuka terdekat di antara trigger yang sedang dimasuki MC. Dihitung ulang setiap frame,
+    // jadi gate tengah tidak "hilang" saat MC keluar dari trigger gate sebelah walau masih berdiri di gate tengah,
+    // dan gate yang sudah dimasuki sebelum pilihan dibuka langsung aktif begitu pilihan terbuka.
+    private void RefreshFocus()
+    {
+        GatePortal best = null;
+
+        if (IsSelecting && playerMotor != null)
+        {
+            Vector3 player = playerMotor.transform.position;
+            float bestDistance = float.PositiveInfinity;
+
+            IEnumerable<GatePortal> candidates = focusByDistance ? (IEnumerable<GatePortal>)portals : occupiedPortals;
+
+            foreach (GatePortal portal in candidates)
+            {
+                if (portal == null || !portal.IsOpen)
+                    continue;
+
+                GetFocusArea(portal, out Vector3 center, out float radius);
+                center.y = player.y;
+
+                float distance = (center - player).sqrMagnitude;
+
+                if (focusByDistance && distance > radius * radius)
+                    continue;
+
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    best = portal;
+                }
+            }
+        }
+
+        if (best == activePortal)
+            return;
+
+        if (activePortal != null)
+        {
+            GatePortal previous = activePortal;
+            previous.SetHighlighted(false);
+            activePortal = null;
+            PortalUnfocused?.Invoke(previous);
+        }
+
+        if (best != null)
+        {
+            activePortal = best;
+            best.SetHighlighted(true);
+            PortalFocused?.Invoke(best);
+        }
     }
 
     private void ClearActivePortal()
@@ -352,8 +410,49 @@ public class GateSelectionRoom : MonoBehaviour
             Debug.Log("GateSelectionRoom: " + message, this);
     }
 
+    // Pusat dan radius area depan gate di bidang datar, diambil dari collider gate.
+    private void GetFocusArea(GatePortal portal, out Vector3 center, out float radius)
+    {
+        Collider area = portal.GetComponent<Collider>();
+
+        if (area == null)
+        {
+            center = portal.transform.position;
+            radius = focusMargin + 0.5f;
+            return;
+        }
+
+        Bounds bounds = area.bounds;
+        center = bounds.center;
+        radius = Mathf.Max(bounds.extents.x, bounds.extents.z) + focusMargin;
+    }
+
     private void OnDrawGizmos()
     {
+        if (focusByDistance && portals != null)
+        {
+            foreach (GatePortal portal in portals)
+            {
+                if (portal == null)
+                    continue;
+
+                GetFocusArea(portal, out Vector3 center, out float radius);
+                center.y = portal.transform.position.y + 0.05f;
+
+                Gizmos.color = portal == activePortal ? Color.green : new Color(1f, 0.9f, 0.2f, 0.8f);
+                const int segments = 32;
+                Vector3 previous = center + new Vector3(radius, 0f, 0f);
+
+                for (int i = 1; i <= segments; i++)
+                {
+                    float angle = i * Mathf.PI * 2f / segments;
+                    Vector3 point = center + new Vector3(Mathf.Cos(angle) * radius, 0f, Mathf.Sin(angle) * radius);
+                    Gizmos.DrawLine(previous, point);
+                    previous = point;
+                }
+            }
+        }
+
         DrawSpawnGizmo(safezoneSpawn, Color.cyan);
         DrawSpawnGizmo(arenaSpawn, new Color(1f, 0.5f, 0f));
 

@@ -271,6 +271,15 @@ public class GameUI : MonoBehaviour
 
         ApplyInputGate(false);
 
+        // MC sudah berdiri di gate saat kartu belum boleh tampil: buka sekarang jika gate itu masih aktif.
+        if (deferredPortal != null && gateRoom != null)
+        {
+            if (gateRoom.ActivePortal != deferredPortal)
+                deferredPortal = null;
+            else if (State == RunState.Preparing && !IsPaused && !IsMainMenuOpen && !IsAnnouncing)
+                HandlePortalFocused(deferredPortal);
+        }
+
         if (combatDebugPanel != null && combatDebugPanel.enabled != AIDebugSettings.Enabled)
             combatDebugPanel.enabled = AIDebugSettings.Enabled;
     }
@@ -574,10 +583,21 @@ public class GameUI : MonoBehaviour
         hud.FlashRound(round, runManager != null ? runManager.TotalRounds : 0, runManager != null ? runManager.CurrentWave : null);
     }
 
+    // Gate yang difokus saat kartunya belum boleh tampil (mis. pengumuman ronde masih jalan). Dibuka di Update begitu boleh.
+    private GatePortal deferredPortal;
+
     private void HandlePortalFocused(GatePortal portal)
     {
-        if (portal == null || !portal.IsOpen || State != RunState.Preparing || IsPaused || IsMainMenuOpen || IsAnnouncing)
+        deferredPortal = null;
+
+        if (portal == null || !portal.IsOpen)
             return;
+
+        if (State != RunState.Preparing || IsPaused || IsMainMenuOpen || IsAnnouncing)
+        {
+            deferredPortal = portal;
+            return;
+        }
 
         gateModal.Open(portal.Gate);
         enemyPreview.SetCompareGate(portal.Gate);
@@ -588,6 +608,9 @@ public class GameUI : MonoBehaviour
 
     private void HandlePortalUnfocused(GatePortal portal)
     {
+        if (deferredPortal == portal)
+            deferredPortal = null;
+
         gateModal.Hide();
         enemyPreview.SetCompareGate(null);
     }
