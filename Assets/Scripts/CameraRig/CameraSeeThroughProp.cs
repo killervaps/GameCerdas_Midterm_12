@@ -83,28 +83,117 @@ public class CameraSeeThroughProp : MonoBehaviour
         return hasBounds;
     }
 
-    // Apakah prop ini menghalangi garis kamera -> titik fokus (diperlebar Radius), atau kamera berada di dalamnya.
-    public bool Blocks(Vector3 camera, Vector3 focus, float radius, float cameraRadius)
+    private readonly List<Collider> solidColliders = new List<Collider>();
+    private readonly List<Renderer> shapeRenderers = new List<Renderer>();
+    private bool shapesReady;
+
+    // Apakah prop ini benar-benar menghalangi garis kamera -> titik fokus, atau kamera berada di dalamnya.
+    //   1. Saringan kasar: kotak gabungan prop (cepat, untuk melewati prop yang jauh dari garis).
+    //   2. Cek tepat: collider prop jika ada (bentuk asli), jika tidak ada collider memakai kotak tiap mesh yang ikut
+    //      berputar bersama objek (bukan kotak sejajar sumbu dunia yang membengkak untuk objek miring atau pohon).
+    // Bagian garis sepanjang Focus Margin di ujung dekat MC diabaikan, supaya prop yang hanya menempel di samping
+    // atau di belakang MC tidak ikut memudar.
+    public bool Blocks(Vector3 camera, Vector3 focus, float radius, float cameraRadius, float focusMargin)
     {
         if (!TryGetBounds(out Bounds box))
             return false;
 
-        Bounds around = box;
-        around.Expand(cameraRadius * 2f);
-
-        if (around.Contains(camera))
-            return true;
-
         Vector3 delta = focus - camera;
         float length = delta.magnitude;
+        Bounds coarse = box;
+        coarse.Expand(Mathf.Max(radius, cameraRadius) * 2f);
 
-        if (length < 0.001f)
+        if (!coarse.Contains(camera) &&
+            (length < 0.001f || !coarse.IntersectRay(new Ray(camera, delta / length), out float coarseHit) || coarseHit > length))
+        {
+            return false;
+        }
+
+        PrepareShapes();
+
+        float reach = Mathf.Max(0f, length - focusMargin);
+        Ray ray = new Ray(camera, length > 0.001f ? delta / length : Vector3.forward);
+
+        if (solidColliders.Count > 0)
+        {
+            foreach (Collider solid in solidColliders)
+            {
+                if (solid == null || !solid.enabled || !solid.gameObject.activeInHierarchy)
+                    continue;
+
+                // Kamera di dalam collider (ClosestPoint hanya berlaku untuk collider cembung/primitif).
+                if (!(solid is MeshCollider mesh && !mesh.convex) &&
+                    (solid.ClosestPoint(camera) - camera).sqrMagnitude < cameraRadius * cameraRadius)
+                {
+                    return true;
+                }
+
+                if (reach > 0f && solid.Raycast(ray, out RaycastHit hit, reach))
+                    return true;
+            }
+
+            return false;
+        }
+
+        foreach (Renderer shape in shapeRenderers)
+        {
+            if (shape == null || !shape.enabled)
+                continue;
+
+            if (SegmentHitsLocalBox(shape, camera, focus, reach, cameraRadius))
+                return true;
+        }
+
+        return false;
+    }
+
+    private void PrepareShapes()
+    {
+        if (shapesReady)
+            return;
+
+        shapesReady = true;
+
+        foreach (Collider solid in GetComponentsInChildren<Collider>(true))
+        {
+            if (!solid.isTrigger)
+                solidColliders.Add(solid);
+        }
+
+        foreach (Renderer renderer in GetComponentsInChildren<Renderer>(true))
+        {
+            if (renderer is MeshRenderer || renderer is SkinnedMeshRenderer)
+                shapeRenderers.Add(renderer);
+        }
+    }
+
+    // Garis kamera -> titik fokus diuji di ruang lokal mesh terhadap localBounds (kotak yang ikut rotasi dan skala objek).
+    private static bool SegmentHitsLocalBox(Renderer shape, Vector3 camera, Vector3 focus, float reach, float cameraRadius)
+    {
+        Transform t = shape.transform;
+        Bounds local = shape.localBounds;
+
+        Vector3 localCamera = t.InverseTransformPoint(camera);
+        Vector3 localFocus = t.InverseTransformPoint(focus);
+
+        // Kamera di dalam mesh (radius lensa dikonversi kasar ke skala lokal).
+        float scale = Mathf.Max(0.0001f, t.lossyScale.magnitude / 1.732f);
+        Bounds lens = local;
+        lens.Expand(cameraRadius * 2f / scale);
+
+        if (lens.Contains(localCamera))
+            return true;
+
+        Vector3 localDelta = localFocus - localCamera;
+        float localLength = localDelta.magnitude;
+
+        if (localLength < 0.0001f || reach <= 0f)
             return false;
 
-        box.Expand(radius * 2f);
+        float worldLength = Vector3.Distance(camera, focus);
+        float localReach = worldLength > 0.0001f ? localLength * (reach / worldLength) : 0f;
 
-        // Titik fokus sendiri di dalam prop (mis. MC berdiri di balik pilar tipis): tetap dipudarkan.
-        return box.IntersectRay(new Ray(camera, delta / length), out float distance) && distance <= length;
+        return local.IntersectRay(new Ray(localCamera, localDelta / localLength), out float distance) && distance <= localReach;
     }
 
     private void OnEnable()

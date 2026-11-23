@@ -20,6 +20,9 @@ public class CameraOccluderFade : MonoBehaviour
     [SerializeField, Min(0f)] private float castRadius = 0.25f;
     // Prop yang menempel di lensa kamera (kamera di dalam prop) ikut memudar dalam radius ini.
     [SerializeField, Min(0f)] private float cameraRadius = 0.4f;
+    // Ujung garis sepanjang ini di dekat MC diabaikan, supaya prop yang hanya menempel di samping/belakang MC
+    // tidak ikut memudar. Naikkan jika prop di sebelah MC masih memudar, turunkan jika prop tepat di depan MC tidak memudar.
+    [SerializeField, Min(0f)] private float focusMargin = 0.35f;
 
     private readonly HashSet<CameraSeeThroughProp> current = new HashSet<CameraSeeThroughProp>();
     private readonly HashSet<CameraSeeThroughProp> previous = new HashSet<CameraSeeThroughProp>();
@@ -98,7 +101,7 @@ public class CameraOccluderFade : MonoBehaviour
         {
             CameraSeeThroughProp prop = props[i];
 
-            if (prop != null && prop.ScanByCamera && prop.Blocks(from, to, castRadius, cameraRadius))
+            if (prop != null && prop.ScanByCamera && prop.Blocks(from, to, castRadius, cameraRadius, focusMargin))
                 current.Add(prop);
         }
 
