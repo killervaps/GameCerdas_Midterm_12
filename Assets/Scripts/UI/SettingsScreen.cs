@@ -8,8 +8,9 @@ using UnityEngine.UI;
 
 // Modal Pengaturan, dibuka dari menu utama dan menu jeda. Tab vertikal di kiri, isi tab di kanan:
 //   Suara      slider Volume utama, Musik, dan Efek suara (GameAudioSettings)
-//   Keyboard   tombol keyboard/mouse tiap aksi, termasuk gerak (KeyboardBindings)
-//   Kontroler  getaran aktif/mati, intensitas getaran, dan tombol gamepad tiap aksi (ControllerBindings)
+//   Keyboard   sensitivitas kamera mouse (CameraSensitivity), tombol keyboard/mouse tiap aksi, termasuk gerak (KeyboardBindings)
+//   Kontroler  sensitivitas kamera stik kanan, getaran aktif/mati, intensitas getaran, dan tombol gamepad tiap aksi
+//              (ControllerBindings)
 // Tab berganti saat difokuskan (atas/bawah di kolom tab) atau diklik. Kanan masuk ke isi tab, kiri kembali ke tab.
 // Slider diubah dengan kiri/kanan di keyboard, atau LT/RT di gamepad (TriggerSlider). ATUR ULANG hanya
 // mengembalikan isi tab yang sedang terbuka. Esc/Menu/B menutup (diurus GameUI).
@@ -18,7 +19,7 @@ public class SettingsScreen : UIScreen
     private const float TabWidth = 230f;
     private const float TabHeight = 64f;
     private const float ContentWidth = 760f;
-    private const float ContentHeight = 640f;
+    private const float ContentHeight = 700f;
     private const float RowHeight = 44f;
     private const float BindingButtonHeight = 40f;
     private const float BindingButtonWidth = 260f;
@@ -44,11 +45,15 @@ public class SettingsScreen : UIScreen
     private TextMeshProUGUI sfxValue;
 
     // Keyboard
+    private Slider mouseSensitivitySlider;
+    private TextMeshProUGUI mouseSensitivityValue;
     private TextMeshProUGUI keyStatus;
     private readonly Dictionary<KeyAction, TextMeshProUGUI> keyLabels = new Dictionary<KeyAction, TextMeshProUGUI>();
     private KeyAction? rebindingKey;
 
     // Kontroler
+    private Slider stickSensitivitySlider;
+    private TextMeshProUGUI stickSensitivityValue;
     private Button vibrationToggle;
     private TextMeshProUGUI vibrationLabel;
     private Slider vibrationSlider;
@@ -262,6 +267,15 @@ public class SettingsScreen : UIScreen
         CreateHeading(page, "Keyboard");
         keyStatus = CreateNote(page, "KeyStatus", string.Empty);
 
+        // Sensitivitas putar kamera dengan mouse (tahan klik kanan).
+        mouseSensitivitySlider = CreateSensitivitySlider(page, out mouseSensitivityValue);
+        mouseSensitivitySlider.onValueChanged.AddListener(value =>
+        {
+            CameraSensitivity.Mouse = value;
+            mouseSensitivityValue.text = CameraSensitivity.Format(CameraSensitivity.Mouse);
+        });
+        pageItems[KeyboardTab].Add(mouseSensitivitySlider);
+
         CreateNote(page, "MoveHeading", "Gerak");
 
         foreach (KeyAction action in KeyboardBindings.Movement)
@@ -313,6 +327,14 @@ public class SettingsScreen : UIScreen
     {
         CreateHeading(page, "Kontroler");
         padStatus = CreateNote(page, "PadStatus", string.Empty);
+
+        // Sensitivitas putar kamera dengan stik kanan.
+        stickSensitivitySlider = CreateSensitivitySlider(page, out stickSensitivityValue);
+        stickSensitivitySlider.onValueChanged.AddListener(value =>
+        {
+            CameraSensitivity.Stick = value;
+            stickSensitivityValue.text = CameraSensitivity.Format(CameraSensitivity.Stick);
+        });
 
         // Getaran aktif/mati.
         RectTransform toggleRow = CreateRow(page, "Getaran");
@@ -423,6 +445,20 @@ public class SettingsScreen : UIScreen
         value = UIKit.UseDisplayFont(UIKit.CreateText("Value", row, "100%", 24f, UIKit.Text, TextAlignmentOptions.Right, true));
         value.textWrappingMode = TextWrappingModes.NoWrap;
         UIKit.Layout(value, -1f, 84f, 0f);
+
+        return slider;
+    }
+
+    // Slider pengali sensitivitas kamera (0,2x - 2,2x, langkah 0,2x lewat kiri/kanan atau LT/RT).
+    private static Slider CreateSensitivitySlider(Transform parent, out TextMeshProUGUI value)
+    {
+        Slider slider = CreateSliderRow(parent, "Sensitivitas kamera", out value);
+        slider.minValue = CameraSensitivity.Min;
+        slider.maxValue = CameraSensitivity.Max;
+
+        // Judul lebih panjang dari baris lain: kecilkan sedikit supaya muat di kolom label.
+        TextMeshProUGUI label = slider.transform.parent.Find("Label").GetComponent<TextMeshProUGUI>();
+        label.fontSize = 21f;
 
         return slider;
     }
@@ -541,9 +577,11 @@ public class SettingsScreen : UIScreen
                 GameAudioSettings.ResetToDefault();
                 break;
             case KeyboardTab:
+                CameraSensitivity.ResetMouse();
                 KeyboardBindings.ResetToDefault();
                 break;
             case ControllerTab:
+                CameraSensitivity.ResetStick();
                 GamepadRumble.ResetToDefault();
                 ControllerBindings.ResetToDefault();
                 break;
@@ -569,6 +607,9 @@ public class SettingsScreen : UIScreen
 
     private void RefreshKeyboard()
     {
+        mouseSensitivitySlider.SetValueWithoutNotify(CameraSensitivity.Mouse);
+        mouseSensitivityValue.text = CameraSensitivity.Format(CameraSensitivity.Mouse);
+
         foreach (KeyValuePair<KeyAction, TextMeshProUGUI> pair in keyLabels)
         {
             if (rebindingKey.HasValue && rebindingKey.Value == pair.Key)
@@ -582,6 +623,9 @@ public class SettingsScreen : UIScreen
 
     private void RefreshController()
     {
+        stickSensitivitySlider.SetValueWithoutNotify(CameraSensitivity.Stick);
+        stickSensitivityValue.text = CameraSensitivity.Format(CameraSensitivity.Stick);
+
         bool vibration = GamepadRumble.Enabled;
         vibrationLabel.text = vibration ? "AKTIF" : "MATI";
         vibrationSlider.SetValueWithoutNotify(GamepadRumble.Intensity);
@@ -612,6 +656,7 @@ public class SettingsScreen : UIScreen
         }
 
         pageItems[ControllerTab].Clear();
+        pageItems[ControllerTab].Add(stickSensitivitySlider);
         pageItems[ControllerTab].Add(vibrationToggle);
 
         // Slider Kekuatan dilewati saat getaran mati.

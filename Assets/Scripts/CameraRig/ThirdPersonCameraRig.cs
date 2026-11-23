@@ -254,7 +254,9 @@ public class ThirdPersonCameraRig : MonoBehaviour
         ReadLookControls(rightHeld, out Vector2 mouse, out Vector2 stick);
 
         // Mouse memberi pergeseran piksel per frame, stik memberi nilai -1..1 yang dikali waktu.
-        Vector2 delta = mouse * mouseSensitivity + Vector2.Scale(stick, stickSpeed) * Time.unscaledDeltaTime;
+        // Pengali dari menu Pengaturan (tab Keyboard untuk mouse, tab Kontroler untuk stik).
+        Vector2 delta = mouse * (mouseSensitivity * CameraSensitivity.Mouse) +
+                        Vector2.Scale(stick, stickSpeed) * (Time.unscaledDeltaTime * CameraSensitivity.Stick);
 
         if (delta.sqrMagnitude < 0.0000001f)
             return;
