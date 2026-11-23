@@ -62,6 +62,13 @@ public class ThirdPersonCameraRig : MonoBehaviour
     // (dua batas supaya tidak berkedip saat kamera tepat di batas).
     [SerializeField] private float hideMargin = 0.12f;
     [SerializeField] private float showMargin = 0.25f;
+    // MC dibuat tembus pandang sebagian saat kamera mendekat (mis. ditahan tembok), dengan opasitas yang sama seperti
+    // prop yang menghalangi. Mulai memudar di Fade Start Distance, paling tembus di Fade Full Distance
+    // (jarak lensa ke permukaan badan MC). Di bawah Hide Margin badan tetap disembunyikan penuh (lensa di dalam badan).
+    [SerializeField] private bool partialFadeWhenClose = true;
+    [SerializeField, Range(0f, 1f)] private float closeOpacity = 0.3f;
+    [SerializeField] private float fadeStartDistance = 1.0f;
+    [SerializeField] private float fadeFullDistance = 0.4f;
     // Saat pindah arena (teleport), kamera diputar ke belakang MC.
     [SerializeField] private bool snapBehindTargetOnTeleport = true;
     // MC dianggap teleport jika berpindah sejauh ini sejak frame sebelumnya.
@@ -187,6 +194,7 @@ public class ThirdPersonCameraRig : MonoBehaviour
     private void OnDisable()
     {
         SetHidden(false);
+        ReleaseBodyFade();
         SetCursorLocked(false);
     }
 
@@ -199,6 +207,7 @@ public class ThirdPersonCameraRig : MonoBehaviour
         if (!value)
         {
             SetHidden(false);
+            ReleaseBodyFade();
             SetCursorLocked(false);
         }
     }
@@ -385,21 +394,61 @@ public class ThirdPersonCameraRig : MonoBehaviour
         Orbit.RadialAxis = radial;
     }
 
+    private CameraSeeThroughProp bodyFade;
+
+    // Penanda see-through di MC, dibuat saat pertama dibutuhkan dan tidak ikut dicek CameraOccluderFade.
+    private CameraSeeThroughProp BodyFade
+    {
+        get
+        {
+            if (bodyFade == null && target != null)
+            {
+                bodyFade = target.GetComponent<CameraSeeThroughProp>();
+
+                if (bodyFade == null)
+                    bodyFade = target.gameObject.AddComponent<CameraSeeThroughProp>();
+
+                bodyFade.ScanByCamera = false;
+            }
+
+            return bodyFade;
+        }
+    }
+
+    private void ReleaseBodyFade()
+    {
+        if (bodyFade != null)
+            bodyFade.ReleaseFade(6f);
+    }
+
     private void UpdateFade()
     {
         if (!fadeWhenClose || outputCamera == null || target == null)
         {
             SetHidden(false);
+            ReleaseBodyFade();
             return;
         }
 
         if (!TryGetBodyBounds(out Bounds body))
         {
             SetHidden(false);
+            ReleaseBodyFade();
             return;
         }
 
         float distance = Mathf.Sqrt(body.SqrDistance(outputCamera.position));
+
+        if (partialFadeWhenClose && BodyFade != null)
+        {
+            float t = Mathf.InverseLerp(fadeFullDistance, fadeStartDistance, distance);
+            float opacity = Mathf.Lerp(closeOpacity, 1f, t);
+
+            if (opacity < 0.999f)
+                BodyFade.RequestFade(opacity, 6f);
+            else
+                BodyFade.ReleaseFade(6f);
+        }
 
         if (!hidden && distance < hideMargin)
             SetHidden(true);

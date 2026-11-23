@@ -158,6 +158,137 @@ public static class MathGateCameraTools
         Debug.Log("MathGate: kamera orang ketiga siap (" + go.name + "). Tekan Play, tahan klik kanan untuk memutar, F8 untuk ganti mode.", go);
     }
 
+    // Prop di grup obstacle tiap arena, dan menara (ElevatedPlatform), boleh ditembus kamera dan dipudarkan saat menghalangi.
+    // Tembok (grup walls) dan lantai tidak disentuh, jadi tetap menahan kamera.
+    // Juga memasang CameraOccluderFade di ThirdPersonCamera. Aman dijalankan ulang setelah menambah prop baru.
+    [MenuItem("MathGate/Camera/Mark See-Through Props")]
+    public static void MarkSeeThroughProps()
+    {
+        if (EditorApplication.isPlaying)
+        {
+            EditorUtility.DisplayDialog("MathGate", "Jalankan di Edit Mode, lalu simpan scene.", "OK");
+            return;
+        }
+
+        int added = 0;
+        int groups = 0;
+
+        foreach (Arena arena in Object.FindObjectsByType<Arena>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            foreach (Transform group in arena.GetComponentsInChildren<Transform>(true))
+            {
+                string name = group.name.ToLowerInvariant();
+
+                if (name != "obstacle" && name != "obstacles")
+                    continue;
+
+                groups++;
+
+                foreach (Transform prop in group)
+                {
+                    if (prop.GetComponentInChildren<Renderer>(true) == null || prop.GetComponent<CameraSeeThroughProp>() != null)
+                        continue;
+
+                    Undo.AddComponent<CameraSeeThroughProp>(prop.gameObject);
+                    added++;
+                }
+            }
+        }
+
+        // Dekorasi Safezone: semua child langsung Safezone kecuali tembok, lantai, gate, dan titik/papan sistem.
+        GateSelectionRoom room = Object.FindAnyObjectByType<GateSelectionRoom>(FindObjectsInactive.Include);
+
+        if (room != null)
+        {
+            foreach (Transform prop in room.transform)
+            {
+                string name = prop.name.ToLowerInvariant();
+
+                if (IsStructure(name) || prop.GetComponent<CameraSeeThroughProp>() != null ||
+                    prop.GetComponentInChildren<Renderer>(true) == null)
+                {
+                    continue;
+                }
+
+                Undo.AddComponent<CameraSeeThroughProp>(prop.gameObject);
+                added++;
+            }
+        }
+
+        // Menara besar: tetap sedikit lebih terlihat saat memudar supaya MC tahu posisi menara.
+        foreach (ElevatedPlatform tower in Object.FindObjectsByType<ElevatedPlatform>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (tower.GetComponent<CameraSeeThroughProp>() != null)
+                continue;
+
+            CameraSeeThroughProp prop = Undo.AddComponent<CameraSeeThroughProp>(tower.gameObject);
+            SerializedObject data = new SerializedObject(prop);
+            data.FindProperty("minOpacityOverride").floatValue = 0.45f;
+            data.ApplyModifiedProperties();
+            added++;
+        }
+
+        ThirdPersonCameraRig rig = Object.FindAnyObjectByType<ThirdPersonCameraRig>(FindObjectsInactive.Include);
+
+        if (rig != null)
+            GetOrAdd<CameraOccluderFade>(rig.gameObject);
+        else
+            Debug.LogWarning("MathGate: ThirdPersonCamera belum ada, CameraOccluderFade tidak dipasang. Jalankan Setup Third Person Camera dulu.");
+
+        EditorSceneManager.MarkAllScenesDirty();
+        Debug.Log("MathGate: " + added + " prop ditandai bisa ditembus kamera (" + groups + " grup obstacle). Simpan scene.");
+    }
+
+    // Nama objek struktur yang harus tetap menahan kamera (tidak dipudarkan).
+    private static bool IsStructure(string lowerName)
+    {
+        string[] structure = { "wall", "floor", "border", "gate", "portal", "spawn", "board", "stairs" };
+
+        foreach (string word in structure)
+        {
+            if (lowerName.Contains(word))
+                return true;
+        }
+
+        return false;
+    }
+
+    // Objek pilihan di Hierarchy dijadikan see-through, mis. dekorasi tinggi di tempat lain.
+    [MenuItem("MathGate/Camera/Mark Selected As See-Through")]
+    public static void MarkSelected()
+    {
+        int added = 0;
+
+        foreach (GameObject selected in Selection.gameObjects)
+        {
+            if (selected.GetComponent<CameraSeeThroughProp>() != null)
+                continue;
+
+            Undo.AddComponent<CameraSeeThroughProp>(selected);
+            added++;
+        }
+
+        if (!EditorApplication.isPlaying)
+            EditorSceneManager.MarkAllScenesDirty();
+
+        Debug.Log("MathGate: " + added + " objek pilihan ditandai bisa ditembus kamera.");
+    }
+
+    [MenuItem("MathGate/Camera/Unmark All See-Through Props")]
+    public static void UnmarkSeeThroughProps()
+    {
+        if (EditorApplication.isPlaying)
+            return;
+
+        CameraSeeThroughProp[] props = Object.FindObjectsByType<CameraSeeThroughProp>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+        foreach (CameraSeeThroughProp prop in props)
+            Undo.DestroyObjectImmediate(prop);
+
+        EditorSceneManager.MarkAllScenesDirty();
+        Debug.Log("MathGate: " + props.Length + " penanda see-through dihapus. Simpan scene.");
+    }
+
     private const string SkyFogMaterialPath = "Assets/Materials/SkyFog.mat";
 
     // Material untuk Full Screen Pass Renderer Feature. Feature-nya ditambahkan manual di renderer URP.

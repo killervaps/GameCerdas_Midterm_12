@@ -497,6 +497,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcf5d893bf661c94d8009a277216088a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3756309}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcf5d893bf661c94d8009a277216088a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3756314}
   m_SourcePrefab: {fileID: 100100000, guid: bcf5d893bf661c94d8009a277216088a, type: 3}
 --- !u!1 &3756308 stripped
 GameObject:
@@ -550,6 +553,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: bcf5d893bf661c94d8009a277216088a, type: 3}
   m_PrefabInstance: {fileID: 3756307}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3756314
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3756308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &4058886
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -747,7 +763,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b1ebf3ccf4b79bf48ae887731f083aa2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1605416025}
   m_SourcePrefab: {fileID: 100100000, guid: b1ebf3ccf4b79bf48ae887731f083aa2, type: 3}
 --- !u!4 &7429177 stripped
 Transform:
@@ -1765,7 +1784,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 97086779}
   m_SourcePrefab: {fileID: 100100000, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
 --- !u!4 &28729038 stripped
 Transform:
@@ -1872,6 +1894,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 32700162}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 32700165}
   m_SourcePrefab: {fileID: 100100000, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
 --- !u!4 &32700156 stripped
 Transform:
@@ -1925,6 +1950,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2156484437492122155, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+--- !u!114 &32700165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 32700157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &32982678
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2309,6 +2347,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 43801577}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 43801581}
   m_SourcePrefab: {fileID: 100100000, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
 --- !u!4 &43801575 stripped
 Transform:
@@ -2362,6 +2403,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2156484437492122155, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+--- !u!114 &43801581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 43801576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &44244397
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2864,7 +2918,7 @@ Transform:
   m_GameObject: {fileID: 55186986}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.5, y: 0, z: -36.5}
+  m_LocalPosition: {x: -2.5, y: 0, z: -66.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3480,6 +3534,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a210903d60c8f4a49a9ce21314f80225, type: 3}
       insertIndex: -1
       addedObject: {fileID: 64232603}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a210903d60c8f4a49a9ce21314f80225, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 64232606}
   m_SourcePrefab: {fileID: 100100000, guid: a210903d60c8f4a49a9ce21314f80225, type: 3}
 --- !u!4 &64232598 stripped
 Transform:
@@ -3513,6 +3570,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 2334367291622730483, guid: a210903d60c8f4a49a9ce21314f80225, type: 3}
+--- !u!114 &64232606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 64232599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &65946383
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4624,6 +4694,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73bf07dec8e17634e874639154ee61d5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 84719614}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73bf07dec8e17634e874639154ee61d5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 84719617}
   m_SourcePrefab: {fileID: 100100000, guid: 73bf07dec8e17634e874639154ee61d5, type: 3}
 --- !u!1 &84719611 stripped
 GameObject:
@@ -4677,6 +4750,19 @@ MonoBehaviour:
   m_IgnoreFromBuild: 0
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffffi
+--- !u!114 &84719617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 84719611}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &88068815 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -5420,6 +5506,24 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0000002, y: 0.1, z: 1.0000002}
   m_Center: {x: -0.00000029802322, y: -0.05, z: 0.0000003874302}
+--- !u!1 &97086776 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+  m_PrefabInstance: {fileID: 28729037}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &97086779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 97086776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &99370285
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7526,6 +7630,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a8633467c26fddb4380a516da615e2a7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 126096779}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a8633467c26fddb4380a516da615e2a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 126096782}
   m_SourcePrefab: {fileID: 100100000, guid: a8633467c26fddb4380a516da615e2a7, type: 3}
 --- !u!1 &126096776 stripped
 GameObject:
@@ -7579,6 +7686,19 @@ MonoBehaviour:
   m_IgnoreFromBuild: 0
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffffi
+--- !u!114 &126096782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 126096776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &128570190
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7892,6 +8012,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 131142294}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 131142298}
   m_SourcePrefab: {fileID: 100100000, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
 --- !u!1 &131142293 stripped
 GameObject:
@@ -7925,6 +8048,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
   m_PrefabInstance: {fileID: 131142292}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &131142298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 131142293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &132247662
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8375,6 +8511,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 137414117}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 137414122}
   m_SourcePrefab: {fileID: 100100000, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
 --- !u!1 &137414116 stripped
 GameObject:
@@ -8428,6 +8567,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
   m_PrefabInstance: {fileID: 137414115}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &137414122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 137414116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &137483093
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8759,6 +8911,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1a1d3eaa074c0d34b993432b8ef4498d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 146067436}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1a1d3eaa074c0d34b993432b8ef4498d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 146067439}
   m_SourcePrefab: {fileID: 100100000, guid: 1a1d3eaa074c0d34b993432b8ef4498d, type: 3}
 --- !u!4 &146067434 stripped
 Transform:
@@ -8791,6 +8946,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.8000001, y: 1, z: 0.8}
   m_Center: {x: 0.099999726, y: 0.5, z: -0.10000011}
+--- !u!114 &146067439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 146067435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &146968809
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9078,6 +9246,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 776109108}
   m_SourcePrefab: {fileID: 100100000, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
+--- !u!1 &151186464 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+  m_PrefabInstance: {fileID: 1336506013}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &151209238
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11000,7 +11173,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 390941666}
   m_SourcePrefab: {fileID: 100100000, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
 --- !u!4 &179200161 stripped
 Transform:
@@ -11125,7 +11301,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1128187878}
   m_SourcePrefab: {fileID: 100100000, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
 --- !u!4 &183645846 stripped
 Transform:
@@ -11955,6 +12134,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 198004159}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 198004162}
   m_SourcePrefab: {fileID: 100100000, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
 --- !u!4 &198004157 stripped
 Transform:
@@ -11988,6 +12170,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4095698799932796643, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+--- !u!114 &198004162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 198004158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &199364559
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13545,6 +13740,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 219213168}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 219213171}
   m_SourcePrefab: {fileID: 100100000, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
 --- !u!4 &219213162 stripped
 Transform:
@@ -13598,6 +13796,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2156484437492122155, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+--- !u!114 &219213171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 219213163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &220876486 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -14644,6 +14855,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 244066297}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 244066302}
   m_SourcePrefab: {fileID: 100100000, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
 --- !u!1 &244066296 stripped
 GameObject:
@@ -14697,6 +14911,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
   m_PrefabInstance: {fileID: 244066295}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &244066302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 244066296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &244990960 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -14855,6 +15082,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3b4600516943a5249835d23656a7235c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 248163161}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3b4600516943a5249835d23656a7235c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 248163164}
   m_SourcePrefab: {fileID: 100100000, guid: 3b4600516943a5249835d23656a7235c, type: 3}
 --- !u!4 &248163156 stripped
 Transform:
@@ -14888,6 +15118,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 5543852910939878438, guid: 3b4600516943a5249835d23656a7235c, type: 3}
+--- !u!114 &248163164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248163157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &249472704
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14951,6 +15194,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 249472706}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 249472710}
   m_SourcePrefab: {fileID: 100100000, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
 --- !u!1 &249472705 stripped
 GameObject:
@@ -14984,6 +15230,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
   m_PrefabInstance: {fileID: 249472704}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &249472710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 249472705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &250265551
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16221,6 +16480,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 273413832}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 273413837}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!1 &273413831 stripped
 GameObject:
@@ -16274,6 +16536,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
   m_PrefabInstance: {fileID: 273413830}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &273413837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 273413831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &273725248 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 6baab976e37badd41a3dbb035103cac3, type: 3}
@@ -16728,6 +17003,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 278432662}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 278432665}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!4 &278432657 stripped
 Transform:
@@ -16761,6 +17039,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4781277628412113339, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+--- !u!114 &278432665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 278432658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &278731847
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18131,6 +18422,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
       insertIndex: -1
       addedObject: {fileID: 300511763}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 300511767}
   m_SourcePrefab: {fileID: 100100000, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
 --- !u!4 &300511761 stripped
 Transform:
@@ -18184,6 +18478,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -6627330728956258486, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
+--- !u!114 &300511767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 300511762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &302836308
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19017,6 +19324,7 @@ GameObject:
   m_Component:
   - component: {fileID: 317342976}
   - component: {fileID: 317342977}
+  - component: {fileID: 317342978}
   m_Layer: 9
   m_Name: tower_1
   m_TagString: Untagged
@@ -19068,6 +19376,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ef0ad122451e654683f85beceb6afbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ElevatedPlatform
+--- !u!114 &317342978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 317342975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: 0.45
 --- !u!1001 &319229054
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20220,6 +20541,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1794507879}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1794507882}
   m_SourcePrefab: {fileID: 100100000, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
 --- !u!4 &331468947 stripped
 Transform:
@@ -20839,6 +21163,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43d93a151f418204f9435378c520f953, type: 3}
       insertIndex: -1
       addedObject: {fileID: 344109254}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43d93a151f418204f9435378c520f953, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 344109258}
   m_SourcePrefab: {fileID: 100100000, guid: 43d93a151f418204f9435378c520f953, type: 3}
 --- !u!1 &344109253 stripped
 GameObject:
@@ -20871,6 +21198,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 43d93a151f418204f9435378c520f953, type: 3}
   m_PrefabInstance: {fileID: 344109252}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &344109258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 344109253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &345959864
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22340,6 +22680,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43d93a151f418204f9435378c520f953, type: 3}
       insertIndex: -1
       addedObject: {fileID: 370450866}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43d93a151f418204f9435378c520f953, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 370450869}
   m_SourcePrefab: {fileID: 100100000, guid: 43d93a151f418204f9435378c520f953, type: 3}
 --- !u!4 &370450861 stripped
 Transform:
@@ -22373,6 +22716,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 438092822475766303, guid: 43d93a151f418204f9435378c520f953, type: 3}
+--- !u!114 &370450869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 370450862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &371384411 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -23399,6 +23755,24 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 3742ababbe2f309459453ca74860ef15, type: 3}
   m_PrefabInstance: {fileID: 715134267}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &390941663 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+  m_PrefabInstance: {fileID: 179200160}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &390941666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390941663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &392947860
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23911,6 +24285,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f68af8e908b6fb84abf321e5c66b588b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1000076288}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f68af8e908b6fb84abf321e5c66b588b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1000076291}
   m_SourcePrefab: {fileID: 100100000, guid: f68af8e908b6fb84abf321e5c66b588b, type: 3}
 --- !u!4 &404214097 stripped
 Transform:
@@ -24361,6 +24738,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 37a678927f639cf42aa93c0b401bce6a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 410215783}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 37a678927f639cf42aa93c0b401bce6a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 410215787}
   m_SourcePrefab: {fileID: 100100000, guid: 37a678927f639cf42aa93c0b401bce6a, type: 3}
 --- !u!4 &410215781 stripped
 Transform:
@@ -24414,6 +24794,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 1561684027339817122, guid: 37a678927f639cf42aa93c0b401bce6a, type: 3}
+--- !u!114 &410215787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 410215782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &412652257
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24952,6 +25345,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 427979428}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 427979432}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!1 &427979427 stripped
 GameObject:
@@ -24984,6 +25380,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
   m_PrefabInstance: {fileID: 427979426}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &427979432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 427979427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &429239141 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -25176,6 +25585,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8a5ff7d605f420c4c908228bcad5793c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 430406718}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8a5ff7d605f420c4c908228bcad5793c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 430406722}
   m_SourcePrefab: {fileID: 100100000, guid: 8a5ff7d605f420c4c908228bcad5793c, type: 3}
 --- !u!4 &430406716 stripped
 Transform:
@@ -25229,6 +25641,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 2076797762088933691, guid: 8a5ff7d605f420c4c908228bcad5793c, type: 3}
+--- !u!114 &430406722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 430406717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &431427172 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -26713,6 +27138,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 69ac7d2e56ffec3468b6bdbb437aa9a8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 450713227}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 69ac7d2e56ffec3468b6bdbb437aa9a8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 450713230}
   m_SourcePrefab: {fileID: 100100000, guid: 69ac7d2e56ffec3468b6bdbb437aa9a8, type: 3}
 --- !u!4 &450713225 stripped
 Transform:
@@ -26745,6 +27173,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 0.6}
   m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!114 &450713230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 450713226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &451255425
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27535,6 +27976,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7c4960b06087ea74b84069f23aef037a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 469232734}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7c4960b06087ea74b84069f23aef037a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 469232737}
   m_SourcePrefab: {fileID: 100100000, guid: 7c4960b06087ea74b84069f23aef037a, type: 3}
 --- !u!4 &469232732 stripped
 Transform:
@@ -27568,6 +28012,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -6342097086232499928, guid: 7c4960b06087ea74b84069f23aef037a, type: 3}
+--- !u!114 &469232737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 469232733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &470487946
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27734,7 +28191,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73c7196a5247d7142a44fbe9bc689a22, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1904432004}
   m_SourcePrefab: {fileID: 100100000, guid: 73c7196a5247d7142a44fbe9bc689a22, type: 3}
 --- !u!4 &470767432 stripped
 Transform:
@@ -30160,6 +30620,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 503352383}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 503352386}
   m_SourcePrefab: {fileID: 100100000, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
 --- !u!4 &503352381 stripped
 Transform:
@@ -30192,6 +30655,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0000002, y: 0.39999998, z: 0.60000014}
   m_Center: {x: 0, y: 0.19999999, z: 0}
+--- !u!114 &503352386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 503352382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &503771453
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30508,6 +30984,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &509974761 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+  m_PrefabInstance: {fileID: 799052344}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &510113776
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30571,6 +31052,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 69ac7d2e56ffec3468b6bdbb437aa9a8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 510113779}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 69ac7d2e56ffec3468b6bdbb437aa9a8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 510113782}
   m_SourcePrefab: {fileID: 100100000, guid: 69ac7d2e56ffec3468b6bdbb437aa9a8, type: 3}
 --- !u!4 &510113777 stripped
 Transform:
@@ -30603,6 +31087,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 0.6}
   m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!114 &510113782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 510113778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &510171233
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30776,6 +31273,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 855402843}
   m_SourcePrefab: {fileID: 100100000, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
+--- !u!1 &518711268 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: cd130699376f6534286f682d2e03102c, type: 3}
+  m_PrefabInstance: {fileID: 1133349645}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &519565926
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30934,6 +31436,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 521701179}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 521701182}
   m_SourcePrefab: {fileID: 100100000, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
 --- !u!4 &521701177 stripped
 Transform:
@@ -30966,6 +31471,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.6, y: 1.025, z: 0.225}
   m_Center: {x: 0.00000017881393, y: 0.5125, z: 0.012499392}
+--- !u!114 &521701182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 521701178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &523099915
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -32015,6 +32533,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f68af8e908b6fb84abf321e5c66b588b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 538533437}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f68af8e908b6fb84abf321e5c66b588b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 538533441}
   m_SourcePrefab: {fileID: 100100000, guid: f68af8e908b6fb84abf321e5c66b588b, type: 3}
 --- !u!4 &538533435 stripped
 Transform:
@@ -32068,6 +32589,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -6317805809608689028, guid: f68af8e908b6fb84abf321e5c66b588b, type: 3}
+--- !u!114 &538533441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 538533436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &538923700
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -33617,12 +34151,28 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5001a50a4dc580548adc5530679d6fac, type: 3}
       insertIndex: -1
       addedObject: {fileID: 221815566}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5001a50a4dc580548adc5530679d6fac, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 564885409}
   m_SourcePrefab: {fileID: 100100000, guid: 5001a50a4dc580548adc5530679d6fac, type: 3}
 --- !u!4 &564885406 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5001a50a4dc580548adc5530679d6fac, type: 3}
   m_PrefabInstance: {fileID: 564885405}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &564885409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 221815562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &566801424
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -33745,7 +34295,7 @@ Transform:
   m_GameObject: {fileID: 569771813}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -17.289999, y: 0, z: -17.460001}
+  m_LocalPosition: {x: -37.29, y: 0, z: -17.460001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -34740,6 +35290,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 187c3518b57291d44b0e2df8ad87512c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 585236241}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 187c3518b57291d44b0e2df8ad87512c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 585236244}
   m_SourcePrefab: {fileID: 100100000, guid: 187c3518b57291d44b0e2df8ad87512c, type: 3}
 --- !u!4 &585236239 stripped
 Transform:
@@ -34772,6 +35325,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0.5, z: 1}
   m_Center: {x: 0, y: 0.25, z: 0}
+--- !u!114 &585236244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 585236240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &585876577
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -36059,12 +36625,28 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43d93a151f418204f9435378c520f953, type: 3}
       insertIndex: -1
       addedObject: {fileID: 253142272}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43d93a151f418204f9435378c520f953, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 596885613}
   m_SourcePrefab: {fileID: 100100000, guid: 43d93a151f418204f9435378c520f953, type: 3}
 --- !u!4 &596885610 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 43d93a151f418204f9435378c520f953, type: 3}
   m_PrefabInstance: {fileID: 596885609}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &596885613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 253142268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &600855637
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -37471,6 +38053,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 619949702}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 619949706}
   m_SourcePrefab: {fileID: 100100000, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
 --- !u!4 &619949700 stripped
 Transform:
@@ -37524,6 +38109,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2156484437492122155, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+--- !u!114 &619949706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 619949701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &621535466
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -39090,6 +39688,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 650001700}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 650001704}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!1 &650001699 stripped
 GameObject:
@@ -39123,6 +39724,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
   m_PrefabInstance: {fileID: 650001698}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &650001704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 650001699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &652565100
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -39186,6 +39800,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 652565106}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 652565109}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!4 &652565101 stripped
 Transform:
@@ -39219,6 +39836,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4781277628412113339, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+--- !u!114 &652565109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652565102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &655712631
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -39883,6 +40513,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
       insertIndex: -1
       addedObject: {fileID: 664515589}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 664515592}
   m_SourcePrefab: {fileID: 100100000, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
 --- !u!4 &664515584 stripped
 Transform:
@@ -39916,6 +40549,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 625845135098221407, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
+--- !u!114 &664515592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 664515585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &665586228
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -40258,6 +40904,7 @@ GameObject:
   m_Component:
   - component: {fileID: 671156227}
   - component: {fileID: 671156228}
+  - component: {fileID: 671156229}
   m_Layer: 9
   m_Name: tower_2
   m_TagString: Untagged
@@ -40313,6 +40960,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ef0ad122451e654683f85beceb6afbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ElevatedPlatform
+--- !u!114 &671156229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 671156226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: 0.45
 --- !u!1001 &671349013
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42186,12 +42846,28 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: df96a3ce85508bf42b964855491afe1d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 339520018}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: df96a3ce85508bf42b964855491afe1d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 706755564}
   m_SourcePrefab: {fileID: 100100000, guid: df96a3ce85508bf42b964855491afe1d, type: 3}
 --- !u!4 &706755563 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: df96a3ce85508bf42b964855491afe1d, type: 3}
   m_PrefabInstance: {fileID: 706755562}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &706755564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 339520016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &707351259
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42736,6 +43412,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bde621aaa8fe1b94c94b8f7cf4de31fd, type: 3}
       insertIndex: -1
       addedObject: {fileID: 716266574}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bde621aaa8fe1b94c94b8f7cf4de31fd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 716266579}
   m_SourcePrefab: {fileID: 100100000, guid: bde621aaa8fe1b94c94b8f7cf4de31fd, type: 3}
 --- !u!1 &716266573 stripped
 GameObject:
@@ -42789,6 +43468,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: bde621aaa8fe1b94c94b8f7cf4de31fd, type: 3}
   m_PrefabInstance: {fileID: 716266572}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &716266579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 716266573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &718071323
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -44278,6 +44970,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 602878856}
   m_SourcePrefab: {fileID: 100100000, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
+--- !u!1 &747098684 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
+  m_PrefabInstance: {fileID: 1654988268}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &748258970
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -45330,6 +46027,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3b4600516943a5249835d23656a7235c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 766596435}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3b4600516943a5249835d23656a7235c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 766596438}
   m_SourcePrefab: {fileID: 100100000, guid: 3b4600516943a5249835d23656a7235c, type: 3}
 --- !u!4 &766596430 stripped
 Transform:
@@ -45363,6 +46063,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 5543852910939878438, guid: 3b4600516943a5249835d23656a7235c, type: 3}
+--- !u!114 &766596438
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 766596431}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &767107774
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -45585,6 +46298,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
       insertIndex: -1
       addedObject: {fileID: 771391333}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 771391336}
   m_SourcePrefab: {fileID: 100100000, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
 --- !u!4 &771391328 stripped
 Transform:
@@ -45618,6 +46334,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -6627330728956258486, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
+--- !u!114 &771391336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 771391329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &772461612
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -46443,12 +47172,28 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 699401554}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 787270159}
   m_SourcePrefab: {fileID: 100100000, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
 --- !u!4 &787270156 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
   m_PrefabInstance: {fileID: 787270155}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &787270159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 699401550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &787474826 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -46598,6 +47343,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3742ababbe2f309459453ca74860ef15, type: 3}
       insertIndex: -1
       addedObject: {fileID: 788905217}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3742ababbe2f309459453ca74860ef15, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 788905220}
   m_SourcePrefab: {fileID: 100100000, guid: 3742ababbe2f309459453ca74860ef15, type: 3}
 --- !u!4 &788905215 stripped
 Transform:
@@ -46630,6 +47378,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 0.6}
   m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!114 &788905220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 788905216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &790641391
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -47330,13 +48091,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 799052348}
   m_SourcePrefab: {fileID: 100100000, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
 --- !u!4 &799052345 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
   m_PrefabInstance: {fileID: 799052344}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &799052348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 509974761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &800634372 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -48046,6 +48823,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 814281086}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 814281089}
   m_SourcePrefab: {fileID: 100100000, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
 --- !u!4 &814281084 stripped
 Transform:
@@ -48078,6 +48858,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0000002, y: 0.40000004, z: 0.6}
   m_Center: {x: 0.00000017881393, y: 0.19999976, z: 0.000000059604645}
+--- !u!114 &814281089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 814281085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &816142186
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -51536,6 +52329,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 856585498}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 856585502}
   m_SourcePrefab: {fileID: 100100000, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
 --- !u!4 &856585496 stripped
 Transform:
@@ -51588,6 +52384,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0000002, y: 0.39999998, z: 0.60000014}
   m_Center: {x: 0, y: 0.19999999, z: 0}
+--- !u!114 &856585502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 856585497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &858753094
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -52675,6 +53484,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &875635248 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: cd130699376f6534286f682d2e03102c, type: 3}
+  m_PrefabInstance: {fileID: 1265959145}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &876270849
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -52754,6 +53568,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73c7196a5247d7142a44fbe9bc689a22, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1604585282}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73c7196a5247d7142a44fbe9bc689a22, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1604585285}
   m_SourcePrefab: {fileID: 100100000, guid: 73c7196a5247d7142a44fbe9bc689a22, type: 3}
 --- !u!4 &876270850 stripped
 Transform:
@@ -53304,7 +54121,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d86ae3699966a7e47a879d3ce6bc013c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1082057780}
   m_SourcePrefab: {fileID: 100100000, guid: d86ae3699966a7e47a879d3ce6bc013c, type: 3}
 --- !u!4 &884973930 stripped
 Transform:
@@ -53542,6 +54362,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
       insertIndex: -1
       addedObject: {fileID: 888491152}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 888491155}
   m_SourcePrefab: {fileID: 100100000, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
 --- !u!4 &888491150 stripped
 Transform:
@@ -53574,6 +54397,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.60312504, y: 1, z: 0.6}
   m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!114 &888491155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 888491151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &889528776
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -54129,7 +54965,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1937981085}
   m_SourcePrefab: {fileID: 100100000, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
 --- !u!4 &899425501 stripped
 Transform:
@@ -54923,6 +55762,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1a1d3eaa074c0d34b993432b8ef4498d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 910392329}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1a1d3eaa074c0d34b993432b8ef4498d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 910392332}
   m_SourcePrefab: {fileID: 100100000, guid: 1a1d3eaa074c0d34b993432b8ef4498d, type: 3}
 --- !u!4 &910392327 stripped
 Transform:
@@ -54956,6 +55798,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -4105812506911450906, guid: 1a1d3eaa074c0d34b993432b8ef4498d, type: 3}
+--- !u!114 &910392332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910392328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &910465597
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -56165,6 +57020,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43d93a151f418204f9435378c520f953, type: 3}
       insertIndex: -1
       addedObject: {fileID: 925629984}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43d93a151f418204f9435378c520f953, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 925629988}
   m_SourcePrefab: {fileID: 100100000, guid: 43d93a151f418204f9435378c520f953, type: 3}
 --- !u!1 &925629983 stripped
 GameObject:
@@ -56198,6 +57056,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 43d93a151f418204f9435378c520f953, type: 3}
   m_PrefabInstance: {fileID: 925629982}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &925629988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 925629983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &925868161
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -57520,6 +58391,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1993923756}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1993923759}
   m_SourcePrefab: {fileID: 100100000, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
 --- !u!4 &949310210 stripped
 Transform:
@@ -58103,6 +58977,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 963078259}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 963078263}
   m_SourcePrefab: {fileID: 100100000, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
 --- !u!4 &963078257 stripped
 Transform:
@@ -58156,6 +59033,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2156484437492122155, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+--- !u!114 &963078263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963078258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &963760707
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -58581,7 +59471,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1746059733}
   m_SourcePrefab: {fileID: 100100000, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
 --- !u!4 &967710211 stripped
 Transform:
@@ -59394,6 +60287,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b5405946bf47294408fc3ea0aaf3380d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 981018875}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b5405946bf47294408fc3ea0aaf3380d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 981018878}
   m_SourcePrefab: {fileID: 100100000, guid: b5405946bf47294408fc3ea0aaf3380d, type: 3}
 --- !u!4 &981018873 stripped
 Transform:
@@ -59426,6 +60322,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.8, y: 0.39999998, z: 0.8}
   m_Center: {x: 0.099999666, y: 0.19999999, z: -0.10000035}
+--- !u!114 &981018878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981018874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &982499896 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -60146,6 +61055,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43d93a151f418204f9435378c520f953, type: 3}
       insertIndex: -1
       addedObject: {fileID: 995766797}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43d93a151f418204f9435378c520f953, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 995766800}
   m_SourcePrefab: {fileID: 100100000, guid: 43d93a151f418204f9435378c520f953, type: 3}
 --- !u!4 &995766795 stripped
 Transform:
@@ -60179,6 +61091,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 438092822475766303, guid: 43d93a151f418204f9435378c520f953, type: 3}
+--- !u!114 &995766800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 995766796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &996048827
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -60242,6 +61167,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 996048830}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 996048833}
   m_SourcePrefab: {fileID: 100100000, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
 --- !u!4 &996048828 stripped
 Transform:
@@ -60275,6 +61203,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4095698799932796643, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+--- !u!114 &996048833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 996048829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &996528800
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -60705,6 +61646,11 @@ MonoBehaviour:
   position: {x: 10, y: 390}
   uiScale: 2
   refreshInterval: 0.1
+--- !u!1 &999459179 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+  m_PrefabInstance: {fileID: 1681066353}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1000076284 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: f68af8e908b6fb84abf321e5c66b588b, type: 3}
@@ -60731,6 +61677,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.875, y: 1.24, z: 0.65}
   m_Center: {x: 0, y: 0.61, z: 0}
+--- !u!114 &1000076291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000076284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1001313238
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -61238,6 +62197,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1011013384}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1011013387}
   m_SourcePrefab: {fileID: 100100000, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
 --- !u!4 &1011013382 stripped
 Transform:
@@ -61270,6 +62232,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.60312504, y: 1, z: 0.6}
   m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!114 &1011013387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1011013383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1013475637
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -62538,6 +63513,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1037868507 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+  m_PrefabInstance: {fileID: 1134896869}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1037965829 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -63200,6 +64180,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1052386009}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1052386012}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!4 &1052386004 stripped
 Transform:
@@ -63233,6 +64216,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4781277628412113339, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+--- !u!114 &1052386012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1052386005}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1055225689
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -65122,6 +66118,24 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 0.6}
   m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!1 &1082057777 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: d86ae3699966a7e47a879d3ce6bc013c, type: 3}
+  m_PrefabInstance: {fileID: 884973929}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1082057780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1082057777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1083532624
 GameObject:
   m_ObjectHideFlags: 0
@@ -66189,6 +67203,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6082fec4d0d4eed4b9b3ab11e1ddb949, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1637514795}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6082fec4d0d4eed4b9b3ab11e1ddb949, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1637514796}
   m_SourcePrefab: {fileID: 100100000, guid: 6082fec4d0d4eed4b9b3ab11e1ddb949, type: 3}
 --- !u!4 &1105431496 stripped
 Transform:
@@ -66655,6 +67672,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1124073718}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1124073722}
   m_SourcePrefab: {fileID: 100100000, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
 --- !u!4 &1124073716 stripped
 Transform:
@@ -66708,6 +67728,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -6627330728956258486, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
+--- !u!114 &1124073722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1124073717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1124379164 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -66929,6 +67962,24 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 0.6}
   m_Center: {x: 0.00000035762787, y: 0.5, z: 0}
+--- !u!1 &1128187875 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
+  m_PrefabInstance: {fileID: 183645845}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1128187878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128187875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1128993828
 GameObject:
   m_ObjectHideFlags: 0
@@ -67041,13 +68092,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cd130699376f6534286f682d2e03102c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1133349649}
   m_SourcePrefab: {fileID: 100100000, guid: cd130699376f6534286f682d2e03102c, type: 3}
 --- !u!4 &1133349646 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: cd130699376f6534286f682d2e03102c, type: 3}
   m_PrefabInstance: {fileID: 1133349645}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1133349649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518711268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1133970171
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -67114,6 +68181,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1133970174}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1133970178}
   m_SourcePrefab: {fileID: 100100000, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
 --- !u!4 &1133970172 stripped
 Transform:
@@ -67167,6 +68237,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -6627330728956258486, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
+--- !u!114 &1133970178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1133970173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1134398531 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 69ac7d2e56ffec3468b6bdbb437aa9a8, type: 3}
@@ -67390,13 +68473,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1134896873}
   m_SourcePrefab: {fileID: 100100000, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
 --- !u!4 &1134896870 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
   m_PrefabInstance: {fileID: 1134896869}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1134896873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1037868507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1136039368
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -67461,6 +68560,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 639726575}
   m_SourcePrefab: {fileID: 100100000, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
+--- !u!1 &1137626301 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: b1ebf3ccf4b79bf48ae887731f083aa2, type: 3}
+  m_PrefabInstance: {fileID: 1295217309}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1138007610
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -68567,6 +69671,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1150032121}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1150032126}
   m_SourcePrefab: {fileID: 100100000, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
 --- !u!1 &1150032120 stripped
 GameObject:
@@ -68620,6 +69727,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
   m_PrefabInstance: {fileID: 1150032119}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1150032126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1150032120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1150676927
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -69128,6 +70248,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0000002, y: 0.1, z: 1.0000002}
   m_Center: {x: -0.00000035762787, y: -0.05, z: -0.00000035762787}
+--- !u!1 &1156256695 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+  m_PrefabInstance: {fileID: 1332849261}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1156971579
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -70150,6 +71275,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a8633467c26fddb4380a516da615e2a7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1164797300}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a8633467c26fddb4380a516da615e2a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1164797305}
   m_SourcePrefab: {fileID: 100100000, guid: a8633467c26fddb4380a516da615e2a7, type: 3}
 --- !u!1 &1164797299 stripped
 GameObject:
@@ -70203,6 +71331,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a8633467c26fddb4380a516da615e2a7, type: 3}
   m_PrefabInstance: {fileID: 1164797298}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1164797305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1164797299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1165686470
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -72066,6 +73207,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1188926888}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1188926891}
   m_SourcePrefab: {fileID: 100100000, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
 --- !u!4 &1188926886 stripped
 Transform:
@@ -72098,6 +73242,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.6, y: 1.025, z: 0.225}
   m_Center: {x: 0.00000023841858, y: 0.5125, z: 0.012500167}
+--- !u!114 &1188926891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1188926887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1190051097
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -73008,6 +74165,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 37a678927f639cf42aa93c0b401bce6a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1202589437}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 37a678927f639cf42aa93c0b401bce6a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1202589441}
   m_SourcePrefab: {fileID: 100100000, guid: 37a678927f639cf42aa93c0b401bce6a, type: 3}
 --- !u!1 &1202589436 stripped
 GameObject:
@@ -73040,6 +74200,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 37a678927f639cf42aa93c0b401bce6a, type: 3}
   m_PrefabInstance: {fileID: 1202589435}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1202589441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1202589436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1204871826 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -73615,6 +74788,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1226075381 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 05f6eef296a35524a8a98d31edc86bcc, type: 3}
+  m_PrefabInstance: {fileID: 1525790080}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1227338900
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -74216,6 +75394,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcf5d893bf661c94d8009a277216088a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1237960773}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcf5d893bf661c94d8009a277216088a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1237960778}
   m_SourcePrefab: {fileID: 100100000, guid: bcf5d893bf661c94d8009a277216088a, type: 3}
 --- !u!1 &1237960772 stripped
 GameObject:
@@ -74269,6 +75450,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: bcf5d893bf661c94d8009a277216088a, type: 3}
   m_PrefabInstance: {fileID: 1237960771}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1237960778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1237960772}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1238568061
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -75207,6 +76401,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bde621aaa8fe1b94c94b8f7cf4de31fd, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1581084048}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bde621aaa8fe1b94c94b8f7cf4de31fd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1581084051}
   m_SourcePrefab: {fileID: 100100000, guid: bde621aaa8fe1b94c94b8f7cf4de31fd, type: 3}
 --- !u!4 &1245079350 stripped
 Transform:
@@ -75372,6 +76569,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.60312504, y: 1, z: 0.6}
   m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!1 &1246610587 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+  m_PrefabInstance: {fileID: 1552514528}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1247094228
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -75530,6 +76732,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1249979424}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1249979427}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!4 &1249979422 stripped
 Transform:
@@ -75563,6 +76768,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4781277628412113339, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+--- !u!114 &1249979427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1249979423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1250370685
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -76568,13 +77786,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cd130699376f6534286f682d2e03102c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1265959149}
   m_SourcePrefab: {fileID: 100100000, guid: cd130699376f6534286f682d2e03102c, type: 3}
 --- !u!4 &1265959146 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: cd130699376f6534286f682d2e03102c, type: 3}
   m_PrefabInstance: {fileID: 1265959145}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1265959149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 875635248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1266564704
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -76828,6 +78062,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1269553317}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1269553320}
   m_SourcePrefab: {fileID: 100100000, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
 --- !u!4 &1269553315 stripped
 Transform:
@@ -76861,6 +78098,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4095698799932796643, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+--- !u!114 &1269553320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1269553316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1270598870
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -77249,6 +78499,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 861028080}
   m_SourcePrefab: {fileID: 100100000, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
+--- !u!1 &1274261886 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
+  m_PrefabInstance: {fileID: 1383160501}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1274477439
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -78432,6 +79687,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   drawGizmos: 1
+--- !u!1 &1293511598 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 5b700343f427a934a867eed05aa91c4f, type: 3}
+  m_PrefabInstance: {fileID: 2093711465}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1295217309
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -78503,13 +79763,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b1ebf3ccf4b79bf48ae887731f083aa2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1295217313}
   m_SourcePrefab: {fileID: 100100000, guid: b1ebf3ccf4b79bf48ae887731f083aa2, type: 3}
 --- !u!4 &1295217310 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b1ebf3ccf4b79bf48ae887731f083aa2, type: 3}
   m_PrefabInstance: {fileID: 1295217309}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1295217313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1137626301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1299603876
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -79534,6 +80810,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1309720442}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1309720446}
   m_SourcePrefab: {fileID: 100100000, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
 --- !u!4 &1309720440 stripped
 Transform:
@@ -79587,6 +80866,19 @@ MonoBehaviour:
   m_IgnoreFromBuild: 0
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffffi
+--- !u!114 &1309720446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309720441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1312829653
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -80455,13 +81747,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1332849265}
   m_SourcePrefab: {fileID: 100100000, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
 --- !u!4 &1332849262 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
   m_PrefabInstance: {fileID: 1332849261}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1332849265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1156256695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1333124148
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -80865,13 +82173,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1336506017}
   m_SourcePrefab: {fileID: 100100000, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
 --- !u!4 &1336506014 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
   m_PrefabInstance: {fileID: 1336506013}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1336506017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 151186464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1339326719
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -81667,6 +82991,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b1ebf3ccf4b79bf48ae887731f083aa2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1343616278}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b1ebf3ccf4b79bf48ae887731f083aa2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1343616282}
   m_SourcePrefab: {fileID: 100100000, guid: b1ebf3ccf4b79bf48ae887731f083aa2, type: 3}
 --- !u!4 &1343616276 stripped
 Transform:
@@ -81720,6 +83047,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 5837342070656465304, guid: b1ebf3ccf4b79bf48ae887731f083aa2, type: 3}
+--- !u!114 &1343616282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1343616277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1344400877 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -83207,6 +84547,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1379770820 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 20163bbf65763d341b554582557f5812, type: 3}
+  m_PrefabInstance: {fileID: 1637058953}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1380216300
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -83491,6 +84836,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1382587297}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1382587300}
   m_SourcePrefab: {fileID: 100100000, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
 --- !u!4 &1382587292 stripped
 Transform:
@@ -83524,6 +84872,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -6627330728956258486, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
+--- !u!114 &1382587300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1382587293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1383160501
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -83583,13 +84944,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1383160505}
   m_SourcePrefab: {fileID: 100100000, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
 --- !u!4 &1383160502 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
   m_PrefabInstance: {fileID: 1383160501}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1383160505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1274261886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1383532871
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -84554,6 +85931,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3b4600516943a5249835d23656a7235c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1405919485}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3b4600516943a5249835d23656a7235c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1405919488}
   m_SourcePrefab: {fileID: 100100000, guid: 3b4600516943a5249835d23656a7235c, type: 3}
 --- !u!4 &1405919480 stripped
 Transform:
@@ -84587,6 +85967,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 5543852910939878438, guid: 3b4600516943a5249835d23656a7235c, type: 3}
+--- !u!114 &1405919488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1405919481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1406149467
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -85030,6 +86423,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1417874313}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1417874317}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!1 &1417874312 stripped
 GameObject:
@@ -85063,6 +86459,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
   m_PrefabInstance: {fileID: 1417874311}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1417874317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1417874312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1419690077
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -86138,6 +87547,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b5405946bf47294408fc3ea0aaf3380d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1436574607}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b5405946bf47294408fc3ea0aaf3380d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1436574610}
   m_SourcePrefab: {fileID: 100100000, guid: b5405946bf47294408fc3ea0aaf3380d, type: 3}
 --- !u!4 &1436574605 stripped
 Transform:
@@ -86170,6 +87582,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.8, y: 0.39999998, z: 0.8}
   m_Center: {x: 0.099999994, y: 0.19999999, z: -0.099999994}
+--- !u!114 &1436574610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1436574606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1437805055
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -86297,6 +87722,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43d93a151f418204f9435378c520f953, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1438266412}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43d93a151f418204f9435378c520f953, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1438266415}
   m_SourcePrefab: {fileID: 100100000, guid: 43d93a151f418204f9435378c520f953, type: 3}
 --- !u!4 &1438266407 stripped
 Transform:
@@ -86330,6 +87758,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 438092822475766303, guid: 43d93a151f418204f9435378c520f953, type: 3}
+--- !u!114 &1438266415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1438266408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1441011798
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -86650,6 +88091,8 @@ MonoBehaviour:
   safezoneSpawn: {fileID: 497299595}
   arenaSpawn: {fileID: 691072782}
   confirmActionName: Player/Interact
+  focusByDistance: 1
+  focusMargin: 0.35
   maxGatesPerRun: 3
   startInSafezone: 1
   logEvents: 1
@@ -87025,6 +88468,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1450209379}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1450209383}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!1 &1450209378 stripped
 GameObject:
@@ -87058,6 +88504,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
   m_PrefabInstance: {fileID: 1450209377}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1450209383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1450209378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1450216004 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -87471,6 +88930,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1462703620}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1462703623}
   m_SourcePrefab: {fileID: 100100000, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
 --- !u!4 &1462703614 stripped
 Transform:
@@ -87524,6 +88986,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2156484437492122155, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+--- !u!114 &1462703623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1462703615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1463946393
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -88247,7 +89722,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1621524144}
   m_SourcePrefab: {fileID: 100100000, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
 --- !u!4 &1476438047 stripped
 Transform:
@@ -88321,6 +89799,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5b700343f427a934a867eed05aa91c4f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1478552418}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5b700343f427a934a867eed05aa91c4f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1478552422}
   m_SourcePrefab: {fileID: 100100000, guid: 5b700343f427a934a867eed05aa91c4f, type: 3}
 --- !u!1 &1478552417 stripped
 GameObject:
@@ -88353,6 +89834,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5b700343f427a934a867eed05aa91c4f, type: 3}
   m_PrefabInstance: {fileID: 1478552416}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1478552422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1478552417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1479397450
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -88419,6 +89913,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73bf07dec8e17634e874639154ee61d5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1479397454}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73bf07dec8e17634e874639154ee61d5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1479397457}
   m_SourcePrefab: {fileID: 100100000, guid: 73bf07dec8e17634e874639154ee61d5, type: 3}
 --- !u!1 &1479397451 stripped
 GameObject:
@@ -88472,6 +89969,19 @@ MonoBehaviour:
   m_IgnoreFromBuild: 0
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffffi
+--- !u!114 &1479397457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1479397451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1479508484
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -88823,6 +90333,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1493181271}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1493181274}
   m_SourcePrefab: {fileID: 100100000, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
 --- !u!4 &1493181265 stripped
 Transform:
@@ -88876,6 +90389,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2156484437492122155, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+--- !u!114 &1493181274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1493181266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1494549983 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -90514,13 +92040,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 05f6eef296a35524a8a98d31edc86bcc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1525790084}
   m_SourcePrefab: {fileID: 100100000, guid: 05f6eef296a35524a8a98d31edc86bcc, type: 3}
 --- !u!4 &1525790081 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 05f6eef296a35524a8a98d31edc86bcc, type: 3}
   m_PrefabInstance: {fileID: 1525790080}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1525790084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226075381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1526023892
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -92315,6 +93857,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1544110237}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1544110241}
   m_SourcePrefab: {fileID: 100100000, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
 --- !u!4 &1544110235 stripped
 Transform:
@@ -92368,6 +93913,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2156484437492122155, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+--- !u!114 &1544110241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1544110236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1544520772
 GameObject:
   m_ObjectHideFlags: 0
@@ -92650,6 +94208,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1546910937}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1546910940}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!4 &1546910932 stripped
 Transform:
@@ -92702,6 +94263,19 @@ MonoBehaviour:
   m_IgnoreFromBuild: 0
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffffi
+--- !u!114 &1546910940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1546910933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1549449221
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -92832,6 +94406,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f68af8e908b6fb84abf321e5c66b588b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1549828807}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f68af8e908b6fb84abf321e5c66b588b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1549828812}
   m_SourcePrefab: {fileID: 100100000, guid: f68af8e908b6fb84abf321e5c66b588b, type: 3}
 --- !u!1 &1549828806 stripped
 GameObject:
@@ -92884,6 +94461,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f68af8e908b6fb84abf321e5c66b588b, type: 3}
   m_PrefabInstance: {fileID: 1549828805}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1549828812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1549828806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1552122087
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -93050,13 +94640,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1552514532}
   m_SourcePrefab: {fileID: 100100000, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
 --- !u!4 &1552514529 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
   m_PrefabInstance: {fileID: 1552514528}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1552514532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1246610587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1555771091
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -94315,6 +95921,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1574203146}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1574203150}
   m_SourcePrefab: {fileID: 100100000, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
 --- !u!4 &1574203144 stripped
 Transform:
@@ -94368,6 +95977,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2156484437492122155, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+--- !u!114 &1574203150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574203145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1575806043
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -94759,6 +96381,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.8924161, y: 0.45390004, z: 0.8045329}
   m_Center: {x: -0.000000014901163, y: 0.22695002, z: -0.000000014901163}
+--- !u!114 &1581084051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1581084044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1581407980
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -95910,6 +97545,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1599461211}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1599461215}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!1 &1599461210 stripped
 GameObject:
@@ -95942,6 +97580,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
   m_PrefabInstance: {fileID: 1599461209}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1599461215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1599461210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1600391410
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -96131,6 +97782,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.56932056, y: 2.4, z: 0.45152053}
   m_Center: {x: 0, y: 0.56, z: 0}
+--- !u!114 &1604585285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1604585278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1604872371
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -96194,6 +97858,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1604872374}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1604872377}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!4 &1604872372 stripped
 Transform:
@@ -96226,6 +97893,37 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.65001523, y: 1.9171717, z: 0.6511395}
   m_Center: {x: 0, y: 0.95858586, z: 0}
+--- !u!114 &1604872377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1604872373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
+--- !u!1 &1605416022 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: b1ebf3ccf4b79bf48ae887731f083aa2, type: 3}
+  m_PrefabInstance: {fileID: 7429176}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1605416025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1605416022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1605467804
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -96543,6 +98241,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 69ac7d2e56ffec3468b6bdbb437aa9a8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1612262446}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 69ac7d2e56ffec3468b6bdbb437aa9a8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1612262449}
   m_SourcePrefab: {fileID: 100100000, guid: 69ac7d2e56ffec3468b6bdbb437aa9a8, type: 3}
 --- !u!4 &1612262444 stripped
 Transform:
@@ -96575,6 +98276,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 0.6}
   m_Center: {x: -0.0000005364418, y: 0.5, z: -0.0000006556511}
+--- !u!114 &1612262449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1612262445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1613105311
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -96801,6 +98515,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 69ac7d2e56ffec3468b6bdbb437aa9a8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1618849507}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 69ac7d2e56ffec3468b6bdbb437aa9a8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1618849510}
   m_SourcePrefab: {fileID: 100100000, guid: 69ac7d2e56ffec3468b6bdbb437aa9a8, type: 3}
 --- !u!4 &1618849505 stripped
 Transform:
@@ -96833,6 +98550,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0000002, y: 1, z: 0.60000014}
   m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!114 &1618849510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1618849506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1619402268
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -96899,6 +98629,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1619402271}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1619402275}
   m_SourcePrefab: {fileID: 100100000, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
 --- !u!4 &1619402269 stripped
 Transform:
@@ -96952,6 +98685,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -6627330728956258486, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
+--- !u!114 &1619402275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1619402270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1619466080
 GameObject:
   m_ObjectHideFlags: 0
@@ -97331,6 +99077,24 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1621524141 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+  m_PrefabInstance: {fileID: 1476438046}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1621524144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1621524141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1622667323
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -98361,13 +100125,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 20163bbf65763d341b554582557f5812, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1637058957}
   m_SourcePrefab: {fileID: 100100000, guid: 20163bbf65763d341b554582557f5812, type: 3}
 --- !u!4 &1637058954 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 20163bbf65763d341b554582557f5812, type: 3}
   m_PrefabInstance: {fileID: 1637058953}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1637058957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1379770820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1637514793 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 6082fec4d0d4eed4b9b3ab11e1ddb949, type: 3}
@@ -98394,6 +100174,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.69, z: 1}
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &1637514796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1637514793}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1637546365
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -99566,6 +101359,7 @@ GameObject:
   - component: {fileID: 1650376319}
   - component: {fileID: 1650376318}
   - component: {fileID: 1650376324}
+  - component: {fileID: 1650376325}
   m_Layer: 0
   m_Name: ThirdPersonCamera
   m_TagString: Untagged
@@ -99591,15 +101385,18 @@ MonoBehaviour:
   mouseSensitivity: 0.15
   stickSpeed: {x: 180, y: 110}
   invertY: 0
+  stickDeadzone: 0.15
   followLockedTarget: 1
   lockSmoothTime: 0.15
   blockManualYawWhileLocked: 1
   lockMinDistance: 1.2
   zoomRange: {x: 0.6, y: 1.5}
   zoomStep: 0.1
+  enforceWallHandling: 1
+  slowRotationAgainstWall: 1
   fadeWhenClose: 1
-  hideDistance: 1
-  showDistance: 1.3
+  hideMargin: 0.12
+  showMargin: 0.25
   snapBehindTargetOnTeleport: 1
   teleportDistance: 3
 --- !u!114 &1650376319
@@ -99813,6 +101610,25 @@ MonoBehaviour:
   fogColoredBackground: 1
   skyResolution: 1024
   flipY: 0
+--- !u!114 &1650376325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1650376317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91a5b58adeb5a7e4c82acfd2f1e74321, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraOccluderFade
+  fadeOccluders: 1
+  minOpacity: 0.3
+  fadeOutTime: 0.15
+  fadeInTime: 0.3
+  castRadius: 0.25
+  cameraRadius: 0.4
+  markDungeonProps: 1
 --- !u!1001 &1651859396
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -100045,13 +101861,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1654988272}
   m_SourcePrefab: {fileID: 100100000, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
 --- !u!4 &1654988269 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
   m_PrefabInstance: {fileID: 1654988268}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1654988272
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 747098684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1658554062
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -101667,13 +103499,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1681066357}
   m_SourcePrefab: {fileID: 100100000, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
 --- !u!4 &1681066354 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
   m_PrefabInstance: {fileID: 1681066353}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1681066357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 999459179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1682286650
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -102908,6 +104756,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1698914899}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1698914902}
   m_SourcePrefab: {fileID: 100100000, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
 --- !u!4 &1698914897 stripped
 Transform:
@@ -102941,6 +104792,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4095698799932796643, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+--- !u!114 &1698914902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1698914898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1699851761
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -104607,6 +106471,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1733293757}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1733293760}
   m_SourcePrefab: {fileID: 100100000, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
 --- !u!4 &1733293755 stripped
 Transform:
@@ -104640,6 +106507,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 625845135098221407, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
+--- !u!114 &1733293760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1733293756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1735760773
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -104703,6 +106583,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cd130699376f6534286f682d2e03102c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1735760776}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cd130699376f6534286f682d2e03102c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1735760779}
   m_SourcePrefab: {fileID: 100100000, guid: cd130699376f6534286f682d2e03102c, type: 3}
 --- !u!4 &1735760774 stripped
 Transform:
@@ -104736,6 +106619,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4095698799932796643, guid: cd130699376f6534286f682d2e03102c, type: 3}
+--- !u!114 &1735760779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1735760775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1736081549
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -105163,6 +107059,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 32452265}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1746059730 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+  m_PrefabInstance: {fileID: 967710210}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1746059733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1746059730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1747793705
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -105324,6 +107238,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1749704351}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1749704354}
   m_SourcePrefab: {fileID: 100100000, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
 --- !u!4 &1749704346 stripped
 Transform:
@@ -105376,6 +107293,19 @@ MonoBehaviour:
   m_IgnoreFromBuild: 1
   m_ApplyToChildren: 0
   m_AffectedAgents: ffffffffi
+--- !u!114 &1749704354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1749704347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1749771197
 GameObject:
   m_ObjectHideFlags: 0
@@ -105482,6 +107412,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73bf07dec8e17634e874639154ee61d5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1751095155}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73bf07dec8e17634e874639154ee61d5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1751095159}
   m_SourcePrefab: {fileID: 100100000, guid: 73bf07dec8e17634e874639154ee61d5, type: 3}
 --- !u!1 &1751095154 stripped
 GameObject:
@@ -105514,6 +107447,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 73bf07dec8e17634e874639154ee61d5, type: 3}
   m_PrefabInstance: {fileID: 1751095153}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1751095159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1751095154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1751769537
 GameObject:
   m_ObjectHideFlags: 0
@@ -106277,6 +108223,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1760341644}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1760341647}
   m_SourcePrefab: {fileID: 100100000, guid: 8ec74b7b4b30a634389d3967dac5f364, type: 3}
 --- !u!4 &1760341642 stripped
 Transform:
@@ -106309,6 +108258,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.60312504, y: 1, z: 0.6}
   m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!114 &1760341647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1760341643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1762068399
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -107593,6 +109555,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43d93a151f418204f9435378c520f953, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1789314177}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43d93a151f418204f9435378c520f953, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1789314181}
   m_SourcePrefab: {fileID: 100100000, guid: 43d93a151f418204f9435378c520f953, type: 3}
 --- !u!1 &1789314176 stripped
 GameObject:
@@ -107626,6 +109591,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 43d93a151f418204f9435378c520f953, type: 3}
   m_PrefabInstance: {fileID: 1789314175}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1789314181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1789314176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1789950416 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -108125,6 +110103,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.6031251, y: 3.23, z: 0.6000001}
   m_Center: {x: 0, y: 1.54, z: 0}
+--- !u!114 &1794507882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1794507875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1795526599
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -108891,6 +110882,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 59f7b882411ae9843b7e017eccd76688, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1809365675}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 59f7b882411ae9843b7e017eccd76688, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1809365680}
   m_SourcePrefab: {fileID: 100100000, guid: 59f7b882411ae9843b7e017eccd76688, type: 3}
 --- !u!1 &1809365674 stripped
 GameObject:
@@ -108944,6 +110938,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 59f7b882411ae9843b7e017eccd76688, type: 3}
   m_PrefabInstance: {fileID: 1809365673}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1809365680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1809365674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1810701441
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -109411,6 +111418,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1811562460}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1811562464}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!1 &1811562459 stripped
 GameObject:
@@ -109444,6 +111454,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
   m_PrefabInstance: {fileID: 1811562458}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1811562464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1811562459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1812690057
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -110352,6 +112375,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1998556883}
   m_SourcePrefab: {fileID: 100100000, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
+--- !u!1 &1825097534 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
+  m_PrefabInstance: {fileID: 1995886139}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1825800145
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -110510,6 +112538,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1825918133}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1825918136}
   m_SourcePrefab: {fileID: 100100000, guid: 867c0ce83b0318f45a52ce64223c563c, type: 3}
 --- !u!4 &1825918131 stripped
 Transform:
@@ -110542,6 +112573,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.6, y: 1.025, z: 0.225}
   m_Center: {x: 0.00000017881393, y: 0.5125, z: 0.012500063}
+--- !u!114 &1825918136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825918132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1826922913
 GameObject:
   m_ObjectHideFlags: 0
@@ -110695,6 +112739,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1828314164}
+  - component: {fileID: 1828314165}
   m_Layer: 0
   m_Name: low_wall_1
   m_TagString: Untagged
@@ -110721,6 +112766,19 @@ Transform:
   - {fileID: 1513930330}
   m_Father: {fileID: 813484472}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1828314165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1828314163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1828430974
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -111041,6 +113099,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 59f7b882411ae9843b7e017eccd76688, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1830726989}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 59f7b882411ae9843b7e017eccd76688, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1830726994}
   m_SourcePrefab: {fileID: 100100000, guid: 59f7b882411ae9843b7e017eccd76688, type: 3}
 --- !u!1 &1830726988 stripped
 GameObject:
@@ -111094,6 +113155,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 59f7b882411ae9843b7e017eccd76688, type: 3}
   m_PrefabInstance: {fileID: 1830726987}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1830726994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1830726988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1831606379 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -111893,6 +113967,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1848121340}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1848121343}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!4 &1848121338 stripped
 Transform:
@@ -111926,6 +114003,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4781277628412113339, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+--- !u!114 &1848121343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1848121339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1849300786
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -114766,6 +116856,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a8633467c26fddb4380a516da615e2a7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1888058260}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a8633467c26fddb4380a516da615e2a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1888058264}
   m_SourcePrefab: {fileID: 100100000, guid: a8633467c26fddb4380a516da615e2a7, type: 3}
 --- !u!4 &1888058258 stripped
 Transform:
@@ -114819,6 +116912,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 6093789492850456457, guid: a8633467c26fddb4380a516da615e2a7, type: 3}
+--- !u!114 &1888058264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1888058259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1889992945
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -115600,6 +117706,24 @@ Transform:
   - {fileID: 198004157}
   m_Father: {fileID: 55186987}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1904432001 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 73c7196a5247d7142a44fbe9bc689a22, type: 3}
+  m_PrefabInstance: {fileID: 470767431}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1904432004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1904432001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1904939961
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -116272,6 +118396,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2, z: 1}
   m_Center: {x: 0, y: -2, z: 0.3}
+--- !u!1 &1916093803 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
+  m_PrefabInstance: {fileID: 1928283110}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1917578726
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -116959,7 +119088,7 @@ Transform:
   m_GameObject: {fileID: 1928172440}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.5, y: 0, z: -12.5}
+  m_LocalPosition: {x: 34.5, y: 0, z: -12.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -117089,13 +119218,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1928283114}
   m_SourcePrefab: {fileID: 100100000, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
 --- !u!4 &1928283111 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
   m_PrefabInstance: {fileID: 1928283110}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1928283114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1916093803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1928374272 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -117193,6 +119338,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8a5ff7d605f420c4c908228bcad5793c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1928404369}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8a5ff7d605f420c4c908228bcad5793c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1928404373}
   m_SourcePrefab: {fileID: 100100000, guid: 8a5ff7d605f420c4c908228bcad5793c, type: 3}
 --- !u!4 &1928404367 stripped
 Transform:
@@ -117246,6 +119394,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 2076797762088933691, guid: 8a5ff7d605f420c4c908228bcad5793c, type: 3}
+--- !u!114 &1928404373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928404368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1930880912
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -117402,6 +119563,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1931307855}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1931307858}
   m_SourcePrefab: {fileID: 100100000, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
 --- !u!4 &1931307849 stripped
 Transform:
@@ -117455,6 +119619,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2156484437492122155, guid: 4b0102e4287e6fb4087942e470b5dcfe, type: 3}
+--- !u!114 &1931307858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1931307850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1933210130
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -117868,6 +120045,24 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1937981082 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+  m_PrefabInstance: {fileID: 899425500}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1937981085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1937981082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1938608546
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -117947,12 +120142,28 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
       insertIndex: -1
       addedObject: {fileID: 701091286}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1938608550}
   m_SourcePrefab: {fileID: 100100000, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
 --- !u!4 &1938608547 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: ad508c423cfd71a4aa823bd12cd38733, type: 3}
   m_PrefabInstance: {fileID: 1938608546}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1938608550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 701091282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1938668649
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -118664,6 +120875,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1955609812}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1955609815}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!4 &1955609807 stripped
 Transform:
@@ -118716,6 +120930,19 @@ MonoBehaviour:
   m_IgnoreFromBuild: 0
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffffi
+--- !u!114 &1955609815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1955609808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1958986997
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -118906,6 +121133,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0000002, y: 0.1, z: 1.0000002}
   m_Center: {x: -0.0000005364418, y: -0.05, z: -0.000000059604645}
+--- !u!1 &1962410577 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+  m_PrefabInstance: {fileID: 2077161940}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1962966483
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -119982,6 +122214,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 68717686}
   m_SourcePrefab: {fileID: 100100000, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
+--- !u!1 &1975615383 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+  m_PrefabInstance: {fileID: 2086762192}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1976249691
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -121775,6 +124012,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1988583708}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1988583712}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!1 &1988583707 stripped
 GameObject:
@@ -121807,6 +124047,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
   m_PrefabInstance: {fileID: 1988583706}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1988583712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1988583707}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1991277882
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -122308,6 +124561,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.6031251, y: 3.25, z: 0.6000001}
   m_Center: {x: 0, y: 1.63, z: 0}
+--- !u!114 &1993923759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1993923752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &1994157961
 GameObject:
   m_ObjectHideFlags: 0
@@ -122727,13 +124993,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1995886143}
   m_SourcePrefab: {fileID: 100100000, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
 --- !u!4 &1995886140 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0d4443f5814b31b42b7a31f209c75ab2, type: 3}
   m_PrefabInstance: {fileID: 1995886139}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1995886143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825097534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &1997577779
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -124606,6 +126888,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2025031481}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2025031484}
   m_SourcePrefab: {fileID: 100100000, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
 --- !u!4 &2025031479 stripped
 Transform:
@@ -124639,6 +126924,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4781277628412113339, guid: 7b028620fffb25f4c858f90673ed2e6d, type: 3}
+--- !u!114 &2025031484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2025031480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &2025688506
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -125020,6 +127318,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 187c3518b57291d44b0e2df8ad87512c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2041201502}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 187c3518b57291d44b0e2df8ad87512c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2041201505}
   m_SourcePrefab: {fileID: 100100000, guid: 187c3518b57291d44b0e2df8ad87512c, type: 3}
 --- !u!4 &2041201500 stripped
 Transform:
@@ -125052,6 +127353,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0.5, z: 1}
   m_Center: {x: 0, y: 0.25, z: 0}
+--- !u!114 &2041201505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2041201501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &2041458197
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -125843,6 +128157,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2052422644}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2052422648}
   m_SourcePrefab: {fileID: 100100000, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
 --- !u!1 &2052422643 stripped
 GameObject:
@@ -125875,6 +128192,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 38c1363e63e26cf448880e17c8dcf09d, type: 3}
   m_PrefabInstance: {fileID: 2052422642}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2052422648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2052422643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &2053533213
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -127216,13 +129546,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2077161944}
   m_SourcePrefab: {fileID: 100100000, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
 --- !u!4 &2077161941 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
   m_PrefabInstance: {fileID: 2077161940}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2077161944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1962410577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &2080689654 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
@@ -127516,13 +129862,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2086762196}
   m_SourcePrefab: {fileID: 100100000, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
 --- !u!4 &2086762193 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c5b861b2cd4365d459835697f80e34e2, type: 3}
   m_PrefabInstance: {fileID: 2086762192}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2086762196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1975615383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1001 &2087050540
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -128056,13 +130418,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5b700343f427a934a867eed05aa91c4f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2093711469}
   m_SourcePrefab: {fileID: 100100000, guid: 5b700343f427a934a867eed05aa91c4f, type: 3}
 --- !u!4 &2093711466 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5b700343f427a934a867eed05aa91c4f, type: 3}
   m_PrefabInstance: {fileID: 2093711465}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2093711469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1293511598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3793fa21c7f03ab4a977912ec4507f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSeeThroughProp
+  minOpacityOverride: -1
 --- !u!1 &2093811735 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}

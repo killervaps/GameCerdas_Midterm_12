@@ -24,6 +24,13 @@ using UnityEngine;
 //     (lihat SensitivityScale dan YawMovesIntoWall).
 public class CameraWallClamp : CinemachineExtension
 {
+    [Header("Gaya")]
+    [Tooltip("Aktif = kamera hanya meluncur maju di sepanjang garis pandangnya sendiri ke MC saat ditahan tembok. " +
+             "Sudut kamera tidak berubah: tidak dinaikkan, tidak diturunkan ke puncak tembok, dan tidak menunduk ke badan MC. " +
+             "MC dibuat tembus pandang sebagian oleh ThirdPersonCameraRig saat kamera dekat. " +
+             "Mati = perilaku lama (kamera naik dan menunduk saat dekat tembok).")]
+    [SerializeField] private bool keepViewAngle = true;
+
     [Header("Tembok")]
     [Tooltip("Layer tembok. Nothing = layer NavBlock.")]
     [SerializeField] private LayerMask wallLayers;
@@ -214,8 +221,7 @@ public class CameraWallClamp : CinemachineExtension
         float rawDistance = toRaw.magnitude;
 
         if (rawDistance > 0.01f &&
-            Physics.Raycast(extra.pivot, toRaw / rawDistance, out RaycastHit sight, rawDistance + wallMargin, Mask,
-                QueryTriggerInteraction.Ignore))
+            WallRaycast(extra.pivot, toRaw / rawDistance, out RaycastHit sight, rawDistance + wallMargin))
         {
             float sightAllowed = Mathf.Clamp(flatDistance * (sight.distance - wallMargin) / rawDistance, 0f, flatDistance);
 
@@ -234,7 +240,7 @@ public class CameraWallClamp : CinemachineExtension
         // Batas tinggi: puncak tembok yang menahan kamera (tidak dibatasi jika tidak ada tembok).
         float capY = float.PositiveInfinity;
 
-        if (extra.hit && capAtWallTop && TryGetWallTop(wallHit, feet, out float wallTop))
+        if (!keepViewAngle && extra.hit && capAtWallTop && TryGetWallTop(wallHit, feet, out float wallTop))
             capY = Mathf.Max(wallTop - wallTopMargin, feet.y + minimumHeight);
 
         bool reset = !vcam.PreviousStateIsValid || deltaTime < 0f || extra.flat < 0f;
@@ -248,7 +254,9 @@ public class CameraWallClamp : CinemachineExtension
             extra.flat = allowed;
 
         // Tinggi: naik sedikit saat kamera sangat dekat MC, tapi tidak melebihi puncak tembok.
-        float liftT = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(closeLiftStartDistance, closeLiftFullDistance, extra.flat));
+        float liftT = keepViewAngle
+            ? 0f
+            : Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(closeLiftStartDistance, closeLiftFullDistance, extra.flat));
         float targetY = Mathf.Max(raw.y, Mathf.Lerp(raw.y, feet.y + closeCameraHeight, liftT));
         targetY = Mathf.Min(targetY, capY);
         float targetOffset = targetY - raw.y;
@@ -266,17 +274,24 @@ public class CameraWallClamp : CinemachineExtension
 
         if (extra.clamping)
         {
-            // Digeser mendatar: kamera di depan tembok pada tinggi orbitnya (diatur heightOffset).
-            solved = feet + direction * extra.flat;
-            solved.y = raw.y + extra.heightOffset;
+            if (keepViewAngle)
+            {
+                // Meluncur di garis titik fokus -> posisi orbit: jarak mendatar jadi Flat, sudut pandang tetap sama.
+                solved = extra.pivot + (raw - extra.pivot) * (extra.flat / flatDistance);
+            }
+            else
+            {
+                // Digeser mendatar: kamera di depan tembok pada tinggi orbitnya (diatur heightOffset).
+                solved = feet + direction * extra.flat;
+                solved.y = raw.y + extra.heightOffset;
+            }
 
             // Pengaman: garis dari titik fokus ke kamera tidak boleh menembus tembok.
             Vector3 toSolved = solved - extra.pivot;
             float solvedDistance = toSolved.magnitude;
 
             if (solvedDistance > 0.01f &&
-                Physics.Raycast(extra.pivot, toSolved / solvedDistance, out RaycastHit block,
-                    solvedDistance + wallMargin, Mask, QueryTriggerInteraction.Ignore))
+                WallRaycast(extra.pivot, toSolved / solvedDistance, out RaycastHit block, solvedDistance + wallMargin))
             {
                 solved = extra.pivot + toSolved / solvedDistance * Mathf.Max(0f, block.distance - wallMargin);
             }
@@ -295,6 +310,31 @@ public class CameraWallClamp : CinemachineExtension
     }
 
     private readonly Collider[] lensOverlaps = new Collider[8];
+    private readonly RaycastHit[] rayHits = new RaycastHit[16];
+
+    // Seperti Physics.Raycast ke layer tembok, tapi prop yang boleh ditembus kamera (CameraSeeThroughProp) dilewati.
+    // Prop itu dipudarkan CameraOccluderFade, jadi kamera tidak perlu maju-mundur setiap melewati prop.
+    private bool WallRaycast(Vector3 origin, Vector3 direction, out RaycastHit nearest, float length)
+    {
+        int count = Physics.RaycastNonAlloc(origin, direction, rayHits, length, Mask, QueryTriggerInteraction.Ignore);
+        float best = float.PositiveInfinity;
+        bool found = false;
+        nearest = default;
+
+        for (int i = 0; i < count; i++)
+        {
+            RaycastHit hit = rayHits[i];
+
+            if (CameraSeeThroughProp.IsSeeThrough(hit.collider) || hit.distance >= best)
+                continue;
+
+            best = hit.distance;
+            nearest = hit;
+            found = true;
+        }
+
+        return found;
+    }
 
     // Lensa terlalu dekat ke permukaan tembok (terserempet, bukan terhalang): geser menyamping menjauhi permukaan.
     // Hanya mendatar, dan dibatalkan jika pergeseran itu malah membuat garis pandang ke MC terpotong.
@@ -308,6 +348,9 @@ public class CameraWallClamp : CinemachineExtension
             Collider wall = lensOverlaps[i];
 
             if (wall is MeshCollider mesh && !mesh.convex || wall is TerrainCollider)
+                continue;
+
+            if (CameraSeeThroughProp.IsSeeThrough(wall))
                 continue;
 
             Vector3 closest = wall.ClosestPoint(pushed);
@@ -329,7 +372,7 @@ public class CameraWallClamp : CinemachineExtension
         float length = toPushed.magnitude;
 
         if (length > 0.01f &&
-            Physics.Raycast(pivot, toPushed / length, length, Mask, QueryTriggerInteraction.Ignore))
+            WallRaycast(pivot, toPushed / length, out _, length))
         {
             return camera;
         }
@@ -347,7 +390,7 @@ public class CameraWallClamp : CinemachineExtension
         hit = false;
         wall = default;
 
-        if (Physics.Raycast(origin, direction, out RaycastHit ray, length, Mask, QueryTriggerInteraction.Ignore))
+        if (WallRaycast(origin, direction, out RaycastHit ray, length))
         {
             allowed = Mathf.Min(allowed, ray.distance - wallMargin);
             wall = ray;
@@ -368,7 +411,7 @@ public class CameraWallClamp : CinemachineExtension
         Vector3 inside = hit.point - hit.normal * 0.05f;
         Vector3 from = new Vector3(inside.x, feet.y + 30f, inside.z);
 
-        if (Physics.Raycast(from, Vector3.down, out RaycastHit topHit, 40f, Mask, QueryTriggerInteraction.Ignore) &&
+        if (WallRaycast(from, Vector3.down, out RaycastHit topHit, 40f) &&
             topHit.collider == hit.collider)
         {
             top = topHit.point.y;
@@ -387,7 +430,7 @@ public class CameraWallClamp : CinemachineExtension
         // Titik pandang turun bertahap dari titik fokus ke badan MC sesuai seberapa jauh tembok menarik kamera.
         float aimHeight = pivotHeight;
 
-        if (extra.clamping && extra.rawFlat > 0.01f)
+        if (!keepViewAngle && extra.clamping && extra.rawFlat > 0.01f)
         {
             float ratio = extra.flat / extra.rawFlat;
             float t = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(lowerAimStartRatio, lowerAimFullRatio, ratio));
@@ -410,7 +453,9 @@ public class CameraWallClamp : CinemachineExtension
         pitch = Mathf.Clamp(pitch, -80f, maxPitch);
 
         Quaternion rotation = Quaternion.LookRotation(forward, Vector3.up) * Quaternion.Euler(pitch, 0f, 0f);
-        rotation = KeepFeetAboveHud(rotation, camera, extra.feet, state.Lens.FieldOfView);
+        // Gaya sudut tetap: kamera tidak menunduk tiba-tiba untuk menjaga kaki MC di atas HUD.
+        if (!keepViewAngle)
+            rotation = KeepFeetAboveHud(rotation, camera, extra.feet, state.Lens.FieldOfView);
 
         state.OrientationCorrection = Quaternion.Inverse(state.RawOrientation) * rotation;
     }
