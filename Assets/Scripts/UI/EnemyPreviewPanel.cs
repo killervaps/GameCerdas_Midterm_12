@@ -95,15 +95,22 @@ public class EnemyPreviewPanel : UIScreen
         WaveData wave = CurrentWave();
 
         title.text = run != null && run.CurrentRound > 0
-            ? "Musuh berikutnya" + (run.CurrentRound >= run.TotalRounds && run.TotalRounds > 0 ? "  <color=" + UIKit.TradeOffHex + ">FINAL</color>" : string.Empty)
+            ? "Musuh berikutnya" + (run.IsEndless ? "  " + run.RoundLabel(run.CurrentRound) : string.Empty) +
+              (run.IsFinalRound || (wave != null && wave.IsBossWave)
+                  ? "  <color=" + UIKit.TradeOffHex + ">" + (run.IsEndless ? "BOSS" : "FINAL") + "</color>"
+                  : string.Empty)
             : "Musuh berikutnya";
 
         ObjectiveType objective = wave != null ? wave.Objective : run != null ? run.CurrentObjective : ObjectiveType.Exterminate;
         UIKit.SetStamp(objectiveStamp, objectiveStampLabel, ObjectiveInfo.Label(objective), UIKit.Cream);
         objectiveGoal.text = ObjectiveInfo.Goal(objective);
 
-        waveName.text = "Belum ada data wave untuk ronde ini.";
-        waveName.gameObject.SetActive(wave == null);
+        // Endless: kelebihan jumlah musuh diubah menjadi HP dan damage lebih tinggi, jadi ditulis di preview.
+        bool stronger = wave != null && wave.StatMultiplier > 1.001f;
+        waveName.text = wave == null
+            ? "Belum ada data wave untuk ronde ini."
+            : stronger ? "Musuh +" + Mathf.RoundToInt((wave.StatMultiplier - 1f) * 100f) + "% HP dan damage" : string.Empty;
+        waveName.gameObject.SetActive(wave == null || stronger);
 
         RebuildList(wave);
         RefreshThreat();

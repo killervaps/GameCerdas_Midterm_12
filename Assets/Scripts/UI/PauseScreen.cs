@@ -78,7 +78,7 @@ public class PauseScreen : UIScreen
         RunManager run = ui.Run;
 
         if (run != null)
-            info.text = "Ronde " + run.CurrentRound + " / " + run.TotalRounds + "   |   " + UIKit.FormatTime(run.RunDuration) +
+            info.text = run.RoundLabel(run.CurrentRound).Replace("/", " / ") + "   |   " + UIKit.FormatTime(run.RunDuration) +
                         (PcgDirector.Current != null && PcgDirector.Current.HasRunSeed ? "   |   Seed " + PcgDirector.Current.RunSeed : string.Empty);
         else
             info.text = string.Empty;

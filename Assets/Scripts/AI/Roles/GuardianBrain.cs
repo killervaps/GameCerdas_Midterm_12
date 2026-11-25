@@ -416,7 +416,7 @@ public class GuardianBrain : EnemyBrain
 
         if (inRange && inFront)
         {
-            player.TakeDamage(new DamageInfo(Data.Damage, gameObject, player.AimPoint, DamageKind.Melee));
+            player.TakeDamage(new DamageInfo(AttackDamage, gameObject, player.AimPoint, DamageKind.Melee));
             SfxManager.Play(SfxCue.GuardianHit);
         }
         else if (Controller.LogStateChanges)

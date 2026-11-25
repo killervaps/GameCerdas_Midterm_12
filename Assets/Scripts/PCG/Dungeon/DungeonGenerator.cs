@@ -225,6 +225,9 @@ public partial class DungeonGenerator : MonoBehaviour
 
     public TileType[,] Grid => grid;
 
+    // Model portal Goal. Dipakai juga sebagai model portal Ekstraksi di Safezone jika tidak ada model khusus.
+    public GameObject GoalPrefab => goalPrefab;
+
     public int MapWidth => mapWidth;
 
     public int MapHeight => mapHeight;

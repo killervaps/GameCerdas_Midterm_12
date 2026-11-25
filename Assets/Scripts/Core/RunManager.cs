@@ -12,7 +12,16 @@ public enum RunState
     // Ronde bersih, jeda sebelum kembali ke Safezone.
     RoundCleared,
     Victory,
-    Defeat
+    Defeat,
+    // Run Endless diakhiri lewat portal Ekstraksi di Safezone. Skor sementara diamankan.
+    Extracted
+}
+
+// Panjang run. Classic3 = ronde buatan tangan (Rounds), Endless = wave tanpa akhir dari WaveGenerator.
+public enum RunLength
+{
+    Classic3,
+    Endless
 }
 
 // Medan pertempuran tiap ronde. Arena = salah satu dari 4 arena buatan tangan, Dungeon = dungeon BSP (Praktikum 10).
@@ -54,8 +63,16 @@ public class RunManager : MonoBehaviour
     // Dungeon jauh lebih luas dari arena, jadi jumlah musuh, budget, dan batas Max per role dikali nilai ini.
     [SerializeField, Min(1f)] private float dungeonEnemyMultiplier = 2f;
 
+    [Header("Run Length")]
+    // Dipilih di layar pilihan mode. Nilai ini dipakai jika run dimulai tanpa menu (Start On Play).
+    [SerializeField] private RunLength runLength = RunLength.Classic3;
+    // Endless: profil musuh tiap wave.
+    [SerializeField] private WaveGenerator endlessWaves = new WaveGenerator();
+    // Endless: portal Ekstraksi muncul di Safezone setelah wave kelipatan ini bersih.
+    [SerializeField, Min(1)] private int extractionEvery = 3;
+
     [Header("Rounds (PCG)")]
-    // Satu profil per ronde, urut dari ronde 1. Jumlah profil = jumlah ronde.
+    // Classic3: satu profil per ronde, urut dari ronde 1. Jumlah profil = jumlah ronde.
     [SerializeField] private EnemyRoundProfile[] rounds = EnemyRoundProfile.Defaults();
     // Challenge 4: biaya tiap role untuk Difficulty Budget. Hanya dipakai profil ronde yang Difficulty Budget-nya > 0.
     [SerializeField] private RoleCost[] roleCosts = RoleCost.Defaults();
@@ -101,7 +118,31 @@ public class RunManager : MonoBehaviour
     // Dimulai dari 1.
     public int CurrentRound { get; private set; }
 
-    public int TotalRounds => rounds != null ? rounds.Length : 0;
+    public RunLength Length => runLength;
+
+    public bool IsEndless => runLength == RunLength.Endless;
+
+    // Classic3: jumlah ronde. Endless: 0 (tanpa batas), pakai IsFinalRound dan RoundLabel untuk tampilan.
+    public int TotalRounds => IsEndless ? 0 : ClassicRounds;
+
+    private int ClassicRounds => rounds != null ? rounds.Length : 0;
+
+    // Ronde ini yang terakhir (hanya Classic3).
+    public bool IsFinalRound => !IsEndless && CurrentRound >= ClassicRounds;
+
+    public WaveGenerator EndlessWaves => endlessWaves;
+
+    // Endless: wave ini boss wave.
+    public bool IsBossWave => IsEndless && endlessWaves.IsBossWave(CurrentRound);
+
+    // Endless: portal Ekstraksi sedang ditawarkan di Safezone.
+    public bool ExtractionOffered { get; private set; }
+
+    // Mis. "Wave 7" (Endless) atau "Ronde 2/3" (Classic3).
+    public string RoundLabel(int round)
+    {
+        return IsEndless ? "Wave " + round : "Ronde " + round + "/" + ClassicRounds;
+    }
 
     // Wave ronde saat ini hasil PCG. Saat Preparing, ini wave yang akan dihadapi setelah memilih gate.
     public WaveData CurrentWave => currentWave;
@@ -114,7 +155,9 @@ public class RunManager : MonoBehaviour
     public int CurrentBudgetSpent { get; private set; }
 
     public EnemyRoundProfile CurrentProfile =>
-        rounds != null && CurrentRound >= 1 && CurrentRound <= rounds.Length ? rounds[CurrentRound - 1] : null;
+        IsEndless
+            ? (CurrentRound >= 1 ? endlessWaves.ProfileFor(CurrentRound) : null)
+            : rounds != null && CurrentRound >= 1 && CurrentRound <= rounds.Length ? rounds[CurrentRound - 1] : null;
 
     // Dipilih dari menu utama sebelum run dimulai. Retry memakai mode yang sama.
     public GameMode Mode { get; private set; } = GameMode.Arena;
@@ -140,7 +183,9 @@ public class RunManager : MonoBehaviour
 
     public float RunEndTime { get; private set; }
 
-    public float RunDuration => (State == RunState.Victory || State == RunState.Defeat ? RunEndTime : Time.time) - RunStartTime;
+    public bool IsEnded => State == RunState.Victory || State == RunState.Defeat || State == RunState.Extracted;
+
+    public float RunDuration => (IsEnded ? RunEndTime : Time.time) - RunStartTime;
 
     public event Action<RunState> StateChanged;
 
@@ -158,6 +203,9 @@ public class RunManager : MonoBehaviour
 
     public event Action RunLost;
 
+    // Run Endless diakhiri lewat portal Ekstraksi.
+    public event Action RunExtracted;
+
     private void Awake()
     {
         if (gateRoom == null || spawner == null || battle == null || playerHealth == null)
@@ -167,11 +215,11 @@ public class RunManager : MonoBehaviour
             return;
         }
 
-        if (TotalRounds == 0)
+        if (ClassicRounds == 0)
             Debug.LogError("RunManager: daftar Rounds masih kosong.", this);
 
-        // Gate dipilih sekali per ronde, jadi batas gate sama dengan jumlah ronde.
-        gateRoom.UseExternalDriver(TotalRounds);
+        // Gate dipilih sekali per ronde, jadi batas gate sama dengan jumlah ronde. Endless diatur ulang saat run mulai.
+        gateRoom.UseExternalDriver(ClassicRounds);
 
         if (dungeon == null)
             dungeon = FindAnyObjectByType<DungeonGenerator>(FindObjectsInactive.Include);
@@ -180,6 +228,10 @@ public class RunManager : MonoBehaviour
         // otomatis supaya scene lama tidak perlu disetup ulang.
         if (FindAnyObjectByType<ObjectiveRunner>(FindObjectsInactive.Include) == null)
             gameObject.AddComponent<ObjectiveRunner>();
+
+        // Skor Aura dan rekor lokal, dipasang otomatis dengan alasan yang sama.
+        if (FindAnyObjectByType<AuraScore>(FindObjectsInactive.Include) == null)
+            gameObject.AddComponent<AuraScore>();
     }
 
     // Dipanggil menu utama sebelum StartRun. Mode Dungeon tanpa DungeonGenerator jatuh kembali ke Mode Arena.
@@ -194,10 +246,19 @@ public class RunManager : MonoBehaviour
         Mode = mode;
     }
 
+    // Dipanggil layar pilihan mode sebelum StartRun.
+    public void SetRunLength(RunLength length)
+    {
+        runLength = length;
+    }
+
     private void OnEnable()
     {
         if (gateRoom != null)
+        {
             gateRoom.GateChosen += HandleGateChosen;
+            gateRoom.ExtractionChosen += HandleExtractionChosen;
+        }
 
         if (battle != null)
         {
@@ -209,7 +270,10 @@ public class RunManager : MonoBehaviour
     private void OnDisable()
     {
         if (gateRoom != null)
+        {
             gateRoom.GateChosen -= HandleGateChosen;
+            gateRoom.ExtractionChosen -= HandleExtractionChosen;
+        }
 
         if (battle != null)
         {
@@ -246,6 +310,10 @@ public class RunManager : MonoBehaviour
         RunStartTime = Time.time;
         RunEndTime = 0f;
         objectiveHistory.Clear();
+        SetExtractionOffered(false);
+
+        // Endless: gate bisa dipilih setiap wave tanpa batas.
+        gateRoom.SetMaxGates(IsEndless ? int.MaxValue : ClassicRounds);
 
         if (arenaSelector != null)
             arenaSelector.ResetHistory();
@@ -262,7 +330,7 @@ public class RunManager : MonoBehaviour
         gateRoom.ResetRun();
         playerHealth.RestoreFull();
 
-        Log("run baru, " + TotalRounds + " ronde, mode " + Mode);
+        Log("run baru, " + (IsEndless ? "Endless" : ClassicRounds + " ronde") + ", mode " + Mode);
 
         SetState(RunState.Preparing);
     }
@@ -274,6 +342,7 @@ public class RunManager : MonoBehaviour
             return;
 
         CancelPendingReturn();
+        SetExtractionOffered(false);
 
         battle.EndBattle();
         spawner.ClearWave();
@@ -297,7 +366,31 @@ public class RunManager : MonoBehaviour
         if (State != RunState.Preparing)
             return;
 
+        // Memilih gate berarti lanjut, tawaran ekstraksi ditutup.
+        SetExtractionOffered(false);
         BeginRound();
+    }
+
+    // Endless: MC menahan Interact di portal Ekstraksi Safezone. Run berakhir dan skor sementara diamankan.
+    private void HandleExtractionChosen()
+    {
+        if (State != RunState.Preparing || !ExtractionOffered)
+            return;
+
+        SetExtractionOffered(false);
+        RunEndTime = Time.time;
+        Log("EKSTRAKSI setelah wave " + (CurrentRound - 1) + " dalam " + RunDuration.ToString("0.0") + " s");
+
+        SetState(RunState.Extracted);
+        RunExtracted?.Invoke();
+    }
+
+    private void SetExtractionOffered(bool offered)
+    {
+        ExtractionOffered = offered;
+
+        if (gateRoom != null)
+            gateRoom.ShowExtraction(offered);
     }
 
     private void BeginRound()
@@ -328,10 +421,10 @@ public class RunManager : MonoBehaviour
 
         RoundCleared?.Invoke(CurrentRound);
 
-        if (CurrentRound >= TotalRounds)
+        if (IsFinalRound)
         {
             RunEndTime = Time.time;
-            Log("MENANG, " + TotalRounds + " ronde bersih dalam " + RunDuration.ToString("0.0") + " s");
+            Log("MENANG, " + ClassicRounds + " ronde bersih dalam " + RunDuration.ToString("0.0") + " s");
 
             SetState(RunState.Victory);
             RunWon?.Invoke();
@@ -387,6 +480,14 @@ public class RunManager : MonoBehaviour
         spawner.ClearWave();
         PrepareRound();
         gateRoom.ReturnToSafezone();
+
+        // Endless: setelah wave kelipatan Extraction Every bersih, portal Ekstraksi ditawarkan di samping gate.
+        int cleared = CurrentRound - 1;
+        bool offer = IsEndless && cleared > 0 && cleared % extractionEvery == 0;
+        SetExtractionOffered(offer);
+
+        if (offer)
+            Log("wave " + cleared + " bersih, portal Ekstraksi terbuka");
 
         SetState(RunState.Preparing);
     }
@@ -510,6 +611,14 @@ public class RunManager : MonoBehaviour
         if (profile != null && !Mathf.Approximately(multiplier, 1f))
             profile = profile.Scaled(multiplier);
 
+        // Endless: jumlah dibatasi, kelebihannya menjadi pengali HP dan damage. Profil Endless selalu salinan baru,
+        // jadi aman diubah langsung.
+        float statMultiplier = 1f;
+        int excess = 0;
+
+        if (IsEndless && profile != null)
+            statMultiplier = endlessWaves.ApplyCap(profile, out excess);
+
         SeededRandom random = PcgDirector.Stream(CurrentRound, PcgStream.EnemyComposition);
         // Arena sudah dipilih lebih dulu, jadi tema arena bisa ikut menentukan komposisi.
         PcgSpawnArea area = spawner.CurrentArea;
@@ -521,11 +630,16 @@ public class RunManager : MonoBehaviour
         CurrentBudgetSpent = spent;
 
         currentWave = WaveData.CreateRuntime(label, entries);
+        currentWave.StatMultiplier = statMultiplier;
+        currentWave.IsBossWave = IsBossWave;
+        currentWave.BossStatMultiplier = IsBossWave ? endlessWaves.bossStatMultiplier : 1f;
 
         string budgetText = CurrentBudget > 0 ? ", budget " + spent + "/" + CurrentBudget : ", biaya " + spent;
         string ddaText = dda != null ? ", DDA " + dda.Mode + " x" + ddaMultiplier.ToString("0.00") : "";
+        string capText = excess > 0 ? ", batas " + endlessWaves.maxEnemiesPerWave + " (+" + excess + " jadi stat x" + statMultiplier.ToString("0.00") + ")" : "";
+        string bossText = IsBossWave ? ", BOSS WAVE" : "";
 
-        Log("komposisi " + label + " (PCG" + (bias != null && bias.Count > 0 ? ", bias " + area.name : "") + budgetText + ddaText + "): " + currentWave.Describe());
+        Log("komposisi " + label + " (PCG" + (bias != null && bias.Count > 0 ? ", bias " + area.name : "") + budgetText + ddaText + capText + bossText + "): " + currentWave.Describe());
     }
 
     // Objective ronde ini dari aliran PCG Objective, jadi seed run sama = urutan objective sama.
@@ -539,6 +653,10 @@ public class RunManager : MonoBehaviour
         if (CurrentRound <= 1)
         {
             ObjectiveReason = "ronde 1 selalu Exterminate";
+        }
+        else if (IsBossWave)
+        {
+            ObjectiveReason = "boss wave selalu Exterminate";
         }
         else
         {

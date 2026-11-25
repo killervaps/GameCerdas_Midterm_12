@@ -169,7 +169,7 @@ public class PcgDebugPanel : MonoBehaviour
             builder.Append("<color=#ff8866>PcgDirector belum ada</color>");
 
         if (runManager != null && runManager.CurrentRound > 0)
-            builder.Append("  <color=#aaaaaa>ronde ").Append(runManager.CurrentRound).Append('/').Append(runManager.TotalRounds).Append("</color>");
+            builder.Append("  <color=#aaaaaa>").Append(runManager.RoundLabel(runManager.CurrentRound).ToLowerInvariant()).Append("</color>");
 
         AppendArena();
         AppendDungeon();

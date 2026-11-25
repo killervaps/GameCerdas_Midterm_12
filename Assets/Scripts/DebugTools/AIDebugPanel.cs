@@ -60,7 +60,7 @@ public class AIDebugPanel : MonoBehaviour
         if (runManager == null)
             return;
 
-        builder.Append("Ronde ").Append(Mathf.Max(1, runManager.CurrentRound)).Append('/').Append(runManager.TotalRounds)
+        builder.Append(runManager.RoundLabel(Mathf.Max(1, runManager.CurrentRound)))
             .Append("  ").Append(runManager.State).Append('\n');
     }
 

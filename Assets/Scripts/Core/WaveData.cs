@@ -39,6 +39,14 @@ public class WaveData : ScriptableObject
     // Objective ronde wave ini, diisi RunManager saat ronde disiapkan. Dipakai preview Safezone.
     public ObjectiveType Objective { get; set; } = ObjectiveType.Exterminate;
 
+    // Endless: pengali HP dan damage semua musuh wave ini (kelebihan dari batas jumlah musuh). 1 = normal.
+    public float StatMultiplier { get; set; } = 1f;
+
+    // Endless: boss wave. Musuh di titik Boss Room mendapat Boss Stat Multiplier tambahan.
+    public bool IsBossWave { get; set; }
+
+    public float BossStatMultiplier { get; set; } = 1f;
+
     public IReadOnlyList<WaveEntry> Entries => entries ?? System.Array.Empty<WaveEntry>();
 
     public int TotalCount

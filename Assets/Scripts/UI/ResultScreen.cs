@@ -3,15 +3,24 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// Layar akhir run (menang/kalah) dengan ringkasan waktu, ronde, gate, dan stat akhir.
-// Menggantikan layar hasil OnGUI di RunStatusPanel.
+// Layar akhir run (menang, kalah, atau ekstraksi) dengan ringkasan waktu, ronde atau wave, gate, skor Aura,
+// rekor lokal, dan stat akhir. Menggantikan layar hasil OnGUI di RunStatusPanel.
 public class ResultScreen : UIScreen
 {
     private TextMeshProUGUI title;
     private TextMeshProUGUI subtitle;
     private TextMeshProUGUI timeValue;
     private TextMeshProUGUI roundValue;
+    private TextMeshProUGUI roundCaption;
     private TextMeshProUGUI gateValue;
+    private TextMeshProUGUI scoreValue;
+    private TextMeshProUGUI lostValue;
+    private TextMeshProUGUI recordValue;
+    private TextMeshProUGUI recordCaption;
+    private Image recordBadge;
+    private TextMeshProUGUI recordBadgeLabel;
+    private GameObject scoresRow;
+    private GameObject recordBadgeRow;
     private TextMeshProUGUI statsText;
     private TextMeshProUGUI gatesText;
     private Image glow;
@@ -46,9 +55,29 @@ public class ResultScreen : UIScreen
         statsLayout.childForceExpandWidth = true;
         UIKit.Layout(stats, 96f);
 
-        timeValue = SummaryTile(stats, "Waktu");
-        roundValue = SummaryTile(stats, "Ronde");
-        gateValue = SummaryTile(stats, "Gate");
+        timeValue = SummaryTile(stats, "Waktu", out _);
+        roundValue = SummaryTile(stats, "Ronde", out roundCaption);
+        gateValue = SummaryTile(stats, "Gate", out _);
+
+        // Skor Aura: aman, hilang (MC mati), dan rekor mode ini.
+        RectTransform scores = UIKit.CreateRect("Scores", panel.transform);
+        HorizontalLayoutGroup scoresLayout = UIKit.AddHorizontal(scores.gameObject, 14f);
+        scoresLayout.childForceExpandWidth = true;
+        UIKit.Layout(scores, 96f);
+
+        scoreValue = SummaryTile(scores, "Skor aman", out _);
+        lostValue = SummaryTile(scores, "Skor hilang", out _);
+        recordValue = SummaryTile(scores, "Rekor", out recordCaption);
+
+        scoresRow = scores.gameObject;
+
+        // Stiker "Rekor baru!" di tengah, hanya tampil jika rekor terpecahkan.
+        RectTransform badgeRow = UIKit.CreateRect("RecordBadgeRow", panel.transform);
+        HorizontalLayoutGroup badgeLayout = UIKit.AddHorizontal(badgeRow.gameObject, 0f, null, TextAnchor.MiddleCenter);
+        badgeLayout.childForceExpandWidth = false;
+        recordBadge = UIKit.CreateStamp("RecordBadge", badgeRow, 24f, -3f, out recordBadgeLabel);
+        UIKit.SetStamp(recordBadge, recordBadgeLabel, "Rekor baru!", UIKit.Accent);
+        recordBadgeRow = badgeRow.gameObject;
 
         // Detail build.
         RectTransform detail = UIKit.CreateRect("Detail", panel.transform);
@@ -87,7 +116,7 @@ public class ResultScreen : UIScreen
         UIKit.CreateText("Heading", parent, text, 20f, UIKit.TextMuted, TextAlignmentOptions.Left, true);
     }
 
-    private static TextMeshProUGUI SummaryTile(Transform parent, string caption)
+    private static TextMeshProUGUI SummaryTile(Transform parent, string caption, out TextMeshProUGUI label)
     {
         Image tile = UIKit.SetCorners(UIKit.CreateImage("Tile_" + caption, parent, UIKit.Well), UIKit.InkMedium);
         UIKit.Layout(tile, 96f, -1f, 1f);
@@ -95,31 +124,62 @@ public class ResultScreen : UIScreen
         TextMeshProUGUI value = UIKit.UseDisplayFont(UIKit.CreateText("Value", tile.transform, "-", 38f, UIKit.Text, TextAlignmentOptions.Center, true));
         UIKit.Stretch(value.rectTransform, 8f, 8f, 10f, 34f);
 
-        TextMeshProUGUI label = UIKit.CreateText("Caption", tile.transform, caption, 18f, UIKit.TextMuted, TextAlignmentOptions.Center, true);
+        label = UIKit.CreateText("Caption", tile.transform, caption, 18f, UIKit.TextMuted, TextAlignmentOptions.Center, true);
         UIKit.Stretch(label.rectTransform, 8f, 8f, 60f, 10f);
 
         return value;
     }
 
-    public void ShowResult(bool victory)
+    public void ShowResult(RunState ending)
     {
         RunManager run = ui.Run;
         PlayerStats stats = ui.Stats;
+        AuraScore aura = AuraScore.Current;
 
-        Color tone = victory ? UIKit.Accent : UIKit.TradeOff;
-        title.text = victory ? "MENANG!" : "KALAH";
+        bool victory = ending == RunState.Victory;
+        bool extracted = ending == RunState.Extracted;
+        Color tone = victory || extracted ? UIKit.Accent : UIKit.TradeOff;
+        title.text = victory ? "MENANG!" : extracted ? "EKSTRAKSI!" : "KALAH";
         title.color = tone;
         glow.color = new Color(tone.r, tone.g, tone.b, 0.18f);
 
         if (run != null)
         {
-            subtitle.text = victory
-                ? "Semua " + run.TotalRounds + " ronde berhasil dibersihkan."
-                : "MC tumbang di ronde " + run.CurrentRound + " dari " + run.TotalRounds + ".";
+            int cleared = aura != null ? aura.WavesCleared : victory ? run.TotalRounds : Mathf.Max(0, run.CurrentRound - 1);
+
+            if (run.IsEndless)
+            {
+                subtitle.text = extracted
+                    ? "Keluar dengan selamat setelah wave " + cleared + "."
+                    : "MC tumbang di wave " + run.CurrentRound + ".";
+                roundCaption.text = "Wave dibersihkan";
+                roundValue.text = cleared.ToString();
+            }
+            else
+            {
+                subtitle.text = victory
+                    ? "Semua " + run.TotalRounds + " ronde berhasil dibersihkan."
+                    : "MC tumbang di ronde " + run.CurrentRound + " dari " + run.TotalRounds + ".";
+                roundCaption.text = "Ronde";
+                roundValue.text = cleared + " / " + run.TotalRounds;
+            }
 
             timeValue.text = UIKit.FormatTime(run.RunDuration);
-            int cleared = victory ? run.TotalRounds : Mathf.Max(0, run.CurrentRound - 1);
-            roundValue.text = cleared + " / " + run.TotalRounds;
+        }
+
+        bool hasScore = aura != null;
+        scoresRow.SetActive(hasScore);
+        recordBadgeRow.SetActive(hasScore && (aura.IsNewRecord || aura.IsNewWaveRecord));
+
+        if (hasScore)
+        {
+            scoreValue.text = aura.Final.ToString("N0");
+            lostValue.text = aura.Lost > 0 ? "-" + aura.Lost.ToString("N0") : "0";
+            lostValue.color = aura.Lost > 0 ? UIKit.TradeOff : UIKit.Text;
+            recordValue.text = aura.BestScore.ToString("N0");
+            recordCaption.text = "Rekor " + aura.RecordLabel() + ", wave " + aura.BestWave;
+            recordBadgeLabel.text = aura.IsNewRecord && aura.IsNewWaveRecord ? "Rekor baru! Skor dan wave"
+                : aura.IsNewRecord ? "Rekor baru!" : "Rekor wave baru!";
         }
 
         gateValue.text = stats != null ? stats.SelectedGates.Count.ToString() : "-";

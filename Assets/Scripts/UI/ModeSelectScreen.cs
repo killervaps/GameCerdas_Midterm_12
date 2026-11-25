@@ -5,6 +5,7 @@ using UnityEngine.UI;
 // Modal pilihan mode, dibuka tombol MULAI di menu utama.
 //   Mode Arena    4 arena buatan tangan, dipilih acak ber-seed tiap ronde.
 //   Mode Dungeon  dungeon BSP baru tiap ronde dari seed run (Praktikum 10).
+//   Panjang run   Klasik 3 ronde atau Endless, berlaku untuk kedua mode.
 // Gaya stiker: dua kartu mode berdampingan, miring ke arah berlawanan. Tiap kartu berisi pita judul, deskripsi,
 // chip ciri singkat, dan tombol main. Mode Dungeon diredupkan dan tidak bisa dipilih jika scene belum punya
 // DungeonGenerator. Esc menutup (diurus GameUI).
@@ -21,6 +22,12 @@ public class ModeSelectScreen : UIScreen
     private TextMeshProUGUI dungeonText;
     private GameObject dungeonChips;
     private CanvasGroup dungeonGroup;
+
+    private Button classicButton;
+    private Button endlessButton;
+    private TextMeshProUGUI lengthNote;
+    private RunLength selectedLength = RunLength.Classic3;
+    private bool lengthInitialized;
 
     protected override void Build()
     {
@@ -53,13 +60,29 @@ public class ModeSelectScreen : UIScreen
         Button arenaButton = CreateCard(cards, "Mode Arena",
             "Empat arena buatan tangan. Arena dipilih acak tiap ronde, musuh dan item ditempatkan PCG.",
             new[] { "4 arena", "acak tiap ronde", "musuh dan item PCG" },
-            true, -1.2f, "MAIN ARENA", () => ui.StartGame(GameMode.Arena), cardInner,
+            true, -1.2f, "MAIN ARENA", () => ui.StartGame(GameMode.Arena, selectedLength), cardInner,
             out _, out _, out _);
 
         dungeonButton = CreateCard(cards, "Mode Dungeon", DungeonDescription,
             new[] { "BSP tiap ronde", "vault dan kunci", "portal Goal" },
-            false, 1.2f, "MAIN DUNGEON", () => ui.StartGame(GameMode.Dungeon), cardInner,
+            false, 1.2f, "MAIN DUNGEON", () => ui.StartGame(GameMode.Dungeon, selectedLength), cardInner,
             out dungeonText, out dungeonChips, out dungeonGroup);
+
+        // Panjang run: Klasik 3 ronde atau Endless (wave tanpa akhir, ekstraksi, skor Aura).
+        RectTransform lengthRow = UIKit.CreateRect("RunLength", panel.transform);
+        UIKit.AddHorizontal(lengthRow.gameObject, 12f, null, TextAnchor.MiddleLeft);
+        UIKit.Layout(lengthRow, 56f);
+
+        TextMeshProUGUI lengthLabel = UIKit.CreateText("Label", lengthRow, "Panjang run", 20f, UIKit.TextMuted, TextAlignmentOptions.Left, true);
+        UIKit.Layout(lengthLabel, -1f, 150f, 0f);
+
+        classicButton = UIKit.CreateButton("ClassicButton", lengthRow, "KLASIK 3 RONDE", () => SelectLength(RunLength.Classic3), 52f);
+        UIKit.Layout(classicButton, 52f, 230f, 0f);
+        endlessButton = UIKit.CreateButton("EndlessButton", lengthRow, "ENDLESS", () => SelectLength(RunLength.Endless), 52f);
+        UIKit.Layout(endlessButton, 52f, 170f, 0f);
+
+        lengthNote = UIKit.CreateText("Note", lengthRow, string.Empty, 17f, UIKit.TextMuted);
+        UIKit.Layout(lengthNote, -1f, -1f, 1f);
 
         RectTransform buttons = UIKit.CreateRect("Buttons", panel.transform);
         UIKit.AddHorizontal(buttons.gameObject, 14f, null, TextAnchor.MiddleRight);
@@ -149,8 +172,43 @@ public class ModeSelectScreen : UIScreen
         return row;
     }
 
+    private void SelectLength(RunLength length)
+    {
+        selectedLength = length;
+        StyleLengthButton(classicButton, length == RunLength.Classic3);
+        StyleLengthButton(endlessButton, length == RunLength.Endless);
+
+        lengthNote.text = length == RunLength.Endless
+            ? "Wave tanpa akhir. Ekstraksi tiap 3 wave untuk mengamankan skor."
+            : "3 ronde, menang jika ronde terakhir bersih.";
+    }
+
+    // Tombol yang dipilih memakai warna aksen emas, yang lain slate.
+    private static void StyleLengthButton(Button button, bool selected)
+    {
+        ColorBlock colors = button.colors;
+        Color baseColor = selected ? UIKit.Accent : UIKit.PanelLight;
+        colors.normalColor = baseColor;
+        colors.selectedColor = baseColor;
+        colors.highlightedColor = selected ? UIKit.AccentHighlight : new Color(0.34f, 0.40f, 0.53f, 1f);
+        button.colors = colors;
+
+        TextMeshProUGUI label = button.GetComponentInChildren<TextMeshProUGUI>();
+
+        if (label != null)
+            label.color = selected ? new Color(0.12f, 0.09f, 0.02f) : UIKit.Text;
+    }
+
     protected override void OnShow()
     {
+        if (!lengthInitialized)
+        {
+            lengthInitialized = true;
+            selectedLength = ui.Run != null ? ui.Run.Length : RunLength.Classic3;
+        }
+
+        SelectLength(selectedLength);
+
         bool available = ui.Run != null && ui.Run.DungeonAvailable;
 
         dungeonButton.interactable = available;

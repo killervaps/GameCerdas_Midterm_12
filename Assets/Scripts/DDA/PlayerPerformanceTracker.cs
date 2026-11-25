@@ -44,6 +44,8 @@ public class PlayerPerformanceTracker : MonoBehaviour
             runManager.RoundCleared += HandleRoundCleared;
             runManager.RunLost += HandleRunLost;
             runManager.RunWon += HandleRunWon;
+            // Ekstraksi Endless dianggap menang untuk DDA (death streak di-reset).
+            runManager.RunExtracted += HandleRunWon;
             runManager.StateChanged += HandleStateChanged;
         }
 
@@ -66,6 +68,7 @@ public class PlayerPerformanceTracker : MonoBehaviour
             runManager.RoundCleared -= HandleRoundCleared;
             runManager.RunLost -= HandleRunLost;
             runManager.RunWon -= HandleRunWon;
+            runManager.RunExtracted -= HandleRunWon;
             runManager.StateChanged -= HandleStateChanged;
         }
 

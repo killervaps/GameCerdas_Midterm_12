@@ -368,7 +368,7 @@ public class ChargerBrain : EnemyBrain
 
             // Hanya sekali per lunge.
             lungeHit = true;
-            player.TakeDamage(new DamageInfo(Data.Damage, gameObject, player.AimPoint, DamageKind.Lunge));
+            player.TakeDamage(new DamageInfo(AttackDamage, gameObject, player.AimPoint, DamageKind.Lunge));
             SfxManager.Play(SfxCue.ChargerLungeHit);
             return;
         }

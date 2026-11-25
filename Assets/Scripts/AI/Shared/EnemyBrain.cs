@@ -13,6 +13,9 @@ public abstract class EnemyBrain : MonoBehaviour, IEnemyBrain
 
     protected EnemyRoleData Data => Controller.RoleData;
 
+    // Damage satu serangan, sudah termasuk pengali stat wave (Endless).
+    protected float AttackDamage => Data.Damage * Controller.DamageMultiplier;
+
     // Build MC menurut GroupBlackboard. Netral (semua 1) jika tidak ada TacticalCoordinator.
     protected BuildIndicators Build =>
         TacticalCoordinator.Current != null ? TacticalCoordinator.Current.Group.Indicators : BuildIndicators.Neutral;

@@ -35,6 +35,19 @@ public class EnemyController : MonoBehaviour
 
     public EnemyRoleData RoleData => roleData;
 
+    // Pengali damage serangan musuh ini (Endless: kelebihan jumlah musuh, boss wave). 1 = sesuai Role Data.
+    public float DamageMultiplier { get; private set; } = 1f;
+
+    // Dipanggil EnemySpawner tepat setelah musuh dimunculkan. HP diisi penuh sesuai MaxHP baru.
+    public void ApplyStatMultipliers(float health, float damage)
+    {
+        if (roleData == null || Health == null)
+            return;
+
+        Health.SetMaxHealth(roleData.MaxHealth * Mathf.Max(0.1f, health));
+        DamageMultiplier = Mathf.Max(0f, damage);
+    }
+
     public EnemyRole Role => roleData != null ? roleData.Role : EnemyRole.Charger;
 
     public EnemyHealth Health { get; private set; }

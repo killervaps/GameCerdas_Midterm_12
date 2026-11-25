@@ -712,7 +712,7 @@ public class ShooterBrain : EnemyBrain
             origin,
             player.AimPoint - origin,
             player,
-            Data.Damage,
+            AttackDamage,
             gameObject,
             DamageKind.Projectile,
             standingOn != null ? standingOn.transform : null

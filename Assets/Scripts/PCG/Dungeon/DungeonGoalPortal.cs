@@ -13,7 +13,7 @@ using UnityEngine.InputSystem;
 public class DungeonGoalPortal : MonoBehaviour
 {
     private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
-    private static readonly Color OpenColor = new Color(1f, 0.68f, 0.2f);
+    private static readonly Color DefaultOpenColor = new Color(1f, 0.68f, 0.2f);
 
     // Radius tempat MC bisa menahan Interact.
     [SerializeField, Min(0.3f)] private float enterRadius = 1.4f;
@@ -37,6 +37,9 @@ public class DungeonGoalPortal : MonoBehaviour
     [SerializeField] private float lightHeight = 1.2f;
 
     private readonly List<Material> instances = new List<Material>();
+
+    // Warna pendar saat terbuka. Emas untuk portal Goal, warna lain untuk portal sejenis (mis. Ekstraksi).
+    private Color openColor = DefaultOpenColor;
 
     private Light glow;
     private Color current = Color.black;
@@ -147,6 +150,16 @@ public class DungeonGoalPortal : MonoBehaviour
         SfxManager.Play(SfxCue.GateChoose);
     }
 
+    public void Close()
+    {
+        SetOpen(false);
+    }
+
+    public void SetColor(Color color)
+    {
+        openColor = color;
+    }
+
     private void SetOpen(bool open)
     {
         IsOpen = open;
@@ -200,7 +213,7 @@ public class DungeonGoalPortal : MonoBehaviour
         if (IsOpen)
         {
             float pulse = 1f + Mathf.Sin(Time.time * pulseSpeed) * pulseAmount;
-            target = OpenColor * emissionIntensity * pulse * (IsHighlighted ? highlightBoost : 1f);
+            target = openColor * emissionIntensity * pulse * (IsHighlighted ? highlightBoost : 1f);
         }
 
         current = Color.Lerp(current, target, 1f - Mathf.Exp(-fadeSpeed * Time.deltaTime));
@@ -239,9 +252,9 @@ public class DungeonGoalPortal : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = IsOpen ? OpenColor : Color.gray;
+        Gizmos.color = IsOpen ? openColor : Color.gray;
         Gizmos.DrawWireSphere(transform.position, enterRadius);
-        Gizmos.color = new Color(OpenColor.r, OpenColor.g, OpenColor.b, 0.35f);
+        Gizmos.color = new Color(openColor.r, openColor.g, openColor.b, 0.35f);
         Gizmos.DrawWireSphere(transform.position, highlightRadius);
     }
 }

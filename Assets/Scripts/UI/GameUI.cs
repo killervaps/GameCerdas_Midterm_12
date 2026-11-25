@@ -369,6 +369,14 @@ public class GameUI : MonoBehaviour
         StartGame();
     }
 
+    public void StartGame(GameMode mode, RunLength length)
+    {
+        if (runManager != null)
+            runManager.SetRunLength(length);
+
+        StartGame(mode);
+    }
+
     // Retry dan Main lagi memakai mode yang sedang dipakai.
     public void StartGame()
     {
@@ -517,16 +525,20 @@ public class GameUI : MonoBehaviour
         if (state != RunState.Preparing)
             gateModal.Hide();
 
-        if (state == RunState.Victory || state == RunState.Defeat)
+        if (state == RunState.Victory || state == RunState.Defeat || state == RunState.Extracted)
         {
             CancelPendingResult();
-            pendingResult = StartCoroutine(ShowResultAfterDelay(state == RunState.Victory));
+            pendingResult = StartCoroutine(ShowResultAfterDelay(state));
         }
 
         if (state == RunState.Preparing)
         {
             enemyPreview.Refresh();
             ShowHint("safezone", () => "Dekati salah satu gate untuk membaca efeknya. <b>Tahan " + ControlHints.Glyph(PadAction.Interact) + "</b> untuk memilih.");
+
+            if (runManager != null && runManager.ExtractionOffered)
+                ShowHint("extraction", () => "Portal <b>Ekstraksi</b> terbuka. Masuk dan <b>tahan " + ControlHints.Glyph(PadAction.Interact) +
+                                             "</b> untuk mengakhiri run dan mengamankan skor, atau pilih gate untuk lanjut.");
         }
         else if (state == RunState.Battle)
         {
@@ -552,7 +564,7 @@ public class GameUI : MonoBehaviour
         if (runManager == null)
             return;
 
-        bool final = round >= runManager.TotalRounds;
+        bool final = runManager.IsFinalRound;
 
         // Getaran perayaan: 3 detik sangat kuat saat menang di ronde terakhir, 2 detik di ronde sebelumnya.
         GamepadRumble.RoundCleared(final);
@@ -561,7 +573,7 @@ public class GameUI : MonoBehaviour
             ? "HP tersisa " + Mathf.CeilToInt(playerHealth.CurrentHealth) + " / " + Mathf.CeilToInt(playerHealth.MaxHealth)
             : string.Empty;
 
-        string kicker = final ? "SEMUA RONDE SELESAI" : "RONDE " + round + " / " + runManager.TotalRounds;
+        string kicker = final ? "SEMUA RONDE SELESAI" : runManager.RoundLabel(round).ToUpperInvariant().Replace("/", " / ");
         string title = final ? "KEMENANGAN!" : "RONDE BERSIH!";
         string subtitle = "Musuh dikalahkan dalam <b>" + UIKit.FormatTime(battleTime) + "</b>" +
                           (hp.Length > 0 ? "   |   " + hp : string.Empty) +
@@ -643,7 +655,7 @@ public class GameUI : MonoBehaviour
         hud.RefreshBuild();
     }
 
-    private IEnumerator ShowResultAfterDelay(bool victory)
+    private IEnumerator ShowResultAfterDelay(RunState ending)
     {
         yield return new WaitForSecondsRealtime(resultDelay);
 
@@ -654,7 +666,7 @@ public class GameUI : MonoBehaviour
         pendingResult = null;
         gateModal.Hide();
         hints.Hide();
-        result.ShowResult(victory);
+        result.ShowResult(ending);
         RefreshPanels();
     }
 
@@ -682,7 +694,7 @@ public class GameUI : MonoBehaviour
     {
         RunState state = State;
         bool inGame = !IsMainMenuOpen && state != RunState.Idle;
-        bool ended = state == RunState.Victory || state == RunState.Defeat;
+        bool ended = state == RunState.Victory || state == RunState.Defeat || state == RunState.Extracted;
 
         bool announcing = IsAnnouncing;
 
@@ -694,8 +706,10 @@ public class GameUI : MonoBehaviour
         damageFeedback.SetVisible(combat);
         enemyPreview.SetVisible(inGame && state == RunState.Preparing);
         goalIndicator.ShowMarker = showGoalIndicator;
-        goalIndicator.SetVisible(inGame && !announcing && state == RunState.RoundCleared &&
-                                 runManager != null && runManager.Mode == GameMode.Dungeon);
+        // Portal Goal dungeon setelah ronde bersih, atau kartu "Tahan E" portal Ekstraksi di Safezone (Endless).
+        bool goalPortal = state == RunState.RoundCleared && runManager != null && runManager.Mode == GameMode.Dungeon;
+        bool extraction = state == RunState.Preparing && runManager != null && runManager.ExtractionOffered;
+        goalIndicator.SetVisible(inGame && !announcing && (goalPortal || extraction));
         // Waypoint grup musuh hanya untuk Exterminate. Objective lain punya penanda sendiri.
         // Dibaca dari RunManager, karena state Battle diumumkan sebelum ObjectiveRunner membuat objective-nya.
         bool exterminate = runManager == null || runManager.CurrentObjective == ObjectiveType.Exterminate;
