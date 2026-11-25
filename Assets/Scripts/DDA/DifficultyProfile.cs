@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 // Semua angka tuning DDA. Dibuat lewat Create > MathGate > DDA Profile.
 [CreateAssetMenu(fileName = "DifficultyProfile", menuName = "MathGate/DDA Profile")]
@@ -14,8 +15,13 @@ public class DifficultyProfile : ScriptableObject
     [Range(0.01f, 1f)] public float nearDeathThreshold = 0.15f;
     // Damage sebesar rasio MaxHP ini membuat skor damage 0.
     [Min(0.01f)] public float damageRatioForZero = 0.6f;
-    // Waktu wajar per musuh. Ronde yang selesai lebih cepat dari ini mendapat skor waktu 1.
-    [Min(0.1f)] public float targetSecondsPerEnemy = 8f;
+    // Exterminate: waktu wajar per musuh, per mode. Ronde yang selesai lebih cepat dari ini mendapat skor waktu 1.
+    // Dungeon lebih lama karena musuh harus dicari dulu.
+    [Min(0.1f)] public float targetSecondsPerEnemyArena = 8f;
+    [FormerlySerializedAs("targetSecondsPerEnemy")]
+    [Min(0.1f)] public float targetSecondsPerEnemyDungeon = 20f;
+    // Hold Zone: skor waktu = clamp01(waktu capture x slack / durasi ronde).
+    [Min(0.1f)] public float holdZoneTimeSlack = 1.3f;
 
     [Header("Penghalusan (EMA)")]
     // Bobot skor ronde terbaru. 1 = hanya ronde terakhir yang dihitung.

@@ -177,6 +177,17 @@ public class PcgDebugPanel : MonoBehaviour
         WaveData wave = runManager != null ? runManager.CurrentWave : null;
         Line("Komposisi: ").Append(wave != null ? wave.Describe() : "-");
 
+        if (runManager != null)
+        {
+            Line("Objective: <color=#ffc040>").Append(runManager.CurrentObjective).Append("</color> <color=#aaaaaa>(")
+                .Append(runManager.ObjectiveReason).Append(")</color>");
+
+            ObjectiveRunner runner = ObjectiveRunner.Current;
+
+            if (runner != null && runner.Active != null)
+                builder.Append("  ").Append(runner.Active.HudText);
+        }
+
         AppendEnemies();
         AppendItems();
 

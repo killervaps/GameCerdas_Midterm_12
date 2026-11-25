@@ -696,7 +696,10 @@ public class GameUI : MonoBehaviour
         goalIndicator.ShowMarker = showGoalIndicator;
         goalIndicator.SetVisible(inGame && !announcing && state == RunState.RoundCleared &&
                                  runManager != null && runManager.Mode == GameMode.Dungeon);
-        enemyWaypoint.SetVisible(showEnemyWaypoint && inGame && !announcing && state == RunState.Battle);
+        // Waypoint grup musuh hanya untuk Exterminate. Objective lain punya penanda sendiri.
+        // Dibaca dari RunManager, karena state Battle diumumkan sebelum ObjectiveRunner membuat objective-nya.
+        bool exterminate = runManager == null || runManager.CurrentObjective == ObjectiveType.Exterminate;
+        enemyWaypoint.SetVisible(showEnemyWaypoint && inGame && !announcing && state == RunState.Battle && exterminate);
 
         if (!inGame || ended)
             gateModal.Hide();

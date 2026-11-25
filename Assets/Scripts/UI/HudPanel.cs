@@ -714,7 +714,7 @@ public class HudPanel : UIScreen
 
         if (inBattle && battle != null)
         {
-            enemyCountText.text = battle.AliveCount + "<size=65%><color=" + UIKit.MutedHex + "> / " + battle.TotalCount + "</color></size>";
+            RefreshObjective(battle);
             RefreshEnemyTokens();
         }
 
@@ -731,6 +731,27 @@ public class HudPanel : UIScreen
 
         if (infoCard.activeSelf != hasInfo)
             infoCard.SetActive(hasInfo);
+    }
+
+    // Kartu objective. Exterminate memakai angka besar sisa/total musuh. Objective lain memakai HudText objective
+    // sebagai keterangan dan progres dalam persen sebagai angka besar.
+    private void RefreshObjective(BattleManager battle)
+    {
+        ObjectiveRunner runner = ObjectiveRunner.Current;
+        IWaveObjective objective = runner != null ? runner.Active : null;
+        ObjectiveType type = objective != null ? objective.Type : ObjectiveType.Exterminate;
+
+        UIKit.SetStamp(objectiveStamp, objectiveStampLabel, ObjectiveInfo.Label(type), UIKit.Cream);
+
+        if (type == ObjectiveType.Exterminate)
+        {
+            objectiveCaption.text = "Brainrot tersisa";
+            enemyCountText.text = battle.AliveCount + "<size=65%><color=" + UIKit.MutedHex + "> / " + battle.TotalCount + "</color></size>";
+            return;
+        }
+
+        objectiveCaption.text = objective.HudText;
+        enemyCountText.text = Mathf.RoundToInt(objective.Progress01 * 100f) + "<size=65%><color=" + UIKit.MutedHex + ">%</color></size>";
     }
 
     // Token ronde: sudah lewat = slate, sekarang = krem besar dan miring, belum = sumur redup.

@@ -107,6 +107,8 @@ public class PlayerPerformanceTracker : MonoBehaviour
         current = new WavePerformance
         {
             round = round,
+            objective = runManager != null ? runManager.CurrentObjective : ObjectiveType.Exterminate,
+            mode = runManager != null ? runManager.Mode : GameMode.Arena,
             maxHealth = playerHealth != null ? playerHealth.MaxHealth : 0f,
             hpStartRatio = HealthRatio()
         };

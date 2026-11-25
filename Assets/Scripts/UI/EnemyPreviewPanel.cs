@@ -10,6 +10,9 @@ public class EnemyPreviewPanel : UIScreen
 {
     private TextMeshProUGUI title;
     private TextMeshProUGUI waveName;
+    private Image objectiveStamp;
+    private TextMeshProUGUI objectiveStampLabel;
+    private TextMeshProUGUI objectiveGoal;
     private RectTransform list;
     private ThreatMeter meter;
     private RectTransform card;
@@ -36,6 +39,13 @@ public class EnemyPreviewPanel : UIScreen
         }
 
         title = UIKit.CreateText("Title", host, "Musuh berikutnya", 20f, UIKit.TextMuted, TextAlignmentOptions.Left, true);
+
+        // Objective ronde berikutnya: stiker jenis + tujuan singkat.
+        RectTransform objectiveRow = UIKit.CreateRect("ObjectiveRow", host);
+        HorizontalLayoutGroup objectiveLayout = UIKit.AddHorizontal(objectiveRow.gameObject, 10f, null, TextAnchor.MiddleLeft);
+        objectiveLayout.childForceExpandWidth = false;
+        objectiveStamp = UIKit.CreateStamp("ObjectiveStamp", objectiveRow, 18f, -3f, out objectiveStampLabel);
+        objectiveGoal = UIKit.CreateText("ObjectiveGoal", objectiveRow, string.Empty, 18f, UIKit.Text);
 
         // Hanya tampil jika wave belum ada (pesan kosong). Nama wave tidak ditampilkan karena sama dengan ronde.
         waveName = UIKit.CreateText("WaveName", host, string.Empty, 19f, UIKit.TextMuted);
@@ -87,6 +97,10 @@ public class EnemyPreviewPanel : UIScreen
         title.text = run != null && run.CurrentRound > 0
             ? "Musuh berikutnya" + (run.CurrentRound >= run.TotalRounds && run.TotalRounds > 0 ? "  <color=" + UIKit.TradeOffHex + ">FINAL</color>" : string.Empty)
             : "Musuh berikutnya";
+
+        ObjectiveType objective = wave != null ? wave.Objective : run != null ? run.CurrentObjective : ObjectiveType.Exterminate;
+        UIKit.SetStamp(objectiveStamp, objectiveStampLabel, ObjectiveInfo.Label(objective), UIKit.Cream);
+        objectiveGoal.text = ObjectiveInfo.Goal(objective);
 
         waveName.text = "Belum ada data wave untuk ronde ini.";
         waveName.gameObject.SetActive(wave == null);

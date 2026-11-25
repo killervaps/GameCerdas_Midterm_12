@@ -224,6 +224,10 @@ public class DifficultyModel : MonoBehaviour
 
     // ---------- Rumus ----------
 
+    // Skor waktu bergantung objective:
+    //   Exterminate  waktu wajar per musuh (per mode) x jumlah musuh dibanding durasi.
+    //   Survival     durasi ditentukan timer, jadi komponen waktu tidak dipakai dan bobot HP + damage dinormalisasi ulang.
+    //   Hold Zone    waktu capture x slack dibanding durasi.
     private void Score(ref WavePerformance perf)
     {
         perf.hpScore = Mathf.Clamp01(perf.hpEndRatio);
@@ -231,16 +235,44 @@ public class DifficultyModel : MonoBehaviour
         float damageForZero = perf.maxHealth * profile.damageRatioForZero;
         perf.damageScore = damageForZero > 0f ? 1f - Mathf.Clamp01(perf.damageTaken / damageForZero) : 1f;
 
-        perf.timeScore = perf.enemyCount > 0 && perf.duration > 0.01f
-            ? Mathf.Clamp01(profile.targetSecondsPerEnemy * perf.enemyCount / perf.duration)
-            : 1f;
+        float penalty = profile.nearDeathPenalty * perf.nearDeathCount;
+
+        if (perf.objective == ObjectiveType.Survival)
+        {
+            perf.timeScore = 1f;
+            float weightSum = profile.weightHp + profile.weightDamage;
+            float survival = weightSum > 0f
+                ? (profile.weightHp * perf.hpScore + profile.weightDamage * perf.damageScore) / weightSum
+                : perf.hpScore;
+
+            perf.score = Mathf.Clamp01(survival - penalty);
+            return;
+        }
+
+        if (perf.objective == ObjectiveType.HoldZone)
+        {
+            perf.timeScore = perf.captureSeconds > 0f && perf.duration > 0.01f
+                ? Mathf.Clamp01(perf.captureSeconds * profile.holdZoneTimeSlack / perf.duration)
+                : 1f;
+        }
+        else
+        {
+            perf.timeScore = perf.enemyCount > 0 && perf.duration > 0.01f
+                ? Mathf.Clamp01(TargetSecondsPerEnemy(perf.mode) * perf.enemyCount / perf.duration)
+                : 1f;
+        }
 
         perf.score = Mathf.Clamp01(
             profile.weightHp * perf.hpScore +
             profile.weightDamage * perf.damageScore +
             profile.weightTime * perf.timeScore -
-            profile.nearDeathPenalty * perf.nearDeathCount
+            penalty
         );
+    }
+
+    public float TargetSecondsPerEnemy(GameMode gameMode)
+    {
+        return gameMode == GameMode.Dungeon ? profile.targetSecondsPerEnemyDungeon : profile.targetSecondsPerEnemyArena;
     }
 
     private void UpdateSmoothed(float score)
@@ -314,9 +346,10 @@ public class DifficultyModel : MonoBehaviour
 
     public static string DescribeScore(WavePerformance perf)
     {
-        return "HP " + perf.hpScore.ToString("0.00") +
+        return perf.objective + " " + perf.mode +
+               ", HP " + perf.hpScore.ToString("0.00") +
                ", damage " + perf.damageScore.ToString("0.00") +
-               ", waktu " + perf.timeScore.ToString("0.00") +
+               ", waktu " + (perf.objective == ObjectiveType.Survival ? "-" : perf.timeScore.ToString("0.00")) +
                ", hampir mati " + perf.nearDeathCount;
     }
 

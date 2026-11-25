@@ -36,6 +36,9 @@ public class WaveData : ScriptableObject
 
     public string DisplayName => string.IsNullOrEmpty(waveName) ? name : waveName;
 
+    // Objective ronde wave ini, diisi RunManager saat ronde disiapkan. Dipakai preview Safezone.
+    public ObjectiveType Objective { get; set; } = ObjectiveType.Exterminate;
+
     public IReadOnlyList<WaveEntry> Entries => entries ?? System.Array.Empty<WaveEntry>();
 
     public int TotalCount

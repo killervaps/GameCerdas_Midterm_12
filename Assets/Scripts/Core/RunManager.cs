@@ -60,6 +60,14 @@ public class RunManager : MonoBehaviour
     // Challenge 4: biaya tiap role untuk Difficulty Budget. Hanya dipakai profil ronde yang Difficulty Budget-nya > 0.
     [SerializeField] private RoleCost[] roleCosts = RoleCost.Defaults();
 
+    [Header("Objective (PCG)")]
+    // Bobot undian objective tiap ronde. Ronde 1 selalu Exterminate, objective yang sama tidak dipilih dua ronde
+    // berturut-turut, dan Survival serta Hold Zone hanya dipilih di Mode Dungeon. Objective yang belum punya
+    // implementasi dilewati. Jika tidak ada calon tersisa, ronde memakai Exterminate.
+    [SerializeField, Min(0f)] private float exterminateWeight = 2f;
+    [SerializeField, Min(0f)] private float survivalWeight = 1f;
+    [SerializeField, Min(0f)] private float holdZoneWeight = 1f;
+
     [Header("Between Rounds")]
     // TODO(desain): aturan heal antar ronde belum diputuskan. Sementara pulih 30% MaxHP.
     [SerializeField] private HealRule healRule = HealRule.Partial;
@@ -77,8 +85,18 @@ public class RunManager : MonoBehaviour
     private WaveData currentWave;
     private Arena dungeonArena;
     private DungeonGoalPortal openPortal;
+    // Objective tiap ronde di run ini, indeks 0 = ronde 1.
+    private readonly List<ObjectiveType> objectiveHistory = new List<ObjectiveType>();
+    private readonly List<ObjectiveType> objectiveCandidates = new List<ObjectiveType>();
+    private readonly List<float> objectiveCandidateWeights = new List<float>();
 
     public RunState State { get; private set; } = RunState.Idle;
+
+    // Objective ronde saat ini hasil PCG. Saat Preparing, ini objective ronde yang akan dihadapi.
+    public ObjectiveType CurrentObjective { get; private set; } = ObjectiveType.Exterminate;
+
+    // Alasan pemilihan objective ronde ini, untuk panel debug PCG.
+    public string ObjectiveReason { get; private set; } = string.Empty;
 
     // Dimulai dari 1.
     public int CurrentRound { get; private set; }
@@ -157,6 +175,11 @@ public class RunManager : MonoBehaviour
 
         if (dungeon == null)
             dungeon = FindAnyObjectByType<DungeonGenerator>(FindObjectsInactive.Include);
+
+        // Tanpa ObjectiveRunner, ronde tetap ditutup langsung dari BattleManager seperti sebelumnya. Runner dipasang
+        // otomatis supaya scene lama tidak perlu disetup ulang.
+        if (FindAnyObjectByType<ObjectiveRunner>(FindObjectsInactive.Include) == null)
+            gameObject.AddComponent<ObjectiveRunner>();
     }
 
     // Dipanggil menu utama sebelum StartRun. Mode Dungeon tanpa DungeonGenerator jatuh kembali ke Mode Arena.
@@ -222,6 +245,7 @@ public class RunManager : MonoBehaviour
         CurrentRound = 1;
         RunStartTime = Time.time;
         RunEndTime = 0f;
+        objectiveHistory.Clear();
 
         if (arenaSelector != null)
             arenaSelector.ResetHistory();
@@ -287,7 +311,17 @@ public class RunManager : MonoBehaviour
         battle.BeginBattle(spawner.SpawnWave(CurrentWave, CurrentRound));
     }
 
+    // Jika ada ObjectiveRunner, ronde ditutup oleh runner saat objective selesai (Exterminate: semua musuh mati).
     private void HandleAllEnemiesDead()
+    {
+        if (ObjectiveRunner.Current != null)
+            return;
+
+        CompleteRound();
+    }
+
+    // Satu-satunya jalur penutupan ronde: ronde bersih, lalu menang, portal Goal terbuka, atau kembali ke Safezone.
+    public void CompleteRound()
     {
         if (State != RunState.Battle)
             return;
@@ -362,6 +396,7 @@ public class RunManager : MonoBehaviour
     {
         PrepareArena(repick);
         GenerateWave();
+        ChooseObjective();
         gateRoom.SetUpcomingWave(CurrentWave);
 
         RoundPrepared?.Invoke(CurrentRound);
@@ -491,6 +526,84 @@ public class RunManager : MonoBehaviour
         string ddaText = dda != null ? ", DDA " + dda.Mode + " x" + ddaMultiplier.ToString("0.00") : "";
 
         Log("komposisi " + label + " (PCG" + (bias != null && bias.Count > 0 ? ", bias " + area.name : "") + budgetText + ddaText + "): " + currentWave.Describe());
+    }
+
+    // Objective ronde ini dari aliran PCG Objective, jadi seed run sama = urutan objective sama.
+    private void ChooseObjective()
+    {
+        int index = CurrentRound - 1;
+        bool hasPrevious = index >= 1 && objectiveHistory.Count >= index;
+        ObjectiveType previous = hasPrevious ? objectiveHistory[index - 1] : ObjectiveType.Exterminate;
+        ObjectiveType chosen = ObjectiveType.Exterminate;
+
+        if (CurrentRound <= 1)
+        {
+            ObjectiveReason = "ronde 1 selalu Exterminate";
+        }
+        else
+        {
+            objectiveCandidates.Clear();
+            objectiveCandidateWeights.Clear();
+
+            AddObjectiveCandidate(ObjectiveType.Exterminate, exterminateWeight, hasPrevious, previous);
+            AddObjectiveCandidate(ObjectiveType.Survival, survivalWeight, hasPrevious, previous);
+            AddObjectiveCandidate(ObjectiveType.HoldZone, holdZoneWeight, hasPrevious, previous);
+
+            float total = 0f;
+
+            foreach (float weight in objectiveCandidateWeights)
+                total += weight;
+
+            if (total <= 0f)
+            {
+                ObjectiveReason = "tidak ada calon lain, kembali ke Exterminate";
+            }
+            else
+            {
+                SeededRandom random = PcgDirector.Stream(CurrentRound, PcgStream.Objective);
+                float pick = random.Value * total;
+                chosen = objectiveCandidates[objectiveCandidates.Count - 1];
+
+                for (int i = 0; i < objectiveCandidates.Count; i++)
+                {
+                    pick -= objectiveCandidateWeights[i];
+
+                    if (pick < 0f)
+                    {
+                        chosen = objectiveCandidates[i];
+                        break;
+                    }
+                }
+
+                ObjectiveReason = "undian dari " + objectiveCandidates.Count + " calon";
+            }
+        }
+
+        while (objectiveHistory.Count <= index)
+            objectiveHistory.Add(ObjectiveType.Exterminate);
+
+        objectiveHistory[index] = chosen;
+        CurrentObjective = chosen;
+
+        if (currentWave != null)
+            currentWave.Objective = chosen;
+
+        Log("objective ronde " + CurrentRound + ": " + chosen + " (" + ObjectiveReason + ")");
+    }
+
+    private void AddObjectiveCandidate(ObjectiveType type, float weight, bool hasPrevious, ObjectiveType previous)
+    {
+        if (weight <= 0f || !ObjectiveRunner.IsImplemented(type))
+            return;
+
+        if (hasPrevious && type == previous)
+            return;
+
+        if (type != ObjectiveType.Exterminate && Mode != GameMode.Dungeon)
+            return;
+
+        objectiveCandidates.Add(type);
+        objectiveCandidateWeights.Add(weight);
     }
 
     private void HandlePlayerDied()
