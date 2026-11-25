@@ -46,6 +46,9 @@ public class TopDownCameraFollow : MonoBehaviour
 
     public GameplayCameraMode Mode => UsesThirdPerson ? GameplayCameraMode.ThirdPerson : GameplayCameraMode.TopDown;
 
+    // Yaw tetap kamera top-down (derajat). Minimap memutar petanya dengan nilai ini supaya atas peta = atas layar.
+    public float Yaw => yaw;
+
     private bool UsesThirdPerson => mode == GameplayCameraMode.ThirdPerson && thirdPerson != null;
 
     public bool HasThirdPersonRig => thirdPerson != null;

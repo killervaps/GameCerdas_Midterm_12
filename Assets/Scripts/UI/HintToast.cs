@@ -34,7 +34,8 @@ public class HintToast : UIScreen
     {
         Image panel = UIKit.CreatePanel("Panel", rect, UIKit.Panel);
         panelRect = panel.rectTransform;
-        UIKit.Place(panelRect, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -36f), new Vector2(maxWidth, 0f));
+        // Di bawah strip waktu + skor yang menempel di tengah atas.
+        UIKit.Place(panelRect, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -96f), new Vector2(maxWidth, 0f));
         UIKit.AddHorizontal(panel.gameObject, 18f, new RectOffset(24, 28, 18, 22), TextAnchor.MiddleLeft);
         UIKit.FitHeight(panel.gameObject);
 

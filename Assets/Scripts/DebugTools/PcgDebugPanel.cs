@@ -317,6 +317,12 @@ public class PcgDebugPanel : MonoBehaviour
         Line("  <color=#ff8c26>graf</color> ").Append(graph.RoomCount).Append(" room, ").Append(edges / 2).Append(" sambungan, pintu ")
             .Append(doors).Append(" (maks ").Append(maxDoors).Append(" per room)");
 
+        Minimap minimap = Minimap.Current;
+
+        if (minimap != null && minimap.RoomCount > 0)
+            Line("  <color=#ff8c26>minimap</color> ").Append(minimap.RevealedRooms).Append("/").Append(minimap.RoomCount)
+                .Append(" room terbuka, fog <color=#ffc040>mati selama F1</color>");
+
         PlayerHealth player = PlayerHealth.Current;
 
         if (player == null)

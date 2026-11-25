@@ -107,6 +107,11 @@ public class EnemyGroupWaypoint : UIScreen
 
     public bool RevealActive { get; private set; }
 
+    // Musuh yang sedang di-reveal (titik merah), dipakai minimap. Kosong jika reveal tidak aktif.
+    public IReadOnlyList<EnemyHealth> RevealedEnemies => RevealActive ? members : NoEnemies;
+
+    private static readonly EnemyHealth[] NoEnemies = new EnemyHealth[0];
+
     public float Delay => DifficultyModel.Current != null ? DifficultyModel.Current.WaypointDelay : fallbackDelay;
 
     public bool InCombat => Time.time - lastCombatTime < combatMemory || AnyAware;
