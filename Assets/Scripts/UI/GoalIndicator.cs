@@ -148,7 +148,8 @@ public class GoalIndicator : UIScreen
         UIKit.SetBarFill(promptFill, 0f);
     }
 
-    private void UpdatePrompt(DungeonGoalPortal portal)
+    // extraction = portal Ekstraksi di Safezone (Endless), teks dan catatannya berbeda dengan portal Goal.
+    private void UpdatePrompt(DungeonGoalPortal portal, bool extraction)
     {
         bool show = portal != null && portal.PlayerInRange;
         promptGroup.alpha = Mathf.MoveTowards(promptGroup.alpha, show ? 1f : 0f, 8f * Time.unscaledDeltaTime);
@@ -157,20 +158,35 @@ public class GoalIndicator : UIScreen
             return;
 
         float progress = portal.ConfirmProgress;
+        string action = extraction ? "ekstraksi" : "kembali ke Safezone";
         UIKit.SetBarFill(promptFill, progress);
         ControlGlyphs.Apply(promptText);
         promptText.text = progress > 0.01f
-            ? "Kembali ke Safezone... <b>" + Mathf.RoundToInt(progress * 100f) + "%</b>"
-            : "Tahan <b>" + ControlHints.Glyph(PadAction.Interact) + "</b> untuk kembali ke Safezone";
+            ? (extraction ? "Ekstraksi... <b>" : "Kembali ke Safezone... <b>") + Mathf.RoundToInt(progress * 100f) + "%</b>"
+            : "Tahan <b>" + ControlHints.Glyph(PadAction.Interact) + "</b> untuk " + action;
         ControlHints.StyleCap(promptKeyCap, promptKeyLabel, PadAction.Interact);
 
-        DungeonVault vault = DungeonVault.Active;
-        bool vaultLeft = vault != null && vault.State != VaultState.Looted;
-        promptNote.text = vaultLeft ? "Vault belum dibuka. Hadiahnya hilang jika ronde diakhiri." : string.Empty;
+        string note = string.Empty;
 
-        if (promptNote.gameObject.activeSelf != vaultLeft)
+        if (extraction)
         {
-            promptNote.gameObject.SetActive(vaultLeft);
+            AuraScore aura = AuraScore.Current;
+            note = "Run berakhir di sini." + (aura != null ? " Skor sementara " + aura.Unbanked.ToString("N0") + " diamankan." : string.Empty);
+        }
+        else
+        {
+            DungeonVault vault = DungeonVault.Active;
+
+            if (vault != null && vault.State != VaultState.Looted)
+                note = "Vault belum dibuka. Hadiahnya hilang jika ronde diakhiri.";
+        }
+
+        promptNote.text = note;
+        bool hasNote = note.Length > 0;
+
+        if (promptNote.gameObject.activeSelf != hasNote)
+        {
+            promptNote.gameObject.SetActive(hasNote);
             UIKit.ForceRebuild(prompt);
         }
     }
@@ -254,7 +270,12 @@ public class GoalIndicator : UIScreen
         DungeonGoalPortal portal = ui.Run != null ? ui.Run.OpenPortal : null;
         PlayerHealth player = PlayerHealth.Current;
 
-        UpdatePrompt(portal);
+        // Di Safezone portal Ekstraksi hanya memakai kartu "Tahan E". Letaknya di samping gate, jadi tanpa penanda arah.
+        DungeonGoalPortal extraction = portal == null && ui.State == RunState.Preparing && ui.GateRoom != null
+            ? ui.GateRoom.ExtractionPortal
+            : null;
+
+        UpdatePrompt(portal != null ? portal : extraction, extraction != null);
 
         if (cam == null || !cam.isActiveAndEnabled)
             cam = Camera.main;

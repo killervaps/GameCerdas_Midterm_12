@@ -5,6 +5,10 @@ using System;
 public struct WavePerformance
 {
     public int round;
+    public ObjectiveType objective;
+    public GameMode mode;
+    // Hold Zone: waktu capture zona (detik) sebagai patokan skor waktu. 0 = objective lain.
+    public float captureSeconds;
     // Detik dari ronde mulai sampai ronde bersih atau MC mati.
     public float duration;
     public int enemyCount;

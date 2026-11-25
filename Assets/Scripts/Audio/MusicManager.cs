@@ -119,6 +119,7 @@ public class MusicManager : MonoBehaviour
                 Play(Track.Battle);
                 break;
             case RunState.Victory:
+            case RunState.Extracted:
                 Play(Track.Victory);
                 break;
             case RunState.Defeat:

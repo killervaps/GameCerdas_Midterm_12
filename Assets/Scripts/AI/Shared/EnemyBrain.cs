@@ -13,12 +13,34 @@ public abstract class EnemyBrain : MonoBehaviour, IEnemyBrain
 
     protected EnemyRoleData Data => Controller.RoleData;
 
+    // Damage satu serangan, sudah termasuk pengali stat wave (Endless).
+    protected float AttackDamage => Data.Damage * Controller.DamageMultiplier;
+
     // Build MC menurut GroupBlackboard. Netral (semua 1) jika tidak ada TacticalCoordinator.
     protected BuildIndicators Build =>
         TacticalCoordinator.Current != null ? TacticalCoordinator.Current.Group.Indicators : BuildIndicators.Neutral;
 
     protected BuildReactions Reactions =>
         TacticalCoordinator.Current != null ? TacticalCoordinator.Current.Reactions : BuildReactions.Disabled;
+
+    // Pengetahuan kelompok, termasuk titik objective. Null tanpa TacticalCoordinator.
+    protected GroupBlackboard Group => TacticalCoordinator.Current != null ? TacticalCoordinator.Current.Group : null;
+
+    protected bool HasObjective => Group != null && Group.HasObjectivePoint;
+
+    // Titik di dalam zona untuk musuh ini. Tiap musuh mendapat sudut sendiri (dari namanya yang unik, mis. Charger_12)
+    // supaya tidak bertumpuk.
+    protected Vector3 ObjectiveSpot(float radiusFraction)
+    {
+        GroupBlackboard group = Group;
+        float angle = (Mathf.Abs(name.GetHashCode()) % 360) * Mathf.Deg2Rad;
+        Vector3 offset = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * group.ObjectiveRadius * radiusFraction;
+        Vector3 point = group.ObjectivePoint + offset;
+
+        return UnityEngine.AI.NavMesh.SamplePosition(point, out UnityEngine.AI.NavMeshHit hit, 2f, UnityEngine.AI.NavMesh.AllAreas)
+            ? hit.position
+            : group.ObjectivePoint;
+    }
 
     public abstract string BrainName { get; }
 

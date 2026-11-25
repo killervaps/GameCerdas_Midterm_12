@@ -51935,6 +51935,37 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 917390031}
   m_SourcePrefab: {fileID: 100100000, guid: 475d6f6e7b60aff4993b95b071236d24, type: 3}
+--- !u!1 &864992484
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 864992485}
+  m_Layer: 0
+  m_Name: Extraction Point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &864992485
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864992484}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.7071064, z: -0, w: 0.7071072}
+  m_LocalPosition: {x: -4.3999996, y: 0, z: 1.2999992}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1441237112}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1001 &865660338
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -79050,6 +79081,26 @@ MonoBehaviour:
   dungeon: {fileID: 1557585634}
   hideArenasInDungeon: 1
   dungeonEnemyMultiplier: 2
+  runLength: 0
+  endlessWaves:
+    baseStart: 3
+    linearGrowth: 0.6
+    linearUntil: 9
+    lateGrowth: 1.2
+    shooterFrom: 2
+    guardianFrom: 3
+    guardianMax: 1
+    guardianLateFrom: 9
+    guardianMaxLate: 2
+    chargerWeight: 3
+    shooterWeight: 2
+    guardianWeight: 1
+    maxEnemiesPerWave: 12
+    excessStatPerEnemy: 0.08
+    bossEvery: 6
+    bossStatMultiplier: 1.5
+    bossScoreMultiplier: 2
+  extractionEvery: 3
   rounds:
   - label: Ronde 1
     minEnemies: 2
@@ -79109,6 +79160,9 @@ MonoBehaviour:
     cost: 2
   - role: 2
     cost: 3
+  exterminateWeight: 2
+  survivalWeight: 1
+  holdZoneWeight: 1
   healRule: 1
   partialHealRatio: 0.3
   returnDelay: 2
@@ -86624,6 +86678,7 @@ Transform:
   - {fileID: 1581407981}
   - {fileID: 1188353631}
   - {fileID: 1088977594}
+  - {fileID: 864992485}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1441237113
@@ -86652,6 +86707,9 @@ MonoBehaviour:
   confirmActionName: Player/Interact
   maxGatesPerRun: 3
   startInSafezone: 1
+  extractionPoint: {fileID: 864992485}
+  extractionPrefab: {fileID: 919132149155446097, guid: 3742ababbe2f309459453ca74860ef15, type: 3}
+  extractionColor: {r: 0.3, g: 0.85, b: 1, a: 1}
   logEvents: 1
   debugReturnKey: 1
 --- !u!114 &1441237114

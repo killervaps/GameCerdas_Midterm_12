@@ -29,7 +29,7 @@ public class RunStatusPanel : MonoBehaviour
 
     private bool ShowingResult =>
         runManager != null &&
-        (runManager.State == RunState.Victory || runManager.State == RunState.Defeat);
+        runManager.IsEnded;
 
     private void OnEnable()
     {
@@ -65,7 +65,7 @@ public class RunStatusPanel : MonoBehaviour
 
     private void HandleStateChanged(RunState state)
     {
-        resultText = state == RunState.Victory || state == RunState.Defeat
+        resultText = state == RunState.Victory || state == RunState.Defeat || state == RunState.Extracted
             ? BuildResult(state)
             : string.Empty;
 
@@ -75,8 +75,7 @@ public class RunStatusPanel : MonoBehaviour
     private string BuildStatus()
     {
         builder.Clear();
-        builder.Append("<b>Ronde ").Append(Mathf.Max(1, runManager.CurrentRound))
-            .Append('/').Append(runManager.TotalRounds).Append("</b>  ").Append(StateLabel(runManager.State)).Append('\n');
+        builder.Append("<b>").Append(runManager.RoundLabel(Mathf.Max(1, runManager.CurrentRound))).Append("</b>  ").Append(StateLabel(runManager.State)).Append('\n');
 
         switch (runManager.State)
         {
@@ -114,10 +113,12 @@ public class RunStatusPanel : MonoBehaviour
 
         if (state == RunState.Victory)
             builder.Append("<size=28><b><color=#66ff66>MENANG</color></b></size>\n");
+        else if (state == RunState.Extracted)
+            builder.Append("<size=28><b><color=#66ff66>EKSTRAKSI</color></b></size>\n");
         else
             builder.Append("<size=28><b><color=#ff6666>KALAH</color></b></size>\n");
 
-        builder.Append("Ronde ").Append(runManager.CurrentRound).Append('/').Append(runManager.TotalRounds)
+        builder.Append(runManager.RoundLabel(runManager.CurrentRound))
             .Append("   Waktu ").Append(runManager.RunDuration.ToString("0.0")).Append(" s\n");
 
         if (playerHealth != null)

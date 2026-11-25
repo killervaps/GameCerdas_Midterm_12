@@ -117,11 +117,11 @@ public class DdaDebugPanel : MonoBehaviour
         if (history.Count > 0)
         {
             WavePerformance last = history[history.Count - 1];
-            builder.Append("Ronde ").Append(last.round).Append(last.died ? " <color=#ff6655>(mati)</color>" : string.Empty)
+            builder.Append("Ronde ").Append(last.round).Append(' ').Append(last.objective).Append(last.died ? " <color=#ff6655>(mati)</color>" : string.Empty)
                 .Append("  skor <b>").Append(last.score.ToString("0.00")).Append("</b>  EMA ").Append(model.SmoothedScore.ToString("0.00")).Append('\n');
             builder.Append("  HP ").Append(last.hpScore.ToString("0.00"))
                 .Append("  damage ").Append(last.damageScore.ToString("0.00"))
-                .Append("  waktu ").Append(last.timeScore.ToString("0.00"))
+                .Append("  waktu ").Append(last.objective == ObjectiveType.Survival ? "-" : last.timeScore.ToString("0.00"))
                 .Append("  hampir mati ").Append(last.nearDeathCount).Append('\n');
             lines += 2;
         }

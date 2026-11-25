@@ -44,6 +44,8 @@ public class PlayerPerformanceTracker : MonoBehaviour
             runManager.RoundCleared += HandleRoundCleared;
             runManager.RunLost += HandleRunLost;
             runManager.RunWon += HandleRunWon;
+            // Ekstraksi Endless dianggap menang untuk DDA (death streak di-reset).
+            runManager.RunExtracted += HandleRunWon;
             runManager.StateChanged += HandleStateChanged;
         }
 
@@ -66,6 +68,7 @@ public class PlayerPerformanceTracker : MonoBehaviour
             runManager.RoundCleared -= HandleRoundCleared;
             runManager.RunLost -= HandleRunLost;
             runManager.RunWon -= HandleRunWon;
+            runManager.RunExtracted -= HandleRunWon;
             runManager.StateChanged -= HandleStateChanged;
         }
 
@@ -107,6 +110,8 @@ public class PlayerPerformanceTracker : MonoBehaviour
         current = new WavePerformance
         {
             round = round,
+            objective = runManager != null ? runManager.CurrentObjective : ObjectiveType.Exterminate,
+            mode = runManager != null ? runManager.Mode : GameMode.Arena,
             maxHealth = playerHealth != null ? playerHealth.MaxHealth : 0f,
             hpStartRatio = HealthRatio()
         };
@@ -178,6 +183,10 @@ public class PlayerPerformanceTracker : MonoBehaviour
         current.duration = Time.time - startTime;
         current.enemyCount = Mathf.Max(current.enemyCount, current.kills);
         current.died = died;
+
+        // Hold Zone: waktu capture zona jadi patokan skor waktu DDA.
+        if (ObjectiveRunner.Current != null && ObjectiveRunner.Current.Active is HoldZoneObjective holdZone)
+            current.captureSeconds = holdZone.CaptureSeconds;
         current.hpEndRatio = died ? 0f : HealthRatio();
 
         if (playerHealth != null)

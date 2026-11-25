@@ -4,6 +4,8 @@ using UnityEngine;
 // Koordinator kelompok musuh, satu per arena. Brain tidak saling tahu, koordinasi lewat sini.
 // Saat wave muncul: daftar musuh, pasangkan Guardian dengan Shooter (anchor = Shooter).
 // Loop tiap 0,25 s: perbarui GroupBlackboard, hitung dan bagikan slot, arbitrasi token, cabut token yang timeout.
+// Hold Zone: Guardian dijaga di zona (bukan bodyguard), dan satu musuh tanpa token ditugaskan sebagai penjaga zona.
+// Slot tetap dihitung di sekitar MC.
 // Saat musuh mati: lepas token dan slot. Jika yang mati anchor Guardian, GuardianBrain masuk mode marah sendiri.
 public class TacticalCoordinator : MonoBehaviour
 {
@@ -22,6 +24,10 @@ public class TacticalCoordinator : MonoBehaviour
 
     [Header("Pairing")]
     [SerializeField] private bool pairGuardianWithShooter = true;
+
+    [Header("Hold Zone")]
+    // Leash Guardian selama Hold Zone = radius zona + nilai ini.
+    [SerializeField, Min(0f)] private float zoneLeashExtra = 3f;
 
     [Header("Build Reactions")]
     [SerializeField] private BuildReactions reactions = new BuildReactions();
@@ -83,6 +89,17 @@ public class TacticalCoordinator : MonoBehaviour
         RunLoop();
     }
 
+    // Musuh yang muncul di tengah ronde. Daftar musuh dibangun ulang tiap loop dari EnemyController.Active, jadi cukup
+    // menjalankan loop sekarang supaya slot, token, dan pasangan Guardian langsung ikut memperhitungkannya.
+    public void RegisterLate(EnemyController enemy)
+    {
+        if (enemy == null)
+            return;
+
+        Log(enemy.name + " bergabung di tengah ronde");
+        RunLoop();
+    }
+
     private void HandleWaveSpawned(IReadOnlyList<EnemyHealth> enemies)
     {
         tokens.Clear();
@@ -131,8 +148,16 @@ public class TacticalCoordinator : MonoBehaviour
         if (ThreatEstimator.Current != null && group.Stats != null)
             group.SetThreat(ThreatEstimator.Current.EvaluateLive(registry, group.Stats.GetSnapshot()));
 
-        if (pairGuardianWithShooter)
-            PairGuardians();
+        // Hold Zone: Guardian menjaga zona, jadi pairing bodyguard ke Shooter dimatikan selama ronde itu.
+        if (group.HasObjectivePoint)
+            ApplyZoneRules();
+        else
+        {
+            ReleaseZoneRules();
+
+            if (pairGuardianWithShooter)
+                PairGuardians();
+        }
 
         BuildIndicators build = group.Indicators;
 
@@ -150,6 +175,71 @@ public class TacticalCoordinator : MonoBehaviour
         {
             if (enemy != null && !enemy.Health.IsDead)
                 registry.Add(enemy);
+        }
+    }
+
+    // ---------- Hold Zone ----------
+
+    // Guardian: anchor = pusat zona, leash = radius zona + Zone Leash Extra.
+    // Penjaga zona: minimal satu musuh non-Guardian yang tidak memegang token ditugaskan masuk zona, supaya zona tetap
+    // terancam walau MC sedang menahan musuh lain. Penjaga lama dipertahankan selama masih valid (tidak berganti-ganti).
+    private void ApplyZoneRules()
+    {
+        float leash = group.ObjectiveRadius + zoneLeashExtra;
+        EnemyController guard = null;
+
+        foreach (EnemyController enemy in registry)
+        {
+            if (enemy.Brain is GuardianBrain guardian)
+            {
+                guardian.SetZoneAnchor(group.ObjectiveAnchor, leash);
+                enemy.IsZoneGuard = false;
+                continue;
+            }
+
+            if (enemy.IsZoneGuard)
+            {
+                if (guard == null && !enemy.HasAttackToken)
+                    guard = enemy;
+                else
+                    enemy.IsZoneGuard = false;
+            }
+        }
+
+        if (guard != null)
+            return;
+
+        float best = float.MaxValue;
+
+        foreach (EnemyController enemy in registry)
+        {
+            if (enemy.Brain is GuardianBrain || enemy.HasAttackToken)
+                continue;
+
+            float distance = (enemy.transform.position - group.ObjectivePoint).sqrMagnitude;
+
+            if (distance < best)
+            {
+                best = distance;
+                guard = enemy;
+            }
+        }
+
+        if (guard == null)
+            return;
+
+        guard.IsZoneGuard = true;
+        Log(guard.name + " ditugaskan menjaga zona");
+    }
+
+    private void ReleaseZoneRules()
+    {
+        foreach (EnemyController enemy in registry)
+        {
+            enemy.IsZoneGuard = false;
+
+            if (enemy.Brain is GuardianBrain guardian && guardian.IsZoneAnchored)
+                guardian.ClearAnchor();
         }
     }
 

@@ -31,6 +31,13 @@ public class GateSelectionRoom : MonoBehaviour
     // Dipakai hanya tanpa RunManager. Dengan RunManager, alur dimulai dari RunManager.
     [SerializeField] private bool startInSafezone = true;
 
+    [Header("Ekstraksi (Endless)")]
+    // Posisi portal Ekstraksi. Kosong = sejajar deretan gate, satu jarak gate di samping gate terakhir.
+    [SerializeField] private Transform extractionPoint;
+    // Model portal Ekstraksi. Kosong = model portal Goal dari DungeonGenerator, atau cakram jika tidak ada.
+    [SerializeField] private GameObject extractionPrefab;
+    [SerializeField] private Color extractionColor = new Color(0.3f, 0.85f, 1f);
+
     [Header("Debug")]
     [SerializeField] private bool logEvents = true;
     // Hanya tanpa RunManager. Tombol R di arena mengembalikan MC ke Safezone.
@@ -42,6 +49,13 @@ public class GateSelectionRoom : MonoBehaviour
     private GatePortal activePortal;
     private bool drivenExternally;
     private WaveData upcomingWave;
+    private DungeonGoalPortal extractionPortal;
+
+    // Portal Ekstraksi yang sedang terbuka, null jika tidak ditawarkan. Dipakai prompt "Tahan E" di HUD.
+    public DungeonGoalPortal ExtractionPortal => extractionPortal != null && extractionPortal.IsOpen ? extractionPortal : null;
+
+    // Dikirim saat MC selesai menahan Interact di portal Ekstraksi.
+    public event Action ExtractionChosen;
 
     public bool IsSelecting { get; private set; }
 
@@ -110,6 +124,133 @@ public class GateSelectionRoom : MonoBehaviour
     {
         drivenExternally = true;
         maxGatesPerRun = Mathf.Max(1, maxGates);
+    }
+
+    // Dipanggil RunManager saat run mulai. Endless memakai batas tanpa akhir.
+    public void SetMaxGates(int maxGates)
+    {
+        maxGatesPerRun = Mathf.Max(1, maxGates);
+    }
+
+    // ---------- Ekstraksi ----------
+
+    // Dipanggil RunManager: tampilkan portal Ekstraksi di Safezone (Endless, setelah wave kelipatan tertentu).
+    public void ShowExtraction(bool show)
+    {
+        if (!show)
+        {
+            if (extractionPortal != null)
+            {
+                extractionPortal.Close();
+                extractionPortal.gameObject.SetActive(false);
+            }
+
+            return;
+        }
+
+        if (extractionPortal == null)
+            extractionPortal = CreateExtractionPortal();
+
+        if (extractionPortal == null)
+            return;
+
+        extractionPortal.gameObject.SetActive(true);
+        extractionPortal.Open();
+
+        Log("portal Ekstraksi dibuka di " + extractionPortal.transform.position);
+    }
+
+    private DungeonGoalPortal CreateExtractionPortal()
+    {
+        GetExtractionPose(out Vector3 position, out Quaternion rotation);
+
+        GameObject prefab = extractionPrefab;
+
+        if (prefab == null)
+        {
+            DungeonGenerator dungeon = FindAnyObjectByType<DungeonGenerator>(FindObjectsInactive.Include);
+            prefab = dungeon != null ? dungeon.GoalPrefab : null;
+        }
+
+        GameObject model;
+
+        if (prefab != null)
+        {
+            model = Instantiate(prefab, position, rotation);
+        }
+        else
+        {
+            model = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            model.transform.SetPositionAndRotation(position + Vector3.up * 0.03f, rotation);
+            model.transform.localScale = new Vector3(2.4f, 0.03f, 2.4f);
+            Destroy(model.GetComponent<Collider>());
+        }
+
+        model.name = "ExtractionPortal";
+
+        DungeonGoalPortal portal = model.AddComponent<DungeonGoalPortal>();
+        portal.SetColor(extractionColor);
+        portal.Build(2f);
+        portal.Entered += HandleExtractionEntered;
+        return portal;
+    }
+
+    // Titik Inspector, atau satu jarak gate di samping gate terakhir searah deretan gate, menempel ke lantai.
+    private void GetExtractionPose(out Vector3 position, out Quaternion rotation)
+    {
+        if (extractionPoint != null)
+        {
+            position = extractionPoint.position;
+            rotation = extractionPoint.rotation;
+            return;
+        }
+
+        List<Transform> gates = new List<Transform>();
+
+        foreach (GatePortal portal in portals)
+        {
+            if (portal != null)
+                gates.Add(portal.transform);
+        }
+
+        if (gates.Count == 0)
+        {
+            position = safezoneSpawn != null ? safezoneSpawn.position + safezoneSpawn.forward * 4f : transform.position;
+            rotation = safezoneSpawn != null ? safezoneSpawn.rotation : Quaternion.identity;
+            return;
+        }
+
+        Transform last = gates[gates.Count - 1];
+        rotation = last.rotation;
+
+        if (gates.Count == 1)
+        {
+            position = last.position + last.right * 4f;
+        }
+        else
+        {
+            Vector3 span = last.position - gates[0].position;
+            span.y = 0f;
+            float spacing = span.magnitude / (gates.Count - 1);
+            position = last.position + span.normalized * spacing;
+        }
+
+        if (Physics.Raycast(position + Vector3.up * 3f, Vector3.down, out RaycastHit hit, 10f, GameLayers.GroundMask, QueryTriggerInteraction.Ignore))
+            position.y = hit.point.y;
+    }
+
+    private void HandleExtractionEntered(DungeonGoalPortal portal)
+    {
+        if (!IsSelecting)
+            return;
+
+        IsSelecting = false;
+        CloseAllPortals();
+        ClearActivePortal();
+
+        Log("MC memilih Ekstraksi");
+
+        ExtractionChosen?.Invoke();
     }
 
     private void Start()

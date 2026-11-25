@@ -15,6 +15,8 @@ public enum PcgStream
     Vault = 7,
     // Dekorasi dungeon (variasi lantai). Terpisah dari layout supaya mengubahnya tidak menggeser room dan corridor.
     Decor = 8,
+    // Pemilihan objective ronde dan keputusan acak di dalam objective.
+    Objective = 9,
     Preview = 99
 }
 

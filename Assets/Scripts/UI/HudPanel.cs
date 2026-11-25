@@ -27,8 +27,12 @@ public class HudPanel : UIScreen
 
     private RectTransform topLeft;
     private RectTransform roundTokens;
+    private TextMeshProUGUI roundLabel;
     private int shownRound = -1;
     private int shownTotalRounds = -1;
+    private TextMeshProUGUI scoreText;
+    private TextMeshProUGUI scoreCaption;
+    private GameObject scoreCard;
     private Image stateTag;
     private TextMeshProUGUI stateTagLabel;
     private GameObject infoCard;
@@ -37,6 +41,8 @@ public class HudPanel : UIScreen
     private Image objectiveStamp;
     private TextMeshProUGUI objectiveStampLabel;
     private TextMeshProUGUI objectiveCaption;
+    private GameObject objectiveBar;
+    private RectTransform objectiveBarFill;
     private RectTransform enemyTokens;
     private readonly List<Image> enemyTokenImages = new List<Image>();
     private readonly List<TextMeshProUGUI> enemyTokenLabels = new List<TextMeshProUGUI>();
@@ -154,6 +160,15 @@ public class HudPanel : UIScreen
         TextMeshProUGUI pauseHint = UIKit.CreateText("PauseHint", timerCard.transform, "<b>[Esc]</b> Jeda", 17f, UIKit.TextMuted, TextAlignmentOptions.Center);
         UIKit.Stretch(pauseHint.rectTransform, 0f, 0f, 56f, 8f);
         ControlHintLabel.Bind(pauseHint, () => "<b>" + ControlHints.Glyph(PadAction.Pause) + "</b> Jeda");
+
+        // Skor Aura sementara (belum aman) di bawah waktu run.
+        Image score = UIKit.CreatePanel("ScoreCard", rect, UIKit.Panel);
+        scoreCard = score.gameObject;
+        UIKit.Place(score.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-28f, -132f), new Vector2(200f, 72f));
+        scoreText = UIKit.UseDisplayFont(UIKit.CreateText("Score", score.transform, "0", 30f, UIKit.Accent, TextAlignmentOptions.Center, true));
+        UIKit.Stretch(scoreText.rectTransform, 0f, 0f, 6f, 30f);
+        scoreCaption = UIKit.CreateText("Caption", score.transform, "skor sementara", 16f, UIKit.TextMuted, TextAlignmentOptions.Center);
+        UIKit.Stretch(scoreCaption.rectTransform, 0f, 0f, 44f, 6f);
 
         // ---------- Kanan bawah: Aura Burst (cooldown lingkaran) ----------
         BuildSkill();
@@ -299,7 +314,7 @@ public class HudPanel : UIScreen
         UIKit.AddHardShadow(roundSticker, UIKit.ButtonShadow);
         UIKit.AddHorizontal(roundSticker.gameObject, 8f, new RectOffset(14, 14, 7, 9), TextAnchor.MiddleLeft);
 
-        TextMeshProUGUI roundLabel = UIKit.UseDisplayFont(UIKit.CreateText("Label", roundSticker.transform, "Ronde", 26f, UIKit.Text, TextAlignmentOptions.Left, true));
+        roundLabel = UIKit.UseDisplayFont(UIKit.CreateText("Label", roundSticker.transform, "Ronde", 26f, UIKit.Text, TextAlignmentOptions.Left, true));
         roundLabel.textWrappingMode = TextWrappingModes.NoWrap;
 
         roundTokens = UIKit.CreateRect("Tokens", roundSticker.transform);
@@ -330,6 +345,13 @@ public class HudPanel : UIScreen
         UIKit.Layout(objectiveCaption, -1f, -1f, 1f);
         enemyCountText = UIKit.UseDisplayFont(UIKit.CreateText("Count", countRow, "-", 30f, UIKit.Text, TextAlignmentOptions.Right, true));
         enemyCountText.textWrappingMode = TextWrappingModes.NoWrap;
+
+        // Bar progres objective selain Exterminate (Survival: sisa waktu, Hold Zone: progres zona).
+        RectTransform bar = UIKit.CreateBar("ObjectiveBar", battleRoot, UIKit.Well, UIKit.Accent, out Image barFill);
+        UIKit.Layout(bar, 14f);
+        objectiveBar = bar.gameObject;
+        objectiveBarFill = barFill.rectTransform;
+        objectiveBar.SetActive(false);
 
         // Satu token per musuh yang di-spawn. Token musuh yang sudah mati diredupkan.
         enemyTokens = UIKit.CreateRect("EnemyTokens", battleRoot);
@@ -500,8 +522,13 @@ public class HudPanel : UIScreen
     // pita token role musuh. Pita disembunyikan jika wave kosong.
     public void FlashRound(int round, int totalRounds, WaveData wave)
     {
-        UIKit.SetStamp(bannerStamp, bannerTitle, "RONDE " + round, UIKit.Cream);
-        bannerFinal.gameObject.SetActive(totalRounds > 0 && round >= totalRounds);
+        RunManager run = ui.Run;
+        bool endless = run != null && run.IsEndless;
+        bool boss = wave != null && wave.IsBossWave;
+        string title = endless ? (boss ? "BOSS WAVE " : "WAVE ") + round : "RONDE " + round;
+
+        UIKit.SetStamp(bannerStamp, bannerTitle, title, boss ? UIKit.TradeOff : UIKit.Cream);
+        bannerFinal.gameObject.SetActive(!endless && totalRounds > 0 && round >= totalRounds);
 
         UIKit.ClearChildren(bannerTokens);
         bool anyEnemy = false;
@@ -699,6 +726,8 @@ public class HudPanel : UIScreen
             timerText.text = UIKit.FormatTime(run.RunDuration);
         }
 
+        RefreshScore();
+
         RefreshStateTag(state, run);
         RefreshVault(state);
 
@@ -714,8 +743,14 @@ public class HudPanel : UIScreen
 
         if (inBattle && battle != null)
         {
-            enemyCountText.text = battle.AliveCount + "<size=65%><color=" + UIKit.MutedHex + "> / " + battle.TotalCount + "</color></size>";
-            RefreshEnemyTokens();
+            // Token per musuh hanya untuk Exterminate. Di objective lain musuh terus berdatangan.
+            bool exterminate = RefreshObjective(battle);
+
+            if (enemyTokens.gameObject.activeSelf != exterminate)
+                enemyTokens.gameObject.SetActive(exterminate);
+
+            if (exterminate)
+                RefreshEnemyTokens();
         }
 
         threatLine.SetActive(inBattle && ui.Threat != null);
@@ -733,11 +768,67 @@ public class HudPanel : UIScreen
             infoCard.SetActive(hasInfo);
     }
 
+    // Kartu objective. Exterminate memakai angka besar sisa/total musuh. Objective lain memakai HudText objective
+    // sebagai keterangan dan bar progres. Survival: angka besar = musuh hidup, bar = sisa waktu.
+    // Hold Zone: angka besar = progres zona dalam persen. Mengembalikan true jika objective-nya Exterminate.
+    private bool RefreshObjective(BattleManager battle)
+    {
+        ObjectiveRunner runner = ObjectiveRunner.Current;
+        IWaveObjective objective = runner != null ? runner.Active : null;
+        ObjectiveType type = objective != null ? objective.Type : ObjectiveType.Exterminate;
+
+        UIKit.SetStamp(objectiveStamp, objectiveStampLabel, ObjectiveInfo.Label(type), UIKit.Cream);
+
+        bool exterminate = type == ObjectiveType.Exterminate;
+
+        if (objectiveBar.activeSelf == exterminate)
+            objectiveBar.SetActive(!exterminate);
+
+        if (exterminate)
+        {
+            objectiveCaption.text = "Brainrot tersisa";
+            enemyCountText.text = battle.AliveCount + "<size=65%><color=" + UIKit.MutedHex + "> / " + battle.TotalCount + "</color></size>";
+            return true;
+        }
+
+        objectiveCaption.text = objective.HudText;
+
+        if (type == ObjectiveType.Survival)
+        {
+            UIKit.SetBarFill(objectiveBarFill, 1f - objective.Progress01);
+            enemyCountText.text = battle.AliveCount + "<size=65%><color=" + UIKit.MutedHex + "> hidup</color></size>";
+        }
+        else
+        {
+            UIKit.SetBarFill(objectiveBarFill, objective.Progress01);
+            enemyCountText.text = Mathf.RoundToInt(objective.Progress01 * 100f) + "<size=65%><color=" + UIKit.MutedHex + ">%</color></size>";
+        }
+
+        return false;
+    }
+
+    // Skor sementara (Unbanked). Skor yang sudah aman ditulis kecil di keterangan jika ada.
+    private void RefreshScore()
+    {
+        AuraScore aura = AuraScore.Current;
+
+        if (scoreCard.activeSelf != (aura != null))
+            scoreCard.SetActive(aura != null);
+
+        if (aura == null)
+            return;
+
+        scoreText.text = aura.Unbanked.ToString("N0");
+        scoreCaption.text = aura.Banked > 0 ? "sementara  |  aman " + aura.Banked.ToString("N0") : "skor sementara";
+    }
+
     // Token ronde: sudah lewat = slate, sekarang = krem besar dan miring, belum = sumur redup.
+    // Endless: label "Wave" dan satu token berisi nomor wave sekarang.
     private void RefreshRoundTokens(RunManager run)
     {
-        int total = Mathf.Max(1, run.TotalRounds);
-        int current = Mathf.Clamp(run.CurrentRound, 1, total);
+        bool endless = run.IsEndless;
+        int total = endless ? 0 : Mathf.Max(1, run.TotalRounds);
+        int current = endless ? Mathf.Max(1, run.CurrentRound) : Mathf.Clamp(run.CurrentRound, 1, total);
 
         if (current == shownRound && total == shownTotalRounds)
             return;
@@ -745,6 +836,15 @@ public class HudPanel : UIScreen
         shownRound = current;
         shownTotalRounds = total;
         UIKit.ClearChildren(roundTokens);
+        roundLabel.text = endless ? "Wave" : "Ronde";
+
+        if (endless)
+        {
+            Color fill = run.IsBossWave ? UIKit.TradeOff : UIKit.Cream;
+            Image wave = UIKit.CreateToken("Wave", roundTokens, 40f, fill, current.ToString(), out _);
+            wave.rectTransform.localRotation = Quaternion.Euler(0f, 0f, -6f);
+            return;
+        }
 
         for (int i = 1; i <= total; i++)
         {
@@ -787,6 +887,10 @@ public class HudPanel : UIScreen
             case RunState.Defeat:
                 text = "Kalah";
                 fill = UIKit.TradeOff;
+                break;
+            case RunState.Extracted:
+                text = "Ekstraksi";
+                fill = UIKit.Accent;
                 break;
             default:
                 text = null;

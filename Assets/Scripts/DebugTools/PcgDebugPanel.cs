@@ -49,6 +49,7 @@ public class PcgDebugPanel : MonoBehaviour
     private static readonly Color SafeRoomColor = new Color(0.3f, 0.6f, 1f, 0.9f);
     private static readonly Color VaultColor = new Color(1f, 0.78f, 0.25f, 1f);
     private static readonly Color DoorColor = new Color(0.31f, 0.64f, 1f, 1f);
+    private static readonly Color GraphColor = new Color(1f, 0.55f, 0.15f, 0.9f);
 
     private readonly StringBuilder builder = new StringBuilder();
 
@@ -169,13 +170,45 @@ public class PcgDebugPanel : MonoBehaviour
             builder.Append("<color=#ff8866>PcgDirector belum ada</color>");
 
         if (runManager != null && runManager.CurrentRound > 0)
-            builder.Append("  <color=#aaaaaa>ronde ").Append(runManager.CurrentRound).Append('/').Append(runManager.TotalRounds).Append("</color>");
+            builder.Append("  <color=#aaaaaa>").Append(runManager.RoundLabel(runManager.CurrentRound).ToLowerInvariant()).Append("</color>");
 
         AppendArena();
         AppendDungeon();
 
         WaveData wave = runManager != null ? runManager.CurrentWave : null;
         Line("Komposisi: ").Append(wave != null ? wave.Describe() : "-");
+
+        if (runManager != null)
+        {
+            Line("Objective: <color=#ffc040>").Append(runManager.CurrentObjective).Append("</color> <color=#aaaaaa>(")
+                .Append(runManager.ObjectiveReason).Append(")</color>");
+
+            ObjectiveRunner runner = ObjectiveRunner.Current;
+
+            if (runner != null && runner.Active != null)
+                builder.Append("  ").Append(runner.Active.HudText);
+
+            if (runner != null && runner.Active is SurvivalObjective survival)
+                Line("  <color=#ffc040>survival</color> ").Append(survival.DebugStatus);
+
+            if (runner != null && runner.Active is HoldZoneObjective holdZone)
+            {
+                Line("  <color=#ffc040>zona</color> ").Append(holdZone.DebugStatus);
+
+                TacticalCoordinator coordinator = TacticalCoordinator.Current;
+
+                if (coordinator != null)
+                {
+                    builder.Append(", MC ").Append(coordinator.Group.PlayerInObjective ? "di zona" : "di luar");
+
+                    foreach (EnemyController enemy in coordinator.Registry)
+                    {
+                        if (enemy.IsZoneGuard)
+                            builder.Append(", penjaga ").Append(enemy.name);
+                    }
+                }
+            }
+        }
 
         AppendEnemies();
         AppendItems();
@@ -260,7 +293,37 @@ public class PcgDebugPanel : MonoBehaviour
             .Append(" titik, bangun ").Append((m.generateMs + m.buildMs).ToString("0")).Append(" ms, NavMesh ")
             .Append(m.bakeMs.ToString("0")).Append(" ms");
 
+        AppendRoomGraph(dungeon.RoomGraph);
         AppendVault(dungeon);
+    }
+
+    // Ringkasan graf ruangan: jumlah edge, pintu, dan posisi MC di graf.
+    private void AppendRoomGraph(DungeonRoomGraph graph)
+    {
+        if (graph == null)
+            return;
+
+        int edges = 0;
+        int doors = 0;
+        int maxDoors = 0;
+
+        for (int r = 0; r < graph.RoomCount; r++)
+        {
+            edges += graph.Neighbors(r).Count;
+            doors += graph.EntranceCount(r);
+            maxDoors = Mathf.Max(maxDoors, graph.EntranceCount(r));
+        }
+
+        Line("  <color=#ff8c26>graf</color> ").Append(graph.RoomCount).Append(" room, ").Append(edges / 2).Append(" sambungan, pintu ")
+            .Append(doors).Append(" (maks ").Append(maxDoors).Append(" per room)");
+
+        PlayerHealth player = PlayerHealth.Current;
+
+        if (player == null)
+            return;
+
+        int room = graph.RoomOf(player.transform.position);
+        builder.Append(", MC di ").Append(room >= 0 ? "room " + room + " (" + graph.EntranceCount(room) + " pintu)" : "koridor");
     }
 
     private void AppendVault(DungeonGenerator dungeon)
@@ -488,6 +551,9 @@ public class PcgDebugPanel : MonoBehaviour
         foreach (Vector3 point in dungeon.BossPoints)
             Circle(point, dungeon.TileSize * 0.3f, AnchorColor);
 
+        DrawRoomGraph(dungeon.RoomGraph, dungeon.TileSize);
+        DrawSurvival(dungeon.RoomGraph, dungeon.TileSize);
+
         // Vault (emas), pintunya (biru), dan kunci (lingkaran emas) selama kunci belum diambil.
         if (dungeon.VaultRoom == null)
             return;
@@ -505,6 +571,64 @@ public class PcgDebugPanel : MonoBehaviour
             Circle(key, dungeon.TileSize * 0.35f, VaultColor);
             Circle(key, dungeon.TileSize * 0.18f, VaultColor);
         }
+    }
+
+    // Graf ruangan: garis oranye antar pusat room yang bertetangga, dan satu lingkaran kecil per pintu di pusat room.
+    // Room MC sekarang diberi lingkaran putih.
+    private static void DrawRoomGraph(DungeonRoomGraph graph, float tileSize)
+    {
+        if (graph == null)
+            return;
+
+        Vector3 lift = Vector3.up * 1.4f;
+        GL.Color(GraphColor);
+
+        for (int a = 0; a < graph.RoomCount; a++)
+        {
+            foreach (int b in graph.Neighbors(a))
+            {
+                if (b > a)
+                    Segment(graph.Center(a) + lift, graph.Center(b) + lift);
+            }
+        }
+
+        for (int r = 0; r < graph.RoomCount; r++)
+        {
+            for (int i = 0; i < graph.EntranceCount(r); i++)
+                Circle(graph.Center(r) + lift, tileSize * (0.2f + 0.12f * i), GraphColor);
+        }
+
+        PlayerHealth player = PlayerHealth.Current;
+        int playerRoom = player != null ? graph.RoomOf(player.transform.position) : -1;
+
+        if (playerRoom >= 0)
+            Circle(graph.Center(playerRoom) + lift, tileSize * 0.9f, Color.white);
+    }
+
+    // Survival: room kandidat spawn terakhir (lingkaran oranye besar) dan titik spawn terakhir (silang merah).
+    private static void DrawSurvival(DungeonRoomGraph graph, float tileSize)
+    {
+        ObjectiveRunner runner = ObjectiveRunner.Current;
+
+        if (graph == null || runner == null || !(runner.Active is SurvivalObjective survival))
+            return;
+
+        Vector3 lift = Vector3.up * 1.4f;
+
+        foreach (int room in survival.LastCandidates)
+        {
+            if (room >= 0 && room < graph.RoomCount)
+                Circle(graph.Center(room) + lift, tileSize * 1.4f, GraphColor);
+        }
+
+        if (!survival.HasLastSpawn)
+            return;
+
+        Vector3 p = survival.LastSpawn + Vector3.up * 0.1f;
+        float s = tileSize * 0.4f;
+        GL.Color(SafeColor);
+        Segment(p + new Vector3(-s, 0f, -s), p + new Vector3(s, 0f, s));
+        Segment(p + new Vector3(-s, 0f, s), p + new Vector3(s, 0f, -s));
     }
 
     private static void DrawBounds(Bounds bounds, Color color)

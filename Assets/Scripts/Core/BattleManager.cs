@@ -26,6 +26,10 @@ public class BattleManager : MonoBehaviour
 
     public float BattleStartTime { get; private set; }
 
+    // True = pertempuran selesai otomatis saat semua musuh mati (Exterminate). False = objective lain yang menutup
+    // ronde (mis. Survival dengan timer), jadi pertempuran tetap berjalan walau musuh sempat habis.
+    public bool AutoFinish { get; set; } = true;
+
     public event Action<EnemyHealth> EnemyDied;
 
     public event Action AllEnemiesDead;
@@ -65,11 +69,24 @@ public class BattleManager : MonoBehaviour
         IsBattleActive = true;
         BattleStartTime = Time.time;
 
-        Log("pertempuran mulai, " + alive.Count + " musuh");
+        Log("pertempuran mulai, " + alive.Count + " musuh" + (AutoFinish ? string.Empty : ", selesai ditentukan objective"));
 
         // Wave kosong langsung dianggap bersih.
-        if (alive.Count == 0)
+        if (alive.Count == 0 && AutoFinish)
             FinishWithVictory();
+    }
+
+    // Menambah musuh yang muncul setelah pertempuran dimulai (spawn di tengah ronde).
+    public void Track(EnemyHealth enemy)
+    {
+        if (!IsBattleActive || enemy == null || tracked.Contains(enemy))
+            return;
+
+        tracked.Add(enemy);
+        enemy.Died += HandleEnemyDied;
+
+        if (!enemy.IsDead)
+            alive.Add(enemy);
     }
 
     // Menghentikan pertempuran tanpa hasil, mis. saat retry di tengah ronde.
@@ -88,7 +105,7 @@ public class BattleManager : MonoBehaviour
 
         EnemyDied?.Invoke(enemy);
 
-        if (alive.Count == 0)
+        if (alive.Count == 0 && AutoFinish)
             FinishWithVictory();
     }
 

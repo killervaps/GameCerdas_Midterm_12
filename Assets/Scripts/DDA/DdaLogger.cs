@@ -10,7 +10,7 @@ public class DdaLogger : MonoBehaviour
 {
     private const string Header =
         "timestamp,seed,mode,round,duration,kills,damageTaken,hpEnd,nearDeath,score,smoothed," +
-        "factorBefore,factorAfter,enemyCount,itemBonus,healRatio,maxTokens,died,waypointDelay";
+        "factorBefore,factorAfter,enemyCount,itemBonus,healRatio,maxTokens,died,waypointDelay,objective,gameMode";
 
     // Kosong = komponen di objek yang sama, lalu dicari di scene.
     [SerializeField] private DifficultyModel model;
@@ -75,7 +75,9 @@ public class DdaLogger : MonoBehaviour
             .Append(model.Active ? model.HealRatio.ToString("0.000", inv) : string.Empty).Append(',')
             .Append(model.MaxTokens.ToString(inv)).Append(',')
             .Append(perf.died ? "1" : "0").Append(',')
-            .Append(model.WaypointDelay.ToString("0.0", inv));
+            .Append(model.WaypointDelay.ToString("0.0", inv)).Append(',')
+            .Append(perf.objective).Append(',')
+            .Append(perf.mode);
 
         try
         {

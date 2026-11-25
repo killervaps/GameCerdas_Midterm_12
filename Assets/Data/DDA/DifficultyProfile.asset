@@ -18,7 +18,9 @@ MonoBehaviour:
   nearDeathPenalty: 0.15
   nearDeathThreshold: 0.15
   damageRatioForZero: 1.2
-  targetSecondsPerEnemy: 20
+  targetSecondsPerEnemyArena: 8
+  targetSecondsPerEnemyDungeon: 20
+  holdZoneTimeSlack: 1.3
   emaAlpha: 0.6
   targetScore: 0.55
   deadzone: 0.08
@@ -39,3 +41,6 @@ MonoBehaviour:
   tokensHigh: 3
   lowThreshold: 0.9
   highThreshold: 1.1
+  waypointDelayAtMin: 2
+  waypointDelayAtMax: 10
+  waypointDelayOff: 5

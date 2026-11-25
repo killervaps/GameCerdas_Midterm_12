@@ -27,5 +27,9 @@ public enum EnemyAction
     Enraged = 15,
 
     // Bergerak ke atau menunggu di slot dari TacticalCoordinator (tanpa token).
-    Flank = 16
+    Flank = 16,
+
+    // Objective bersama (Hold Zone). Charger masuk zona lalu berjaga, Shooter menekan zona dari sekitarnya.
+    MoveToObjective = 17,
+    PressZone = 18
 }

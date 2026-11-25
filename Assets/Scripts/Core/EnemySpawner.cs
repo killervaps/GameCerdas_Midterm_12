@@ -51,6 +51,8 @@ public class EnemySpawner : MonoBehaviour
 
     private readonly List<EnemyHealth> spawned = new List<EnemyHealth>();
     private readonly Dictionary<EnemyHealth, EnemyRole> roles = new Dictionary<EnemyHealth, EnemyRole>();
+    // Musuh yang dimunculkan di titik wajib (Always Use), mis. Guardian di Boss Room dungeon.
+    private readonly HashSet<EnemyHealth> bosses = new HashSet<EnemyHealth>();
     private readonly List<SpawnPoint> usedAnchors = new List<SpawnPoint>();
     private readonly List<Vector3> occupied = new List<Vector3>();
     private readonly List<Vector3> anchorPositions = new List<Vector3>();
@@ -59,6 +61,8 @@ public class EnemySpawner : MonoBehaviour
     private Arena arena;
     private PcgSpawnArea area;
     private int counter;
+    // Pengali stat wave terakhir, dipakai juga untuk musuh yang muncul di tengah ronde.
+    private float lastStatMultiplier = 1f;
 
     // Semua musuh dari wave terakhir, termasuk yang sudah mati.
     public IReadOnlyList<EnemyHealth> Spawned => spawned;
@@ -128,6 +132,12 @@ public class EnemySpawner : MonoBehaviour
         return roles.TryGetValue(enemy, out role);
     }
 
+    // Musuh boss: dimunculkan di titik wajib role-nya (Boss Room dungeon).
+    public bool IsBoss(EnemyHealth enemy)
+    {
+        return enemy != null && bosses.Contains(enemy);
+    }
+
     // Role Data dari prefab atau template role ini. Dipakai ThreatEstimator untuk preview wave.
     public bool TryGetRoleData(EnemyRole role, out EnemyRoleData data)
     {
@@ -149,6 +159,8 @@ public class EnemySpawner : MonoBehaviour
             return spawned;
         }
 
+        lastStatMultiplier = wave.StatMultiplier;
+
         SeededRandom random = PcgDirector.Stream(round, PcgStream.EnemyPlacement);
         PcgSpawnRules activeRules = ActiveRules;
         Vector3? player = PlayerPoint();
@@ -167,8 +179,12 @@ public class EnemySpawner : MonoBehaviour
 
             for (int i = 0; i < entry.count; i++)
             {
-                if (TryPickPosition(entry.role, random, activeRules, player, out Vector3 position, out Quaternion rotation))
-                    Spawn(prefab, entry.role, position, rotation);
+                if (!TryPickPosition(entry.role, random, activeRules, player, out Vector3 position, out Quaternion rotation, out bool boss))
+                    continue;
+
+                // Endless: pengali wave untuk semua musuh, pengali boss wave hanya untuk musuh di titik Boss Room.
+                float stat = wave.StatMultiplier * (boss ? wave.BossStatMultiplier : 1f);
+                Spawn(prefab, entry.role, position, rotation, boss, stat);
             }
         }
 
@@ -194,6 +210,7 @@ public class EnemySpawner : MonoBehaviour
 
         spawned.Clear();
         roles.Clear();
+        bosses.Clear();
         usedAnchors.Clear();
         occupied.Clear();
         anchorPositions.Clear();
@@ -201,8 +218,10 @@ public class EnemySpawner : MonoBehaviour
     }
 
     private bool TryPickPosition(EnemyRole role, SeededRandom random, PcgSpawnRules activeRules, Vector3? player,
-        out Vector3 position, out Quaternion rotation)
+        out Vector3 position, out Quaternion rotation, out bool boss)
     {
+        boss = false;
+
         // Angka ini selalu diambil walau arena tidak punya titik khusus, supaya urutan acak tetap stabil.
         float roll = random.Value;
         // Titik Always Use (mis. Boss Room dungeon) wajib dipakai selama masih ada yang kosong.
@@ -220,6 +239,7 @@ public class EnemySpawner : MonoBehaviour
                 position = hit.position;
 
             rotation = anchor.transform.rotation;
+            boss = anchor.IsForcedFor(role);
             usedAnchors.Add(anchor);
             occupied.Add(position);
             anchorPositions.Add(position);
@@ -333,19 +353,57 @@ public class EnemySpawner : MonoBehaviour
         return direction.sqrMagnitude > 0.001f ? Quaternion.LookRotation(direction) : Quaternion.identity;
     }
 
-    private void Spawn(EnemyHealth prefab, EnemyRole role, Vector3 position, Quaternion rotation)
+    // Memunculkan satu musuh di tengah ronde (mis. bantuan objective Survival). Posisi sudah divalidasi pemanggil.
+    // Pengali stat wave terakhir ikut dipakai. Musuh menghadap MC dan ikut dibersihkan bersama wave.
+    public EnemyHealth SpawnAt(EnemyRole role, Vector3 position)
+    {
+        EnemyHealth prefab = GetPrefab(role);
+
+        if (prefab == null)
+        {
+            Debug.LogError("EnemySpawner: prefab untuk role " + role + " belum diisi.", this);
+            return null;
+        }
+
+        PlayerHealth player = PlayerHealth.Current;
+        Quaternion rotation = FacePlayer(position, player != null ? player.transform.position : (Vector3?)null);
+
+        EnemyHealth enemy = Spawn(prefab, role, position, rotation, false, lastStatMultiplier);
+        occupied.Add(position);
+
+        if (logSpawns)
+            Debug.Log("EnemySpawner: " + enemy.name + " muncul di tengah ronde di " + position, this);
+
+        return enemy;
+    }
+
+    private EnemyHealth Spawn(EnemyHealth prefab, EnemyRole role, Vector3 position, Quaternion rotation, bool boss, float statMultiplier)
     {
         EnemyHealth enemy = Instantiate(prefab, position, rotation);
 
         counter++;
-        enemy.name = role + "_" + counter;
+        enemy.name = (boss ? "Boss_" : string.Empty) + role + "_" + counter;
 
         // Salinan dari template scene yang nonaktif ikut nonaktif, jadi dihidupkan di sini.
         if (!enemy.gameObject.activeSelf)
             enemy.gameObject.SetActive(true);
 
+        // Role Data sudah diterapkan di Awake. Pengali dipasang sesudahnya supaya HP penuh mengikuti MaxHP baru.
+        if (!Mathf.Approximately(statMultiplier, 1f))
+        {
+            EnemyController controller = enemy.GetComponent<EnemyController>();
+
+            if (controller != null)
+                controller.ApplyStatMultipliers(statMultiplier, statMultiplier);
+        }
+
         spawned.Add(enemy);
         roles[enemy] = role;
+
+        if (boss)
+            bosses.Add(enemy);
+
+        return enemy;
     }
 
     private EnemyHealth GetPrefab(EnemyRole role)

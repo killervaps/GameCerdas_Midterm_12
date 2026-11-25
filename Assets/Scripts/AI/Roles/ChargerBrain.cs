@@ -7,9 +7,10 @@ using UnityEngine.AI;
 //   1. Mati                                   -> Die
 //   2. Aksi terkunci sedang jalan             -> lanjutkan Windup / Lunge / Recover
 //   3. Jarak <= lungeRange, LOS, dapat token  -> mulai Windup
-//   4. MC terlihat                            -> Chase
-//   5. Punya LKP                              -> Search
-//   6. Lainnya                                -> Idle
+//   4. MC terlihat                            -> Chase (penjaga zona tanpa token: ke zona, bukan ke slot)
+//   5. Ada titik objective, MC tidak terlihat -> MoveToObjective (masuk zona, lalu diam menghadap pintu terdekat)
+//   6. Punya LKP                              -> Search
+//   7. Lainnya                                -> Idle
 // Windup, Lunge, dan Recover adalah aksi terkunci. Penjaga di prioritas 2 mencegah cabang lain menyela,
 // karena framework BT ini tidak memberi tahu node Running yang tersela.
 public class ChargerBrain : EnemyBrain
@@ -83,6 +84,9 @@ public class ChargerBrain : EnemyBrain
             if (Reactions.ChargerPredictionTime(Build) > 0f && CurrentAction == EnemyAction.Chase)
                 return "mencegat";
 
+            if (Controller.IsZoneGuard)
+                return "penjaga zona";
+
             return string.Empty;
         }
     }
@@ -116,6 +120,11 @@ public class ChargerBrain : EnemyBrain
             {
                 new ConditionNode(() => Blackboard.CanSeePlayer),
                 new ActionNode(Chase)
+            }),
+            new SequenceNode(new List<BTNode>
+            {
+                new ConditionNode(() => HasObjective && !Blackboard.CanSeePlayer),
+                new ActionNode(MoveToObjective)
             }),
             new SequenceNode(new List<BTNode>
             {
@@ -206,6 +215,10 @@ public class ChargerBrain : EnemyBrain
 
         Vector3 playerPosition = Blackboard.Player.transform.position;
 
+        // Penjaga zona tanpa token tetap menduduki zona supaya zona terus terancam.
+        if (Controller.IsZoneGuard && HasObjective && !Controller.HasAttackToken)
+            return MoveToObjective();
+
         // Tanpa token, Charger ke slot dari coordinator dan menunggu giliran di sana (pincer muncul dari sini).
         if (Controller.HasSlot && !Controller.HasAttackToken)
         {
@@ -227,6 +240,27 @@ public class ChargerBrain : EnemyBrain
         // Berhenti sedikit di dalam lungeRange supaya cabang lunge bisa terpicu.
         // MC cepat dicegat di posisi prediksinya, bukan dikejar dari belakang.
         Motor.MoveTo(PredictPlayerPosition(), 1f, Data.LungeRange * 0.7f);
+
+        return NodeState.Running;
+    }
+
+    // Masuk ke titik di dalam zona, lalu diam menghadap pintu zona terdekat (menunggu MC datang).
+    private NodeState MoveToObjective()
+    {
+        search.Cancel();
+        SetAction(EnemyAction.MoveToObjective);
+
+        Motor.MoveTo(ObjectiveSpot(0.45f), 1f, 0.4f);
+
+        if (Motor.HasArrived)
+        {
+            if (Group.TryNearestObjectiveDoor(transform.position, out Vector3 door))
+                Motor.FacePosition(door);
+        }
+        else
+        {
+            Motor.ClearFacing();
+        }
 
         return NodeState.Running;
     }
@@ -368,7 +402,7 @@ public class ChargerBrain : EnemyBrain
 
             // Hanya sekali per lunge.
             lungeHit = true;
-            player.TakeDamage(new DamageInfo(Data.Damage, gameObject, player.AimPoint, DamageKind.Lunge));
+            player.TakeDamage(new DamageInfo(AttackDamage, gameObject, player.AimPoint, DamageKind.Lunge));
             SfxManager.Play(SfxCue.ChargerLungeHit);
             return;
         }

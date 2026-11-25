@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 // Pengetahuan bersama kelompok musuh, diperbarui TacticalCoordinator setiap loop.
-// Termasuk indikator build MC dan ancaman live, yang dibaca semua brain lewat TacticalCoordinator.
+// Termasuk indikator build MC, ancaman live, dan titik objective bersama (Hold Zone), yang dibaca semua brain
+// lewat TacticalCoordinator.
 public class GroupBlackboard
 {
     public PlayerHealth Player { get; private set; }
@@ -33,6 +35,81 @@ public class GroupBlackboard
         HasThreat = true;
     }
 
+    // ---------- Titik objective (Hold Zone) ----------
+
+    private readonly List<Vector3> objectiveDoors = new List<Vector3>();
+
+    // Ada titik objective bersama yang harus didatangi musuh walau tidak melihat MC.
+    public bool HasObjectivePoint => ObjectiveAnchor != null;
+
+    public Vector3 ObjectivePoint => ObjectiveAnchor != null ? ObjectiveAnchor.position : Vector3.zero;
+
+    public float ObjectiveRadius { get; private set; }
+
+    // Transform pusat zona, dipakai Guardian sebagai anchor.
+    public Transform ObjectiveAnchor { get; private set; }
+
+    // MC berada di dalam radius objective. Diperbarui tiap loop coordinator.
+    public bool PlayerInObjective { get; private set; }
+
+    // Titik tengah tiap pintu room zona, untuk arah jaga musuh di dalam zona.
+    public IReadOnlyList<Vector3> ObjectiveDoors => objectiveDoors;
+
+    // Diisi HoldZoneObjective saat ronde mulai.
+    public void SetObjective(Transform anchor, float radius, IReadOnlyList<Vector3> doors)
+    {
+        ObjectiveAnchor = anchor;
+        ObjectiveRadius = Mathf.Max(0f, radius);
+        objectiveDoors.Clear();
+
+        if (doors != null)
+            objectiveDoors.AddRange(doors);
+
+        PlayerInObjective = false;
+    }
+
+    // Dikosongkan HoldZoneObjective saat ronde selesai.
+    public void ClearObjective()
+    {
+        ObjectiveAnchor = null;
+        ObjectiveRadius = 0f;
+        objectiveDoors.Clear();
+        PlayerInObjective = false;
+    }
+
+    // Pintu zona terdekat dari posisi ini. False jika zona tidak punya data pintu.
+    public bool TryNearestObjectiveDoor(Vector3 from, out Vector3 door)
+    {
+        door = ObjectivePoint;
+        float best = float.MaxValue;
+
+        foreach (Vector3 candidate in objectiveDoors)
+        {
+            float distance = (candidate - from).sqrMagnitude;
+
+            if (distance < best)
+            {
+                best = distance;
+                door = candidate;
+            }
+        }
+
+        return objectiveDoors.Count > 0;
+    }
+
+    private void UpdateObjective()
+    {
+        if (!HasObjectivePoint || Player == null)
+        {
+            PlayerInObjective = false;
+            return;
+        }
+
+        Vector3 offset = PlayerPosition - ObjectivePoint;
+        offset.y = 0f;
+        PlayerInObjective = offset.sqrMagnitude <= ObjectiveRadius * ObjectiveRadius;
+    }
+
     private PlayerMotor motor;
     private PlayerStats stats;
     private TargetSelector targetSelector;
@@ -57,5 +134,6 @@ public class GroupBlackboard
         PlayerRange = stats != null ? stats.Get(StatType.Range) : 8f;
         PlayerLockedTarget = targetSelector != null ? targetSelector.LockedTarget : null;
         Indicators = BuildIndicators.From(stats);
+        UpdateObjective();
     }
 }

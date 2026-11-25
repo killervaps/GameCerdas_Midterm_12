@@ -82,8 +82,7 @@ public class EnemyPreviewBoard : MonoBehaviour
         WaveData wave = runManager.CurrentWave;
 
         builder.Clear();
-        builder.Append("<b>RONDE ").Append(Mathf.Max(1, runManager.CurrentRound))
-            .Append('/').Append(runManager.TotalRounds).Append("</b>\n");
+        builder.Append("<b>").Append(runManager.RoundLabel(Mathf.Max(1, runManager.CurrentRound)).ToUpperInvariant()).Append("</b>\n");
 
         if (wave == null)
         {
