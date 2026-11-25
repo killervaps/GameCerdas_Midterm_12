@@ -35,6 +35,9 @@ public class EnemyController : MonoBehaviour
 
     public EnemyRoleData RoleData => roleData;
 
+    // Ditugaskan TacticalCoordinator untuk masuk dan menjaga zona Hold Zone selama tidak memegang token.
+    public bool IsZoneGuard { get; set; }
+
     // Pengali damage serangan musuh ini (Endless: kelebihan jumlah musuh, boss wave). 1 = sesuai Role Data.
     public float DamageMultiplier { get; private set; } = 1f;
 

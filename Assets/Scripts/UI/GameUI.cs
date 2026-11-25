@@ -84,6 +84,7 @@ public class GameUI : MonoBehaviour
     private ModeSelectScreen modeSelect;
     private GoalIndicator goalIndicator;
     private EnemyGroupWaypoint enemyWaypoint;
+    private ZoneIndicator zoneIndicator;
     private ResultScreen result;
 
     private InputActionMap playerMap;
@@ -714,6 +715,9 @@ public class GameUI : MonoBehaviour
         // Dibaca dari RunManager, karena state Battle diumumkan sebelum ObjectiveRunner membuat objective-nya.
         bool exterminate = runManager == null || runManager.CurrentObjective == ObjectiveType.Exterminate;
         enemyWaypoint.SetVisible(showEnemyWaypoint && inGame && !announcing && state == RunState.Battle && exterminate);
+        // Penanda zona selalu tampil selama ronde Hold Zone.
+        bool holdZone = runManager != null && runManager.CurrentObjective == ObjectiveType.HoldZone;
+        zoneIndicator.SetVisible(inGame && !announcing && state == RunState.Battle && holdZone);
 
         if (!inGame || ended)
             gateModal.Hide();
@@ -793,6 +797,7 @@ public class GameUI : MonoBehaviour
         damageFeedback = CreateScreen<DamageFeedback>("DamageFeedback", false);
         goalIndicator = CreateScreen<GoalIndicator>("GoalIndicator", false);
         enemyWaypoint = CreateScreen<EnemyGroupWaypoint>("EnemyGroupWaypoint", false);
+        zoneIndicator = CreateScreen<ZoneIndicator>("ZoneIndicator", false);
         hud = CreateScreen<HudPanel>("HUD", false);
         enemyPreview = CreateScreen<EnemyPreviewPanel>("EnemyPreview", false);
         gateModal = CreateScreen<GateInfoModal>("GateInfoModal", false);

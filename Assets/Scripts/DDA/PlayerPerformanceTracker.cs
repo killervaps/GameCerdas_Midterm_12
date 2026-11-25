@@ -183,6 +183,10 @@ public class PlayerPerformanceTracker : MonoBehaviour
         current.duration = Time.time - startTime;
         current.enemyCount = Mathf.Max(current.enemyCount, current.kills);
         current.died = died;
+
+        // Hold Zone: waktu capture zona jadi patokan skor waktu DDA.
+        if (ObjectiveRunner.Current != null && ObjectiveRunner.Current.Active is HoldZoneObjective holdZone)
+            current.captureSeconds = holdZone.CaptureSeconds;
         current.hpEndRatio = died ? 0f : HealthRatio();
 
         if (playerHealth != null)

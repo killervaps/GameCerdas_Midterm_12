@@ -19,6 +19,9 @@ public class ObjectiveRunner : MonoBehaviour
     [Header("Survival")]
     [SerializeField] private SurvivalSettings survival = new SurvivalSettings();
 
+    [Header("Hold Zone")]
+    [SerializeField] private HoldZoneSettings holdZone = new HoldZoneSettings();
+
     [Header("Despawn")]
     // Lama efek mengecil sebelum musuh sisa dihilangkan saat objective selesai.
     [SerializeField, Min(0f)] private float despawnDuration = 0.4f;
@@ -50,8 +53,10 @@ public class ObjectiveRunner : MonoBehaviour
     // Objective yang sudah punya implementasi. Tipe lain tidak dipilih PCG.
     public static bool IsImplemented(ObjectiveType type)
     {
-        return type == ObjectiveType.Exterminate || type == ObjectiveType.Survival;
+        return type == ObjectiveType.Exterminate || type == ObjectiveType.Survival || type == ObjectiveType.HoldZone;
     }
+
+    public HoldZoneSettings HoldZone => holdZone;
 
     public IWaveObjective Create(ObjectiveType type)
     {
@@ -59,6 +64,8 @@ public class ObjectiveRunner : MonoBehaviour
         {
             case ObjectiveType.Survival:
                 return new SurvivalObjective(survival);
+            case ObjectiveType.HoldZone:
+                return new HoldZoneObjective(holdZone);
             default:
                 return new ExterminateObjective();
         }

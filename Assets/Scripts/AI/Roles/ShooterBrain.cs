@@ -65,6 +65,7 @@ public class ShooterBrain : EnemyBrain
     private UtilityAction repositionAction;
     private UtilityAction holdAction;
     private UtilityAction searchAction;
+    private UtilityAction pressZoneAction;
 
     private SearchRoutine search;
     private ProjectilePool pool;
@@ -93,6 +94,11 @@ public class ShooterBrain : EnemyBrain
 
     private ElevatedPlatform platform;
     private bool playerOnPlatform;
+
+    // Titik tekan zona (Hold Zone): di sekitar zona, punya LOS ke pusat zona, sekitar jarak ideal.
+    private Vector3 pressPoint;
+    private bool hasPressPoint;
+    private float nextPressPointTime;
 
     private bool jumpCommitted;
     private float jumpCommitUntil;
@@ -124,6 +130,12 @@ public class ShooterBrain : EnemyBrain
             AppendScore("H", holdAction).Append('\n');
             AppendScore("F", fleeAction).Append(' ');
             AppendScore("S", searchAction);
+
+            if (HasObjective)
+                AppendScore(" Z", pressZoneAction);
+
+            if (Controller.IsZoneGuard)
+                builder.Append(" penjaga zona");
             builder.Append("  mob ").Append(mobility.ToString("0.00"));
 
             return builder.ToString();
@@ -144,9 +156,10 @@ public class ShooterBrain : EnemyBrain
         repositionAction = new UtilityAction(EnemyAction.Reposition, ScoreReposition, ExecuteReposition);
         holdAction = new UtilityAction(EnemyAction.Hold, ScoreHold, ExecuteHold);
         searchAction = new UtilityAction(EnemyAction.Search, ScoreSearch, ExecuteSearch);
+        pressZoneAction = new UtilityAction(EnemyAction.PressZone, ScorePressZone, ExecutePressZone);
 
         selector = new UtilitySelector(
-            new List<UtilityAction> { fleeAction, kiteAction, repositionAction, holdAction, searchAction },
+            new List<UtilityAction> { fleeAction, kiteAction, repositionAction, holdAction, searchAction, pressZoneAction },
             Data.UtilityDecisionInterval,
             Data.UtilityInertia
         );
@@ -383,6 +396,19 @@ public class ShooterBrain : EnemyBrain
         return 0.8f * Blackboard.MemoryRemaining / Blackboard.MemoryDuration;
     }
 
+    // Hold Zone: 0.6 saat MC tidak terlihat (zona jadi tujuan), 0.35 saat MC terlihat dan berada di zona
+    // (menekan MC yang sedang merebut zona). Tanpa titik objective, 0.
+    private float ScorePressZone()
+    {
+        if (!HasObjective || StayOnHighGround)
+            return 0f;
+
+        if (!Blackboard.CanSeePlayer)
+            return 0.6f;
+
+        return Group.PlayerInObjective ? 0.35f : 0f;
+    }
+
     // ---------- Eksekusi ----------
 
     private void ExecuteFlee()
@@ -514,6 +540,84 @@ public class ShooterBrain : EnemyBrain
         }
 
         Motor.FacePosition(playerPosition);
+    }
+
+    // Pindah ke titik sekitar zona yang punya LOS ke pusat zona. Penjaga zona masuk ke dalam zona.
+    private void ExecutePressZone()
+    {
+        search.Cancel();
+
+        if (!HasObjective)
+        {
+            selector.RequestDecision();
+            return;
+        }
+
+        SetAction(EnemyAction.PressZone);
+
+        Vector3 target;
+
+        if (Controller.IsZoneGuard)
+        {
+            target = ObjectiveSpot(0.4f);
+        }
+        else
+        {
+            if (!hasPressPoint || Time.time >= nextPressPointTime)
+                ChoosePressPoint();
+
+            target = hasPressPoint ? pressPoint : ObjectiveSpot(0.4f);
+        }
+
+        Motor.MoveTo(target, 1f, 0.3f);
+
+        if (Blackboard.CanSeePlayer)
+            Motor.FacePosition(Blackboard.Player.transform.position);
+        else if (Motor.HasArrived)
+            Motor.FacePosition(Group.ObjectivePoint);
+        else
+            Motor.ClearFacing();
+    }
+
+    // Kandidat di lingkaran sekitar pusat zona (sejauh jarak ideal, minimal di luar radius zona), mulai dari arah
+    // Shooter sekarang. Dipilih yang punya LOS ke pusat zona dan paling dekat dari posisi Shooter.
+    private void ChoosePressPoint()
+    {
+        nextPressPointTime = Time.time + 1f;
+        hasPressPoint = false;
+
+        GroupBlackboard group = Group;
+        Vector3 center = group.ObjectivePoint;
+        float distance = Mathf.Max(group.ObjectiveRadius + 1f, idealDistance);
+
+        Vector3 fromCenter = transform.position - center;
+        fromCenter.y = 0f;
+        float currentBearing = Mathf.Atan2(fromCenter.x, fromCenter.z) * Mathf.Rad2Deg;
+        float best = float.MaxValue;
+        Vector3 centerEye = center + Vector3.up * 1f;
+
+        for (int i = 0; i < candidates.Length; i++)
+        {
+            float bearing = currentBearing + 360f * i / candidates.Length;
+            Vector3 point = center + Quaternion.Euler(0f, bearing, 0f) * Vector3.forward * distance;
+
+            if (!NavMesh.SamplePosition(point, out NavMeshHit hit, navMeshSampleRadius * 2f, NavMesh.AllAreas))
+                continue;
+
+            Vector3 eye = hit.position + Vector3.up * Data.EyeHeight * transform.lossyScale.y;
+
+            if (Physics.Linecast(eye, centerEye, obstacleMask, QueryTriggerInteraction.Ignore))
+                continue;
+
+            float travel = (hit.position - transform.position).sqrMagnitude;
+
+            if (travel < best)
+            {
+                best = travel;
+                pressPoint = hit.position;
+                hasPressPoint = true;
+            }
+        }
     }
 
     private void ExecuteSearch()

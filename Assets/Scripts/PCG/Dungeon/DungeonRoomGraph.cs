@@ -22,6 +22,8 @@ public class DungeonRoomGraph
     private readonly List<int>[] neighbors;
     private readonly int[,] hops;
     private readonly int[] entrances;
+    // Titik tengah tiap celah pintu room (dunia), untuk arah jaga musuh di zona.
+    private readonly List<Vector3>[] entrancePoints;
 
     public int RoomCount => dungeon.Rooms.Count;
 
@@ -38,6 +40,7 @@ public class DungeonRoomGraph
         neighbors = new List<int>[count];
         hops = new int[count, count];
         entrances = new int[count];
+        entrancePoints = new List<Vector3>[count];
 
         for (int i = 0; i < roomOfCell.Length; i++)
             roomOfCell[i] = -1;
@@ -45,6 +48,7 @@ public class DungeonRoomGraph
         for (int r = 0; r < count; r++)
         {
             neighbors[r] = new List<int>();
+            entrancePoints[r] = new List<Vector3>();
             DungeonRoom room = dungeon.Rooms[r];
 
             for (int x = room.x; x < room.x + room.width; x++)
@@ -107,6 +111,11 @@ public class DungeonRoomGraph
     public int EntranceCount(int room)
     {
         return room >= 0 && room < RoomCount ? entrances[room] : 0;
+    }
+
+    public IReadOnlyList<Vector3> EntrancePoints(int room)
+    {
+        return entrancePoints[room];
     }
 
     public DungeonRoom Room(int index)
@@ -210,10 +219,14 @@ public class DungeonRoomGraph
 
             groups++;
             stack.Push(start);
+            Vector3 sum = Vector3.zero;
+            int cells = 0;
 
             while (stack.Count > 0)
             {
                 Vector2Int cell = stack.Pop();
+                sum += dungeon.CellToWorld(cell);
+                cells++;
 
                 foreach (Vector2Int direction in Directions)
                 {
@@ -223,6 +236,8 @@ public class DungeonRoomGraph
                         stack.Push(next);
                 }
             }
+
+            entrancePoints[room].Add(sum / Mathf.Max(1, cells));
         }
 
         return groups;

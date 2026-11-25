@@ -52,7 +52,6 @@ public class SurvivalObjective : IWaveObjective
     private readonly List<EnemyRole> roles = new List<EnemyRole>();
     private readonly List<int> roleWeights = new List<int>();
     private readonly List<int> candidates = new List<int>();
-    private readonly List<Vector3> occupied = new List<Vector3>();
 
     private ObjectiveContext context;
     private float elapsed;
@@ -115,29 +114,8 @@ public class SurvivalObjective : IWaveObjective
         HasLastSpawn = false;
         LastSpawnRoom = -1;
 
-        DifficultyModel dda = DifficultyModel.Current;
-        factor = dda != null && dda.Active ? Mathf.Max(0.1f, dda.Factor) : 1f;
-
-        roles.Clear();
-        roleWeights.Clear();
-
-        if (context.Wave != null)
-        {
-            foreach (WaveEntry entry in context.Wave.Entries)
-            {
-                if (entry.count <= 0)
-                    continue;
-
-                roles.Add(entry.role);
-                roleWeights.Add(entry.count);
-            }
-        }
-
-        if (roles.Count == 0)
-        {
-            roles.Add(EnemyRole.Charger);
-            roleWeights.Add(1);
-        }
+        factor = RoomSpawner.DdaFactor();
+        RoomSpawner.ReadRoles(context.Wave, roles, roleWeights);
     }
 
     public void Tick(float deltaTime)
@@ -177,30 +155,17 @@ public class SurvivalObjective : IWaveObjective
             return false;
 
         Vector3 playerPosition = player.transform.position;
-        EnemyRole role = PickRole();
+        EnemyRole role = RoomSpawner.PickRole(context.Random, roles, roleWeights);
+        List<Vector3> taken = RoomSpawner.CollectOccupied(context.Battle);
 
-        if (!TryFindPosition(playerPosition, out Vector3 position, out int room))
+        if (!TryFindPosition(playerPosition, taken, out Vector3 position, out int room))
         {
             Failed++;
             return false;
         }
 
-        EnemyHealth enemy = context.Spawner.SpawnAt(role, position);
-
-        if (enemy == null)
+        if (RoomSpawner.Spawn(context, role, position, true, taken) == null)
             return false;
-
-        context.Battle.Track(enemy);
-
-        EnemyController controller = enemy.GetComponent<EnemyController>();
-
-        if (controller != null)
-        {
-            controller.Blackboard.Alert(playerPosition, player.gameObject);
-
-            if (TacticalCoordinator.Current != null)
-                TacticalCoordinator.Current.RegisterLate(controller);
-        }
 
         Spawned++;
         HasLastSpawn = true;
@@ -209,27 +174,7 @@ public class SurvivalObjective : IWaveObjective
         return true;
     }
 
-    private EnemyRole PickRole()
-    {
-        int total = 0;
-
-        foreach (int weight in roleWeights)
-            total += weight;
-
-        int pick = context.Random.Range(0, Mathf.Max(1, total));
-
-        for (int i = 0; i < roles.Count; i++)
-        {
-            pick -= roleWeights[i];
-
-            if (pick < 0)
-                return roles[i];
-        }
-
-        return roles[roles.Count - 1];
-    }
-
-    private bool TryFindPosition(Vector3 playerPosition, out Vector3 position, out int room)
+    private bool TryFindPosition(Vector3 playerPosition, List<Vector3> taken, out Vector3 position, out int room)
     {
         position = Vector3.zero;
         room = -1;
@@ -237,12 +182,10 @@ public class SurvivalObjective : IWaveObjective
         DungeonGenerator dungeon = context.Dungeon;
         DungeonRoomGraph graph = dungeon != null ? dungeon.RoomGraph : null;
 
-        CollectOccupied();
-
         if (graph == null)
-            return TryFindInArea(playerPosition, out position);
+            return TryFindInArea(playerPosition, taken, out position);
 
-        int playerRoom = NearestRoom(graph, playerPosition);
+        int playerRoom = RoomSpawner.NearestRoom(graph, playerPosition);
 
         if (playerRoom < 0)
             return false;
@@ -263,7 +206,8 @@ public class SurvivalObjective : IWaveObjective
 
         foreach (int candidate in candidates)
         {
-            if (TryPlaceInRoom(dungeon, graph.Room(candidate), playerPosition, out position))
+            if (RoomSpawner.TryPlaceInRoom(context, graph.Room(candidate), playerPosition, settings.minSpawnDistance, true,
+                    settings.placementAttempts, taken, out position))
             {
                 room = candidate;
                 return true;
@@ -277,9 +221,6 @@ public class SurvivalObjective : IWaveObjective
     {
         candidates.Clear();
 
-        DungeonGenerator dungeon = graph.Dungeon;
-        DungeonVault vault = DungeonVault.Active;
-        bool vaultClosed = vault != null && (vault.Door == null || !vault.Door.IsOpen);
         float minSqr = settings.minSpawnDistance * settings.minSpawnDistance;
         Vector3 eye = playerPosition + Vector3.up * 1.2f;
 
@@ -287,70 +228,22 @@ public class SurvivalObjective : IWaveObjective
         {
             int hop = graph.HopDistance(playerRoom, r);
 
-            if (hop < settings.minHop || hop > maxHop)
-                continue;
-
-            // Vault yang masih terkunci tidak bisa ditinggalkan musuh.
-            if (vaultClosed && graph.Room(r) == dungeon.VaultRoom)
+            if (hop < settings.minHop || hop > maxHop || RoomSpawner.IsLockedVault(graph, r))
                 continue;
 
             Vector3 center = graph.Center(r);
             Vector3 offset = center - playerPosition;
             offset.y = 0f;
 
-            if (offset.sqrMagnitude < minSqr)
-                continue;
-
-            if (!Hidden(eye, center))
+            if (offset.sqrMagnitude < minSqr || !RoomSpawner.Hidden(eye, center))
                 continue;
 
             candidates.Add(r);
         }
     }
 
-    private bool TryPlaceInRoom(DungeonGenerator dungeon, DungeonRoom room, Vector3 playerPosition, out Vector3 position)
-    {
-        position = Vector3.zero;
-
-        PcgSpawnRules rules = context.Spawner.ActiveRules;
-        Vector3 eye = playerPosition + Vector3.up * 1.2f;
-        float minSqr = settings.minSpawnDistance * settings.minSpawnDistance;
-        // Cell di tepi room dihindari jika room cukup besar, supaya musuh tidak muncul menempel dinding.
-        int inset = room.width > 2 && room.height > 2 ? 1 : 0;
-
-        for (int attempt = 0; attempt < settings.placementAttempts; attempt++)
-        {
-            Vector2Int cell = new Vector2Int(
-                context.Random.Range(room.x + inset, room.x + room.width - inset),
-                context.Random.Range(room.y + inset, room.y + room.height - inset));
-
-            if (!dungeon.IsWalkable(cell))
-                continue;
-
-            float jitter = dungeon.TileSize * 0.35f;
-            Vector3 candidate = dungeon.CellToWorld(cell) + new Vector3(context.Random.Range(-jitter, jitter), 0f, context.Random.Range(-jitter, jitter));
-
-            if (!PcgPlacement.TrySnapToNavMesh(candidate, rules, out candidate))
-                continue;
-
-            Vector3 offset = candidate - playerPosition;
-            offset.y = 0f;
-
-            if (offset.sqrMagnitude < minSqr || !Hidden(eye, candidate + Vector3.up * 1f))
-                continue;
-
-            if (PcgPlacement.Validate(candidate, rules, playerPosition, occupied) != PcgReject.None)
-                continue;
-
-            position = candidate;
-            return true;
-        }
-
-        return false;
-    }
-
     // Mode Arena (tanpa graf): generate-and-test di area spawn, titik harus jauh dan tidak terlihat dari MC.
-    private bool TryFindInArea(Vector3 playerPosition, out Vector3 position)
+    private bool TryFindInArea(Vector3 playerPosition, List<Vector3> taken, out Vector3 position)
     {
         position = Vector3.zero;
         PcgSpawnArea area = context.Spawner.CurrentArea;
@@ -364,68 +257,22 @@ public class SurvivalObjective : IWaveObjective
 
         for (int attempt = 0; attempt < settings.placementAttempts; attempt++)
         {
-            if (!PcgPlacement.TryPlace(area, rules, context.Random, playerPosition, occupied, report, out Vector3 candidate))
+            if (!PcgPlacement.TryPlace(area, rules, context.Random, playerPosition, taken, report, out Vector3 candidate))
                 return false;
 
             Vector3 offset = candidate - playerPosition;
             offset.y = 0f;
 
-            if (offset.magnitude >= settings.minSpawnDistance && Hidden(eye, candidate + Vector3.up * 1f))
+            if (offset.magnitude >= settings.minSpawnDistance && RoomSpawner.Hidden(eye, candidate + Vector3.up))
             {
                 position = candidate;
                 return true;
             }
 
-            occupied.Remove(candidate);
+            taken.Remove(candidate);
         }
 
         return false;
-    }
-
-    // Room MC. Di koridor dipakai room terdekat (jarak datar ke pusat room).
-    private static int NearestRoom(DungeonRoomGraph graph, Vector3 position)
-    {
-        int room = graph.RoomOf(position);
-
-        if (room >= 0)
-            return room;
-
-        float best = float.MaxValue;
-
-        for (int r = 0; r < graph.RoomCount; r++)
-        {
-            Vector3 offset = graph.Center(r) - position;
-            offset.y = 0f;
-
-            if (offset.sqrMagnitude < best)
-            {
-                best = offset.sqrMagnitude;
-                room = r;
-            }
-        }
-
-        return room;
-    }
-
-    // Garis dari mata MC ke titik terhalang dinding atau props penghalang (layer NavBlock).
-    private static bool Hidden(Vector3 eye, Vector3 target)
-    {
-        Vector3 lifted = new Vector3(target.x, Mathf.Max(target.y, eye.y - 0.2f), target.z);
-        return Physics.Linecast(eye, lifted, GameLayers.ObstacleMask, QueryTriggerInteraction.Ignore);
-    }
-
-    private void CollectOccupied()
-    {
-        occupied.Clear();
-
-        if (context.Battle == null)
-            return;
-
-        foreach (EnemyHealth enemy in context.Battle.Alive)
-        {
-            if (enemy != null)
-                occupied.Add(enemy.transform.position);
-        }
     }
 
     // ---------- AI ----------

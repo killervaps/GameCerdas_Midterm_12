@@ -32,6 +32,8 @@ public class GuardianBrain : EnemyBrain
     private float swingHitTime;
     private Vector3 interposePoint;
     private bool hasInterposePoint;
+    // Lebih dari 0 selama Hold Zone: leash diganti radius zona + jarak tambahan.
+    private float zoneLeash;
 
     public override string BrainName => "BT/Guardian";
 
@@ -58,7 +60,7 @@ public class GuardianBrain : EnemyBrain
             if (anchor == null)
                 return string.Empty;
 
-            string anchorName = IsBodyguard ? anchor.name : "titik";
+            string anchorName = IsBodyguard ? anchor.name : IsZoneAnchored ? "zona" : "titik";
             string text = "anchor " + anchorName + "  leash " + DistanceToAnchor().ToString("0.0") + "/" + LeashRadius.ToString("0.#");
 
             if (Reactions.IsDurable(Build))
@@ -136,7 +138,26 @@ public class GuardianBrain : EnemyBrain
     {
         anchor = staticAnchor;
         anchorHealth = null;
+        zoneLeash = 0f;
     }
+
+    // Hold Zone: anchor = pusat zona, leash = radius zona + jarak tambahan. Dipasang TacticalCoordinator.
+    public void SetZoneAnchor(Transform zoneCenter, float leash)
+    {
+        if (zoneCenter == null || enraged || (anchor == zoneCenter && Mathf.Approximately(zoneLeash, leash)))
+            return;
+
+        anchor = zoneCenter;
+        anchorHealth = null;
+        zoneLeash = Mathf.Max(0.5f, leash);
+        returning = false;
+
+        if (Controller.LogStateChanges)
+            Debug.Log(name + ": menjaga zona, leash " + zoneLeash.ToString("0.0"), this);
+    }
+
+    // True jika anchor sekarang adalah pusat zona Hold Zone.
+    public bool IsZoneAnchored => zoneLeash > 0f;
 
     public override void Tick(float deltaTime)
     {
@@ -428,7 +449,7 @@ public class GuardianBrain : EnemyBrain
     public Vector3 AnchorPosition => anchor != null ? anchor.position : transform.position;
 
     // Ketahanan MC tinggi, Guardian jadi garis depan dengan leash dan aggro lebih longgar.
-    public float LeashRadius => Data.LeashRadius * Reactions.GuardianLeashMultiplier(Build);
+    public float LeashRadius => zoneLeash > 0f ? zoneLeash : Data.LeashRadius * Reactions.GuardianLeashMultiplier(Build);
 
     public float AggroRadius => Data.AggroRadius * Reactions.GuardianAggroMultiplier(Build);
 

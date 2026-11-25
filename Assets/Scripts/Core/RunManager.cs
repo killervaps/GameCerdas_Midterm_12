@@ -78,12 +78,17 @@ public class RunManager : MonoBehaviour
     [SerializeField] private RoleCost[] roleCosts = RoleCost.Defaults();
 
     [Header("Objective (PCG)")]
-    // Bobot undian objective tiap ronde. Ronde 1 selalu Exterminate, objective yang sama tidak dipilih dua ronde
-    // berturut-turut, dan Survival serta Hold Zone hanya dipilih di Mode Dungeon. Objective yang belum punya
-    // implementasi dilewati. Jika tidak ada calon tersisa, ronde memakai Exterminate.
+    // Bobot dasar undian objective tiap ronde. Ronde 1 dan boss wave selalu Exterminate. Survival dan Hold Zone
+    // hanya dipilih di Mode Dungeon. Jika tidak ada calon tersisa, ronde memakai Exterminate.
     [SerializeField, Min(0f)] private float exterminateWeight = 2f;
     [SerializeField, Min(0f)] private float survivalWeight = 1f;
     [SerializeField, Min(0f)] private float holdZoneWeight = 1f;
+    // Pengali bobot objective yang sama dengan ronde sebelumnya. 0 = tidak pernah berulang.
+    [SerializeField, Range(0f, 1f)] private float objectiveRepeatMultiplier = 0.35f;
+    // Objective yang sudah muncul sebanyak ini berturut-turut tidak dipilih lagi ronde berikutnya.
+    [SerializeField, Min(1)] private int objectiveMaxStreak = 2;
+    // Tambahan bobot per ronde objective itu tidak muncul (maks 4 ronde), supaya yang lama absen lebih mungkin kembali.
+    [SerializeField, Min(0f)] private float objectiveFreshnessBonus = 0.35f;
 
     [Header("Between Rounds")]
     // TODO(desain): aturan heal antar ronde belum diputuskan. Sementara pulih 30% MaxHP.
@@ -409,15 +414,15 @@ public class RunManager : MonoBehaviour
         battle.BeginBattle(spawner.SpawnWave(WaveToSpawnAtStart(), CurrentRound));
     }
 
-    // Survival: musuh datang bertahap dari objective, jadi ronde dimulai tanpa wave (item tetap dimunculkan).
-    // Objective lain memunculkan komposisi wave seperti biasa.
+    // Survival dan Hold Zone memunculkan musuhnya sendiri (bertahap, atau di sekitar zona), jadi ronde dimulai tanpa
+    // wave (item tetap dimunculkan). Exterminate memunculkan komposisi wave seperti biasa.
     private WaveData WaveToSpawnAtStart()
     {
-        if (CurrentObjective != ObjectiveType.Survival)
+        if (CurrentObjective == ObjectiveType.Exterminate)
             return CurrentWave;
 
         if (emptyWave == null)
-            emptyWave = WaveData.CreateRuntime("Survival", System.Array.Empty<WaveEntry>());
+            emptyWave = WaveData.CreateRuntime("Objective", System.Array.Empty<WaveEntry>());
 
         emptyWave.StatMultiplier = CurrentWave != null ? CurrentWave.StatMultiplier : 1f;
         return emptyWave;
@@ -662,11 +667,13 @@ public class RunManager : MonoBehaviour
     }
 
     // Objective ronde ini dari aliran PCG Objective, jadi seed run sama = urutan objective sama.
+    // Weighted random dengan memori ronde sebelumnya, supaya urutannya bervariasi tanpa pola tetap:
+    //   - objective yang sama dengan ronde lalu tetap boleh, tapi bobotnya dikali Repeat Multiplier
+    //   - objective yang sudah Max Streak kali berturut-turut tidak boleh muncul lagi
+    //   - objective yang lama tidak muncul mendapat bonus Freshness Bonus per ronde absen (maks 4 ronde)
     private void ChooseObjective()
     {
         int index = CurrentRound - 1;
-        bool hasPrevious = index >= 1 && objectiveHistory.Count >= index;
-        ObjectiveType previous = hasPrevious ? objectiveHistory[index - 1] : ObjectiveType.Exterminate;
         ObjectiveType chosen = ObjectiveType.Exterminate;
 
         if (CurrentRound <= 1)
@@ -682,9 +689,9 @@ public class RunManager : MonoBehaviour
             objectiveCandidates.Clear();
             objectiveCandidateWeights.Clear();
 
-            AddObjectiveCandidate(ObjectiveType.Exterminate, exterminateWeight, hasPrevious, previous);
-            AddObjectiveCandidate(ObjectiveType.Survival, survivalWeight, hasPrevious, previous);
-            AddObjectiveCandidate(ObjectiveType.HoldZone, holdZoneWeight, hasPrevious, previous);
+            AddObjectiveCandidate(ObjectiveType.Exterminate, exterminateWeight, index);
+            AddObjectiveCandidate(ObjectiveType.Survival, survivalWeight, index);
+            AddObjectiveCandidate(ObjectiveType.HoldZone, holdZoneWeight, index);
 
             float total = 0f;
 
@@ -693,7 +700,7 @@ public class RunManager : MonoBehaviour
 
             if (total <= 0f)
             {
-                ObjectiveReason = "tidak ada calon lain, kembali ke Exterminate";
+                ObjectiveReason = "tidak ada calon, kembali ke Exterminate";
             }
             else
             {
@@ -712,7 +719,7 @@ public class RunManager : MonoBehaviour
                     }
                 }
 
-                ObjectiveReason = "undian dari " + objectiveCandidates.Count + " calon";
+                ObjectiveReason = DescribeObjectiveOdds(total);
             }
         }
 
@@ -728,19 +735,55 @@ public class RunManager : MonoBehaviour
         Log("objective ronde " + CurrentRound + ": " + chosen + " (" + ObjectiveReason + ")");
     }
 
-    private void AddObjectiveCandidate(ObjectiveType type, float weight, bool hasPrevious, ObjectiveType previous)
+    // Bobot akhir satu calon objective. Riwayat dibaca dari ronde sebelum index.
+    private void AddObjectiveCandidate(ObjectiveType type, float weight, int index)
     {
         if (weight <= 0f || !ObjectiveRunner.IsImplemented(type))
             return;
 
-        if (hasPrevious && type == previous)
-            return;
-
+        // Survival dan Hold Zone butuh graf ruangan dungeon. Hold Zone juga butuh room yang memenuhi syarat zona.
         if (type != ObjectiveType.Exterminate && Mode != GameMode.Dungeon)
             return;
 
+        if (type == ObjectiveType.HoldZone && !HoldZoneObjective.CanHost(dungeon))
+            return;
+
+        int streak = 0;
+
+        for (int i = index - 1; i >= 0 && i < objectiveHistory.Count && objectiveHistory[i] == type; i--)
+            streak++;
+
+        if (streak >= objectiveMaxStreak)
+            return;
+
+        if (streak > 0)
+            weight *= objectiveRepeatMultiplier;
+
+        int absent = 0;
+
+        for (int i = index - 1; i >= 0 && i < objectiveHistory.Count && objectiveHistory[i] != type; i--)
+            absent++;
+
+        weight *= 1f + objectiveFreshnessBonus * Mathf.Min(absent, 4);
+
         objectiveCandidates.Add(type);
         objectiveCandidateWeights.Add(weight);
+    }
+
+    // Mis. "peluang Exterminate 18%, Survival 41%, HoldZone 41%".
+    private string DescribeObjectiveOdds(float total)
+    {
+        System.Text.StringBuilder text = new System.Text.StringBuilder("peluang ");
+
+        for (int i = 0; i < objectiveCandidates.Count; i++)
+        {
+            if (i > 0)
+                text.Append(", ");
+
+            text.Append(objectiveCandidates[i]).Append(' ').Append(Mathf.RoundToInt(100f * objectiveCandidateWeights[i] / total)).Append('%');
+        }
+
+        return text.ToString();
     }
 
     private void HandlePlayerDied()

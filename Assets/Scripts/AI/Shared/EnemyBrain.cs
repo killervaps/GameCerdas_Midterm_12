@@ -23,6 +23,25 @@ public abstract class EnemyBrain : MonoBehaviour, IEnemyBrain
     protected BuildReactions Reactions =>
         TacticalCoordinator.Current != null ? TacticalCoordinator.Current.Reactions : BuildReactions.Disabled;
 
+    // Pengetahuan kelompok, termasuk titik objective. Null tanpa TacticalCoordinator.
+    protected GroupBlackboard Group => TacticalCoordinator.Current != null ? TacticalCoordinator.Current.Group : null;
+
+    protected bool HasObjective => Group != null && Group.HasObjectivePoint;
+
+    // Titik di dalam zona untuk musuh ini. Tiap musuh mendapat sudut sendiri (dari namanya yang unik, mis. Charger_12)
+    // supaya tidak bertumpuk.
+    protected Vector3 ObjectiveSpot(float radiusFraction)
+    {
+        GroupBlackboard group = Group;
+        float angle = (Mathf.Abs(name.GetHashCode()) % 360) * Mathf.Deg2Rad;
+        Vector3 offset = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * group.ObjectiveRadius * radiusFraction;
+        Vector3 point = group.ObjectivePoint + offset;
+
+        return UnityEngine.AI.NavMesh.SamplePosition(point, out UnityEngine.AI.NavMeshHit hit, 2f, UnityEngine.AI.NavMesh.AllAreas)
+            ? hit.position
+            : group.ObjectivePoint;
+    }
+
     public abstract string BrainName { get; }
 
     public EnemyAction CurrentAction { get; private set; } = EnemyAction.Idle;

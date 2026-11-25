@@ -190,6 +190,24 @@ public class PcgDebugPanel : MonoBehaviour
 
             if (runner != null && runner.Active is SurvivalObjective survival)
                 Line("  <color=#ffc040>survival</color> ").Append(survival.DebugStatus);
+
+            if (runner != null && runner.Active is HoldZoneObjective holdZone)
+            {
+                Line("  <color=#ffc040>zona</color> ").Append(holdZone.DebugStatus);
+
+                TacticalCoordinator coordinator = TacticalCoordinator.Current;
+
+                if (coordinator != null)
+                {
+                    builder.Append(", MC ").Append(coordinator.Group.PlayerInObjective ? "di zona" : "di luar");
+
+                    foreach (EnemyController enemy in coordinator.Registry)
+                    {
+                        if (enemy.IsZoneGuard)
+                            builder.Append(", penjaga ").Append(enemy.name);
+                    }
+                }
+            }
         }
 
         AppendEnemies();
