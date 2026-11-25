@@ -85,6 +85,7 @@ public class GameUI : MonoBehaviour
     private GoalIndicator goalIndicator;
     private EnemyGroupWaypoint enemyWaypoint;
     private ZoneIndicator zoneIndicator;
+    private Minimap minimap;
     private ResultScreen result;
 
     private InputActionMap playerMap;
@@ -329,6 +330,13 @@ public class GameUI : MonoBehaviour
 
         if (IsMainMenuOpen || IsResultOpen)
             return;
+
+        // Esc menutup peta penuh dulu sebelum membuka menu jeda.
+        if (minimap != null && minimap.IsExpanded)
+        {
+            minimap.SetExpanded(false);
+            return;
+        }
 
         if (IsPaused)
         {
@@ -718,6 +726,8 @@ public class GameUI : MonoBehaviour
         // Penanda zona selalu tampil selama ronde Hold Zone.
         bool holdZone = runManager != null && runManager.CurrentObjective == ObjectiveType.HoldZone;
         zoneIndicator.SetVisible(inGame && !announcing && state == RunState.Battle && holdZone);
+        // Minimap hanya di Mode Dungeon selama MC berada di dungeon. Di Arena disembunyikan.
+        minimap.SetVisible(combat && runManager != null && runManager.Mode == GameMode.Dungeon);
 
         if (!inGame || ended)
             gateModal.Hide();
@@ -799,6 +809,7 @@ public class GameUI : MonoBehaviour
         enemyWaypoint = CreateScreen<EnemyGroupWaypoint>("EnemyGroupWaypoint", false);
         zoneIndicator = CreateScreen<ZoneIndicator>("ZoneIndicator", false);
         hud = CreateScreen<HudPanel>("HUD", false);
+        minimap = CreateScreen<Minimap>("Minimap", false);
         enemyPreview = CreateScreen<EnemyPreviewPanel>("EnemyPreview", false);
         gateModal = CreateScreen<GateInfoModal>("GateInfoModal", false);
         hints = CreateScreen<HintToast>("HintToast", false);

@@ -7356,6 +7356,7 @@ MonoBehaviour:
     travelWeight: 1
     shooterLineOfSightBonus: 0.5
   pairGuardianWithShooter: 1
+  zoneLeashExtra: 3
   reactions:
     enabled: 1
     highOffense: 1.5
@@ -79163,6 +79164,9 @@ MonoBehaviour:
   exterminateWeight: 2
   survivalWeight: 1
   holdZoneWeight: 1
+  objectiveRepeatMultiplier: 0.35
+  objectiveMaxStreak: 2
+  objectiveFreshnessBonus: 0.35
   healRule: 1
   partialHealRatio: 0.3
   returnDelay: 2
@@ -79246,7 +79250,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DdaDebugPanel
   tracker: {fileID: 1303698178}
   runManager: {fileID: 1303698171}
-  showPanel: 1
+  showPanel: 0
   followDebugToggle: 0
   margin: {x: 10, y: 10}
   width: 330

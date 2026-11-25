@@ -150,25 +150,37 @@ public class HudPanel : UIScreen
         hpText.outlineColor = new Color32(0, 0, 0, 160);
         UIKit.Stretch(hpText.rectTransform);
 
-        // ---------- Kanan atas: waktu ----------
-        Image timerCard = UIKit.CreatePanel("TimerCard", rect, UIKit.Panel);
-        UIKit.Place(timerCard.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-28f, -28f), new Vector2(200f, 92f));
+        // ---------- Tengah atas: strip waktu + skor ----------
+        // Satu stiker horizontal: waktu run, skor Aura sementara (hanya jika AuraScore aktif), dan pengingat jeda.
+        // Kanan atas dipakai minimap Mode Dungeon. Strip menyusut sendiri saat bagian skor disembunyikan.
+        Image strip = UIKit.CreatePanel("StatusStrip", rect, UIKit.Panel);
+        UIKit.Place(strip.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -20f), Vector2.zero);
+        UIKit.AddHorizontal(strip.gameObject, 14f, new RectOffset(18, 18, 6, 8), TextAnchor.MiddleCenter);
+        ContentSizeFitter stripFit = strip.gameObject.AddComponent<ContentSizeFitter>();
+        stripFit.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+        stripFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-        timerText = UIKit.UseDisplayFont(UIKit.CreateText("Time", timerCard.transform, "00:00", 38f, UIKit.Text, TextAlignmentOptions.Center, true));
-        UIKit.Stretch(timerText.rectTransform, 0f, 0f, 8f, 34f);
+        timerText = UIKit.UseDisplayFont(UIKit.CreateText("Time", strip.transform, "00:00", 34f, UIKit.Text, TextAlignmentOptions.Center, true));
+        timerText.textWrappingMode = TextWrappingModes.NoWrap;
 
-        TextMeshProUGUI pauseHint = UIKit.CreateText("PauseHint", timerCard.transform, "<b>[Esc]</b> Jeda", 17f, UIKit.TextMuted, TextAlignmentOptions.Center);
-        UIKit.Stretch(pauseHint.rectTransform, 0f, 0f, 56f, 8f);
-        ControlHintLabel.Bind(pauseHint, () => "<b>" + ControlHints.Glyph(PadAction.Pause) + "</b> Jeda");
-
-        // Skor Aura sementara (belum aman) di bawah waktu run.
-        Image score = UIKit.CreatePanel("ScoreCard", rect, UIKit.Panel);
+        // Skor Aura sementara (belum aman), dipisah garis tinta dari waktu.
+        RectTransform score = UIKit.CreateRect("Score", strip.transform);
         scoreCard = score.gameObject;
-        UIKit.Place(score.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-28f, -132f), new Vector2(200f, 72f));
-        scoreText = UIKit.UseDisplayFont(UIKit.CreateText("Score", score.transform, "0", 30f, UIKit.Accent, TextAlignmentOptions.Center, true));
-        UIKit.Stretch(scoreText.rectTransform, 0f, 0f, 6f, 30f);
-        scoreCaption = UIKit.CreateText("Caption", score.transform, "skor sementara", 16f, UIKit.TextMuted, TextAlignmentOptions.Center);
-        UIKit.Stretch(scoreCaption.rectTransform, 0f, 0f, 44f, 6f);
+        UIKit.AddHorizontal(scoreCard, 14f, null, TextAnchor.MiddleLeft);
+
+        Image scoreDivider = UIKit.CreateImage("Divider", score, UIKit.Ink, false);
+        UIKit.Layout(scoreDivider, 34f, 3f, 0f);
+
+        RectTransform scoreColumn = UIKit.CreateRect("Column", score);
+        UIKit.AddVertical(scoreColumn.gameObject, -4f, null, TextAnchor.MiddleLeft);
+        scoreText = UIKit.UseDisplayFont(UIKit.CreateText("Value", scoreColumn, "0", 24f, UIKit.Accent, TextAlignmentOptions.Left, true));
+        scoreText.textWrappingMode = TextWrappingModes.NoWrap;
+        scoreCaption = UIKit.CreateText("Caption", scoreColumn, "skor sementara", 14f, UIKit.TextMuted, TextAlignmentOptions.Left);
+        scoreCaption.textWrappingMode = TextWrappingModes.NoWrap;
+
+        TextMeshProUGUI pauseHint = UIKit.CreateText("PauseHint", strip.transform, "<b>[Esc]</b> Jeda", 15f, UIKit.TextMuted, TextAlignmentOptions.Center);
+        pauseHint.textWrappingMode = TextWrappingModes.NoWrap;
+        ControlHintLabel.Bind(pauseHint, () => "<b>" + ControlHints.Glyph(PadAction.Pause) + "</b> Jeda");
 
         // ---------- Kanan bawah: Aura Burst (cooldown lingkaran) ----------
         BuildSkill();
@@ -217,7 +229,7 @@ public class HudPanel : UIScreen
         Image toast = UIKit.CreatePanel("VaultToast", rect, UIKit.Panel);
         vaultToast = toast.rectTransform;
         // Di bawah toast Tips (yang menempel di atas layar), supaya keduanya tidak bertumpuk.
-        UIKit.Place(vaultToast, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -150f), Vector2.zero);
+        UIKit.Place(vaultToast, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -210f), Vector2.zero);
         UIKit.AddHorizontal(toast.gameObject, 12f, new RectOffset(14, 18, 10, 12), TextAnchor.MiddleLeft);
         ContentSizeFitter toastFit = toast.gameObject.AddComponent<ContentSizeFitter>();
         toastFit.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
