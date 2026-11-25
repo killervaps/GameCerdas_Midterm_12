@@ -228,6 +228,9 @@ public partial class DungeonGenerator : MonoBehaviour
     // Model portal Goal. Dipakai juga sebagai model portal Ekstraksi di Safezone jika tidak ada model khusus.
     public GameObject GoalPrefab => goalPrefab;
 
+    // Graf ruangan dungeon yang sedang dibangun. Null sebelum generate atau setelah dungeon dihapus.
+    public DungeonRoomGraph RoomGraph { get; private set; }
+
     public int MapWidth => mapWidth;
 
     public int MapHeight => mapHeight;
@@ -411,6 +414,8 @@ public partial class DungeonGenerator : MonoBehaviour
         BakeNavMesh();
         SyncArena();
         ComputeMetrics(generateMs, buildMs);
+
+        RoomGraph = DungeonRoomGraph.Build(this);
 
         if (logGeneration)
             Debug.Log("DungeonGenerator seed " + seed + ": " + Summary(), this);
@@ -1969,6 +1974,8 @@ public partial class DungeonGenerator : MonoBehaviour
     [ContextMenu("Clear Dungeon")]
     public void ClearDungeon()
     {
+        RoomGraph = null;
+
         // Referensi bisa hilang setelah compile, jadi child dengan nama yang sama juga dicari.
         for (int i = transform.childCount - 1; i >= 0; i--)
         {

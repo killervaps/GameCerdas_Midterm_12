@@ -16,6 +16,9 @@ public class ObjectiveRunner : MonoBehaviour
     [SerializeField] private BattleManager battle;
     [SerializeField] private EnemySpawner spawner;
 
+    [Header("Survival")]
+    [SerializeField] private SurvivalSettings survival = new SurvivalSettings();
+
     [Header("Despawn")]
     // Lama efek mengecil sebelum musuh sisa dihilangkan saat objective selesai.
     [SerializeField, Min(0f)] private float despawnDuration = 0.4f;
@@ -47,13 +50,15 @@ public class ObjectiveRunner : MonoBehaviour
     // Objective yang sudah punya implementasi. Tipe lain tidak dipilih PCG.
     public static bool IsImplemented(ObjectiveType type)
     {
-        return type == ObjectiveType.Exterminate;
+        return type == ObjectiveType.Exterminate || type == ObjectiveType.Survival;
     }
 
-    public static IWaveObjective Create(ObjectiveType type)
+    public IWaveObjective Create(ObjectiveType type)
     {
         switch (type)
         {
+            case ObjectiveType.Survival:
+                return new SurvivalObjective(survival);
             default:
                 return new ExterminateObjective();
         }

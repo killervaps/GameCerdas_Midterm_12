@@ -61,6 +61,8 @@ public class EnemySpawner : MonoBehaviour
     private Arena arena;
     private PcgSpawnArea area;
     private int counter;
+    // Pengali stat wave terakhir, dipakai juga untuk musuh yang muncul di tengah ronde.
+    private float lastStatMultiplier = 1f;
 
     // Semua musuh dari wave terakhir, termasuk yang sudah mati.
     public IReadOnlyList<EnemyHealth> Spawned => spawned;
@@ -156,6 +158,8 @@ public class EnemySpawner : MonoBehaviour
             WaveSpawned?.Invoke(spawned);
             return spawned;
         }
+
+        lastStatMultiplier = wave.StatMultiplier;
 
         SeededRandom random = PcgDirector.Stream(round, PcgStream.EnemyPlacement);
         PcgSpawnRules activeRules = ActiveRules;
@@ -349,7 +353,31 @@ public class EnemySpawner : MonoBehaviour
         return direction.sqrMagnitude > 0.001f ? Quaternion.LookRotation(direction) : Quaternion.identity;
     }
 
-    private void Spawn(EnemyHealth prefab, EnemyRole role, Vector3 position, Quaternion rotation, bool boss, float statMultiplier)
+    // Memunculkan satu musuh di tengah ronde (mis. bantuan objective Survival). Posisi sudah divalidasi pemanggil.
+    // Pengali stat wave terakhir ikut dipakai. Musuh menghadap MC dan ikut dibersihkan bersama wave.
+    public EnemyHealth SpawnAt(EnemyRole role, Vector3 position)
+    {
+        EnemyHealth prefab = GetPrefab(role);
+
+        if (prefab == null)
+        {
+            Debug.LogError("EnemySpawner: prefab untuk role " + role + " belum diisi.", this);
+            return null;
+        }
+
+        PlayerHealth player = PlayerHealth.Current;
+        Quaternion rotation = FacePlayer(position, player != null ? player.transform.position : (Vector3?)null);
+
+        EnemyHealth enemy = Spawn(prefab, role, position, rotation, false, lastStatMultiplier);
+        occupied.Add(position);
+
+        if (logSpawns)
+            Debug.Log("EnemySpawner: " + enemy.name + " muncul di tengah ronde di " + position, this);
+
+        return enemy;
+    }
+
+    private EnemyHealth Spawn(EnemyHealth prefab, EnemyRole role, Vector3 position, Quaternion rotation, bool boss, float statMultiplier)
     {
         EnemyHealth enemy = Instantiate(prefab, position, rotation);
 
@@ -374,6 +402,8 @@ public class EnemySpawner : MonoBehaviour
 
         if (boss)
             bosses.Add(enemy);
+
+        return enemy;
     }
 
     private EnemyHealth GetPrefab(EnemyRole role)

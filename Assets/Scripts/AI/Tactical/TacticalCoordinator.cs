@@ -83,6 +83,17 @@ public class TacticalCoordinator : MonoBehaviour
         RunLoop();
     }
 
+    // Musuh yang muncul di tengah ronde. Daftar musuh dibangun ulang tiap loop dari EnemyController.Active, jadi cukup
+    // menjalankan loop sekarang supaya slot, token, dan pasangan Guardian langsung ikut memperhitungkannya.
+    public void RegisterLate(EnemyController enemy)
+    {
+        if (enemy == null)
+            return;
+
+        Log(enemy.name + " bergabung di tengah ronde");
+        RunLoop();
+    }
+
     private void HandleWaveSpawned(IReadOnlyList<EnemyHealth> enemies)
     {
         tokens.Clear();

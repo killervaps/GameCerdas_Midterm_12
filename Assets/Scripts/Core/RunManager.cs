@@ -100,6 +100,7 @@ public class RunManager : MonoBehaviour
 
     private Coroutine pendingReturn;
     private WaveData currentWave;
+    private WaveData emptyWave;
     private Arena dungeonArena;
     private DungeonGoalPortal openPortal;
     // Objective tiap ronde di run ini, indeks 0 = ronde 1.
@@ -286,6 +287,9 @@ public class RunManager : MonoBehaviour
     {
         if (currentWave != null)
             Destroy(currentWave);
+
+        if (emptyWave != null)
+            Destroy(emptyWave);
     }
 
     private void Start()
@@ -401,7 +405,22 @@ public class RunManager : MonoBehaviour
 
         RoundStarted?.Invoke(CurrentRound);
 
-        battle.BeginBattle(spawner.SpawnWave(CurrentWave, CurrentRound));
+        battle.AutoFinish = CurrentObjective == ObjectiveType.Exterminate;
+        battle.BeginBattle(spawner.SpawnWave(WaveToSpawnAtStart(), CurrentRound));
+    }
+
+    // Survival: musuh datang bertahap dari objective, jadi ronde dimulai tanpa wave (item tetap dimunculkan).
+    // Objective lain memunculkan komposisi wave seperti biasa.
+    private WaveData WaveToSpawnAtStart()
+    {
+        if (CurrentObjective != ObjectiveType.Survival)
+            return CurrentWave;
+
+        if (emptyWave == null)
+            emptyWave = WaveData.CreateRuntime("Survival", System.Array.Empty<WaveEntry>());
+
+        emptyWave.StatMultiplier = CurrentWave != null ? CurrentWave.StatMultiplier : 1f;
+        return emptyWave;
     }
 
     // Jika ada ObjectiveRunner, ronde ditutup oleh runner saat objective selesai (Exterminate: semua musuh mati).
@@ -521,7 +540,7 @@ public class RunManager : MonoBehaviour
         }
         else if (State == RunState.Battle)
         {
-            battle.BeginBattle(spawner.SpawnWave(CurrentWave, CurrentRound));
+            battle.BeginBattle(spawner.SpawnWave(WaveToSpawnAtStart(), CurrentRound));
             Log("ronde " + CurrentRound + " dibuat ulang (posisi musuh dan item)");
         }
     }

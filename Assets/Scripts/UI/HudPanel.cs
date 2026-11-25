@@ -41,6 +41,8 @@ public class HudPanel : UIScreen
     private Image objectiveStamp;
     private TextMeshProUGUI objectiveStampLabel;
     private TextMeshProUGUI objectiveCaption;
+    private GameObject objectiveBar;
+    private RectTransform objectiveBarFill;
     private RectTransform enemyTokens;
     private readonly List<Image> enemyTokenImages = new List<Image>();
     private readonly List<TextMeshProUGUI> enemyTokenLabels = new List<TextMeshProUGUI>();
@@ -343,6 +345,13 @@ public class HudPanel : UIScreen
         UIKit.Layout(objectiveCaption, -1f, -1f, 1f);
         enemyCountText = UIKit.UseDisplayFont(UIKit.CreateText("Count", countRow, "-", 30f, UIKit.Text, TextAlignmentOptions.Right, true));
         enemyCountText.textWrappingMode = TextWrappingModes.NoWrap;
+
+        // Bar progres objective selain Exterminate (Survival: sisa waktu, Hold Zone: progres zona).
+        RectTransform bar = UIKit.CreateBar("ObjectiveBar", battleRoot, UIKit.Well, UIKit.Accent, out Image barFill);
+        UIKit.Layout(bar, 14f);
+        objectiveBar = bar.gameObject;
+        objectiveBarFill = barFill.rectTransform;
+        objectiveBar.SetActive(false);
 
         // Satu token per musuh yang di-spawn. Token musuh yang sudah mati diredupkan.
         enemyTokens = UIKit.CreateRect("EnemyTokens", battleRoot);
@@ -734,8 +743,14 @@ public class HudPanel : UIScreen
 
         if (inBattle && battle != null)
         {
-            RefreshObjective(battle);
-            RefreshEnemyTokens();
+            // Token per musuh hanya untuk Exterminate. Di objective lain musuh terus berdatangan.
+            bool exterminate = RefreshObjective(battle);
+
+            if (enemyTokens.gameObject.activeSelf != exterminate)
+                enemyTokens.gameObject.SetActive(exterminate);
+
+            if (exterminate)
+                RefreshEnemyTokens();
         }
 
         threatLine.SetActive(inBattle && ui.Threat != null);
@@ -754,8 +769,9 @@ public class HudPanel : UIScreen
     }
 
     // Kartu objective. Exterminate memakai angka besar sisa/total musuh. Objective lain memakai HudText objective
-    // sebagai keterangan dan progres dalam persen sebagai angka besar.
-    private void RefreshObjective(BattleManager battle)
+    // sebagai keterangan dan bar progres. Survival: angka besar = musuh hidup, bar = sisa waktu.
+    // Hold Zone: angka besar = progres zona dalam persen. Mengembalikan true jika objective-nya Exterminate.
+    private bool RefreshObjective(BattleManager battle)
     {
         ObjectiveRunner runner = ObjectiveRunner.Current;
         IWaveObjective objective = runner != null ? runner.Active : null;
@@ -763,15 +779,32 @@ public class HudPanel : UIScreen
 
         UIKit.SetStamp(objectiveStamp, objectiveStampLabel, ObjectiveInfo.Label(type), UIKit.Cream);
 
-        if (type == ObjectiveType.Exterminate)
+        bool exterminate = type == ObjectiveType.Exterminate;
+
+        if (objectiveBar.activeSelf == exterminate)
+            objectiveBar.SetActive(!exterminate);
+
+        if (exterminate)
         {
             objectiveCaption.text = "Brainrot tersisa";
             enemyCountText.text = battle.AliveCount + "<size=65%><color=" + UIKit.MutedHex + "> / " + battle.TotalCount + "</color></size>";
-            return;
+            return true;
         }
 
         objectiveCaption.text = objective.HudText;
-        enemyCountText.text = Mathf.RoundToInt(objective.Progress01 * 100f) + "<size=65%><color=" + UIKit.MutedHex + ">%</color></size>";
+
+        if (type == ObjectiveType.Survival)
+        {
+            UIKit.SetBarFill(objectiveBarFill, 1f - objective.Progress01);
+            enemyCountText.text = battle.AliveCount + "<size=65%><color=" + UIKit.MutedHex + "> hidup</color></size>";
+        }
+        else
+        {
+            UIKit.SetBarFill(objectiveBarFill, objective.Progress01);
+            enemyCountText.text = Mathf.RoundToInt(objective.Progress01 * 100f) + "<size=65%><color=" + UIKit.MutedHex + ">%</color></size>";
+        }
+
+        return false;
     }
 
     // Skor sementara (Unbanked). Skor yang sudah aman ditulis kecil di keterangan jika ada.
