@@ -10,7 +10,7 @@ public class DdaLogger : MonoBehaviour
 {
     private const string Header =
         "timestamp,seed,mode,round,duration,kills,damageTaken,hpEnd,nearDeath,score,smoothed," +
-        "factorBefore,factorAfter,enemyCount,itemBonus,healRatio,maxTokens,died";
+        "factorBefore,factorAfter,enemyCount,itemBonus,healRatio,maxTokens,died,waypointDelay";
 
     // Kosong = komponen di objek yang sama, lalu dicari di scene.
     [SerializeField] private DifficultyModel model;
@@ -74,11 +74,14 @@ public class DdaLogger : MonoBehaviour
             // Kosong = mode Off, heal memakai Partial Heal Ratio di RunManager.
             .Append(model.Active ? model.HealRatio.ToString("0.000", inv) : string.Empty).Append(',')
             .Append(model.MaxTokens.ToString(inv)).Append(',')
-            .Append(perf.died ? "1" : "0");
+            .Append(perf.died ? "1" : "0").Append(',')
+            .Append(model.WaypointDelay.ToString("0.0", inv));
 
         try
         {
             string path = FilePath;
+
+            ArchiveIfHeaderChanged(path);
 
             if (!File.Exists(path))
                 File.WriteAllText(path, Header + Environment.NewLine);
@@ -92,5 +95,26 @@ public class DdaLogger : MonoBehaviour
 
             warned = true;
         }
+    }
+
+    // File dari versi lama dengan kolom berbeda dipindah ke nama lain, supaya kolom di satu file tidak bercampur.
+    private void ArchiveIfHeaderChanged(string path)
+    {
+        if (!File.Exists(path))
+            return;
+
+        string firstLine;
+
+        using (StreamReader reader = new StreamReader(path))
+            firstLine = reader.ReadLine();
+
+        if (firstLine == Header)
+            return;
+
+        string archive = Path.Combine(Path.GetDirectoryName(path),
+            Path.GetFileNameWithoutExtension(path) + "_lama_" + DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) + Path.GetExtension(path));
+
+        File.Move(path, archive);
+        Debug.Log("DdaLogger: kolom CSV berubah, file lama dipindah ke " + archive, this);
     }
 }

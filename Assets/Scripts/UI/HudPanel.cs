@@ -34,6 +34,9 @@ public class HudPanel : UIScreen
     private GameObject infoCard;
     private GameObject battleSection;
     private TextMeshProUGUI enemyCountText;
+    private Image objectiveStamp;
+    private TextMeshProUGUI objectiveStampLabel;
+    private TextMeshProUGUI objectiveCaption;
     private RectTransform enemyTokens;
     private readonly List<Image> enemyTokenImages = new List<Image>();
     private readonly List<TextMeshProUGUI> enemyTokenLabels = new List<TextMeshProUGUI>();
@@ -314,10 +317,17 @@ public class HudPanel : UIScreen
         battleSection = battleRoot.gameObject;
         UIKit.AddVertical(battleSection, 10f);
 
+        // Kartu objective: stiker jenis objective, lalu teks dan angka progresnya.
+        RectTransform objectiveRow = UIKit.CreateRect("ObjectiveRow", battleRoot);
+        HorizontalLayoutGroup objectiveLayout = UIKit.AddHorizontal(objectiveRow.gameObject, 8f, null, TextAnchor.MiddleLeft);
+        objectiveLayout.childForceExpandWidth = false;
+        objectiveStamp = UIKit.CreateStamp("ObjectiveStamp", objectiveRow, 18f, -3f, out objectiveStampLabel);
+        UIKit.SetStamp(objectiveStamp, objectiveStampLabel, "Basmi", UIKit.Cream);
+
         RectTransform countRow = UIKit.CreateRect("CountRow", battleRoot);
         UIKit.AddHorizontal(countRow.gameObject, 8f, null, TextAnchor.MiddleLeft);
-        TextMeshProUGUI caption = UIKit.CreateText("Caption", countRow, "Musuh tersisa", 20f, UIKit.TextMuted);
-        UIKit.Layout(caption, -1f, -1f, 1f);
+        objectiveCaption = UIKit.CreateText("Caption", countRow, "Brainrot tersisa", 20f, UIKit.TextMuted);
+        UIKit.Layout(objectiveCaption, -1f, -1f, 1f);
         enemyCountText = UIKit.UseDisplayFont(UIKit.CreateText("Count", countRow, "-", 30f, UIKit.Text, TextAlignmentOptions.Right, true));
         enemyCountText.textWrappingMode = TextWrappingModes.NoWrap;
 

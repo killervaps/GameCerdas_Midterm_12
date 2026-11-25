@@ -1,10 +1,14 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 // Penanda arah portal Goal di Mode Dungeon. Hanya muncul setelah ronde bersih dan portal terbuka, jadi selama
-// pertempuran pemain tetap menjelajah sendiri. Portal terlihat di layar = belah ketupat di atas portal,
-// portal di luar layar = panah di tepi layar yang menunjuk ke arahnya. Keduanya menampilkan jarak dalam meter.
+// pertempuran pemain tetap menjelajah sendiri.
+// Pandunya berurutan lewat DungeonGuide, sama dengan waypoint grup musuh: satu titik pada satu waktu, mulai dari
+// pintu keluar room MC, belokan koridor, pintu masuk room berikutnya, dan terakhir portal. Titik berikutnya baru
+// dipakai setelah MC sampai di titik sekarang, jadi penanda tidak pernah menunjuk menembus dinding.
+// Titik terlihat di layar = belah ketupat di atasnya, di luar layar = panah di tepi layar. Jarak = jarak jalan ke portal.
 // Saat MC berada di dekat portal, kartu "Tahan E" muncul di bawah layar dengan bar progress seperti kartu buff gate,
 // plus pengingat jika vault ronde ini belum dibuka.
 public class GoalIndicator : UIScreen
@@ -14,6 +18,40 @@ public class GoalIndicator : UIScreen
     [SerializeField] private float arrowSize = 44f;
     [SerializeField] private float diamondSize = 30f;
     [SerializeField] private float bobAmount = 6f;
+
+    [Header("Pandu Dungeon")]
+    [SerializeField, Min(0.05f)] private float guideInterval = 0.5f;
+    // Titik pandu dianggap tercapai jika jarak jalan (BFS) dari cell MC ke cell titik paling banyak segini.
+    [SerializeField, Min(0)] private int reachCells = 1;
+    // Rencana dibuat ulang jika MC menjauh dari titik sekarang lebih dari segini cell.
+    [SerializeField, Min(1)] private int strayCells = 4;
+    // Jarak aman garis pandang dari dinding, dalam cell.
+    [SerializeField, Range(0f, 0.45f)] private float sightClearance = 0.3f;
+
+    [Header("Debug (F1)")]
+    [SerializeField] private bool drawDebugPath = true;
+
+    private readonly DungeonGuide guide = new DungeonGuide { targetName = "portal" };
+    private float nextGuideUpdate;
+    private bool guideReady;
+    private float guideMeters;
+    private DungeonGoalPortal guidedPortal;
+
+    public static GoalIndicator Current { get; private set; }
+
+    // Sedang memandu ke portal (portal terbuka dan penanda dipakai).
+    public bool IsTracking => IsVisible && guidedPortal != null && ShowMarker;
+
+    // Satu baris untuk panel DDA.
+    public string DebugStatus => guideReady
+        ? "Goal " + Mathf.CeilToInt(guideMeters) + " m, pandu " + guide.DescribeStep()
+        : "Goal tanpa jalur grid";
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        Current = null;
+    }
 
     private RectTransform marker;
     private RectTransform arrow;
@@ -35,6 +73,8 @@ public class GoalIndicator : UIScreen
 
     protected override void Build()
     {
+        Current = this;
+
         marker = UIKit.CreateRect("Marker", rect);
         marker.anchorMin = marker.anchorMax = new Vector2(0.5f, 0.5f);
         marker.sizeDelta = new Vector2(arrowSize, arrowSize);
@@ -135,6 +175,75 @@ public class GoalIndicator : UIScreen
         }
     }
 
+    protected override void OnShow()
+    {
+        ResetGuide();
+    }
+
+    protected override void OnHide()
+    {
+        ResetGuide();
+    }
+
+    private void ResetGuide()
+    {
+        guide.Reset();
+        guideReady = false;
+        guidedPortal = null;
+        nextGuideUpdate = 0f;
+    }
+
+    private void OnEnable()
+    {
+        RenderPipelineManager.endCameraRendering += HandleEndCameraRendering;
+    }
+
+    private void OnDisable()
+    {
+        RenderPipelineManager.endCameraRendering -= HandleEndCameraRendering;
+    }
+
+    private void OnDestroy()
+    {
+        if (Current == this)
+            Current = null;
+    }
+
+    // Rute grid dari MC ke portal, diperbarui tiap Guide Interval. Portal baru = rencana baru dari posisi MC sekarang.
+    private void UpdateGuide(DungeonGoalPortal portal, PlayerHealth player)
+    {
+        if (portal != guidedPortal)
+        {
+            guide.Reset();
+            guidedPortal = portal;
+            nextGuideUpdate = 0f;
+        }
+
+        if (Time.time < nextGuideUpdate)
+            return;
+
+        nextGuideUpdate = Time.time + guideInterval;
+        guideReady = false;
+
+        RunManager run = ui.Run;
+        DungeonGenerator dungeon = run != null ? run.Dungeon : null;
+
+        if (dungeon == null || !dungeon.HasLayout || player == null)
+            return;
+
+        guide.reachCells = reachCells;
+        guide.strayCells = strayCells;
+        guide.sightClearance = sightClearance;
+
+        Vector3 target = portal.transform.position;
+
+        if (!guide.Search(dungeon, player.transform.position) || !DungeonGuide.TryCellOf(dungeon, target, out Vector2Int targetCell))
+            return;
+
+        guideReady = guide.Follow(dungeon, targetCell, target);
+        guideMeters = guide.TargetDistance * dungeon.TileSize;
+    }
+
     protected override void Update()
     {
         base.Update();
@@ -156,22 +265,19 @@ public class GoalIndicator : UIScreen
             return;
         }
 
+        UpdateGuide(portal, player);
+
+        // Tanpa rute grid (mis. layout belum ada), penanda jatuh kembali ke portal langsung.
+        Vector3 point = guideReady ? guide.CurrentPoint : portal.transform.position;
+        float meters = guideReady
+            ? guideMeters
+            : player != null ? Vector3.Distance(player.transform.position, portal.transform.position) : 0f;
+
         content.alpha = 1f;
 
-        Vector3 world = portal.transform.position + Vector3.up * markerHeight;
-        Vector3 screen = cam.WorldToScreenPoint(world);
-        bool behind = screen.z < 0f;
+        bool onScreen = WaypointProjection.Project(cam, rect, edgeMargin, point + Vector3.up * markerHeight,
+            out Vector2 local, out Vector2 direction, out float scale);
 
-        if (behind)
-            screen = -screen;
-
-        Vector2 canvasSize = rect.rect.size;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, screen, null, out Vector2 local);
-
-        Vector2 half = canvasSize * 0.5f - new Vector2(edgeMargin, edgeMargin);
-        bool onScreen = !behind && Mathf.Abs(local.x) <= half.x && Mathf.Abs(local.y) <= half.y;
-
-        float meters = player != null ? Vector3.Distance(player.transform.position, portal.transform.position) : 0f;
         label.text = "GOAL  " + Mathf.CeilToInt(meters) + " m";
 
         float bob = Mathf.Sin(Time.unscaledTime * 4f) * bobAmount;
@@ -184,14 +290,32 @@ public class GoalIndicator : UIScreen
             return;
         }
 
-        // Di luar layar: tempel di tepi pada arah portal dari tengah layar, panah menunjuk keluar.
-        Vector2 direction = local.sqrMagnitude > 0.01f ? local.normalized : Vector2.up;
-        float scale = Mathf.Min(half.x / Mathf.Max(0.001f, Mathf.Abs(direction.x)), half.y / Mathf.Max(0.001f, Mathf.Abs(direction.y)));
-
+        // Di luar layar: tempel di tepi pada arah titik pandu dari tengah layar, panah menunjuk keluar.
         marker.anchoredPosition = direction * scale - direction * bob;
         arrow.gameObject.SetActive(true);
         diamond.gameObject.SetActive(false);
         // Ujung sprite segitiga menunjuk ke bawah (-90 derajat), jadi diputar +90 dari sudut arah.
         arrow.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 90f);
+    }
+
+    // F1: garis emas = rute ke portal, tiang abu = titik yang sudah lewat, biru = berikutnya, putih = yang ditunjuk.
+    private void HandleEndCameraRendering(ScriptableRenderContext context, Camera renderCamera)
+    {
+        if (!drawDebugPath || !AIDebugSettings.Enabled || !IsVisible || !guideReady || renderCamera.cameraType != CameraType.Game)
+            return;
+
+        Material material = DungeonGuide.DebugMaterial;
+
+        if (material == null)
+            return;
+
+        GL.PushMatrix();
+        material.SetPass(0);
+        GL.LoadProjectionMatrix(renderCamera.projectionMatrix);
+        GL.modelview = renderCamera.worldToCameraMatrix;
+        GL.Begin(GL.LINES);
+        guide.DrawDebugLines(new Color(UIKit.Accent.r, UIKit.Accent.g, UIKit.Accent.b, 0.9f), markerHeight);
+        GL.End();
+        GL.PopMatrix();
     }
 }

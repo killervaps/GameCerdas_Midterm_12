@@ -78,6 +78,11 @@ public class DifficultyModel : MonoBehaviour
         Factor > profile.highThreshold ? profile.tokensHigh :
         profile.tokensNormal;
 
+    // Detik tanpa pertempuran sebelum waypoint grup musuh muncul (EnemyGroupWaypoint).
+    public float WaypointDelay => Active
+        ? Mathf.Lerp(profile.waypointDelayAtMin, profile.waypointDelayAtMax, FactorT)
+        : profile.waypointDelayOff;
+
     private float FactorT => Mathf.InverseLerp(profile.minFactor, profile.maxFactor, Factor);
 
     // Dipanggil setiap kali satu ronde dinilai, juga jika faktornya tidak berubah. Argumen: faktor lama, faktor baru, rekap ronde.
@@ -293,15 +298,18 @@ public class DifficultyModel : MonoBehaviour
 
     public string DescribeKnobs()
     {
+        string waypoint = ", waypoint " + WaypointDelay.ToString("0") + " s";
+
         if (!Active)
-            return "knob default";
+            return "knob default" + waypoint;
 
         int bonus = ItemBonus;
 
         return "musuh x" + EnemyMultiplier.ToString("0.00") +
                ", item " + (bonus >= 0 ? "+" : "") + bonus +
                ", heal " + Mathf.RoundToInt(HealRatio * 100f) + "%" +
-               ", token " + MaxTokens;
+               ", token " + MaxTokens +
+               waypoint;
     }
 
     public static string DescribeScore(WavePerformance perf)

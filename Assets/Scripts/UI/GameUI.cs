@@ -47,6 +47,9 @@ public class GameUI : MonoBehaviour
     // Mode Dungeon: penanda arah portal Goal setelah ronde bersih. Mati = pemain mencari portal sendiri
     // (kartu "Tahan E" di dekat portal tetap muncul).
     [SerializeField] private bool showGoalIndicator = true;
+    // Penanda arah ke grup musuh terdekat setelah beberapa detik tanpa pertempuran, plus titik merah di atas
+    // musuh terakhir (EnemyGroupWaypoint).
+    [SerializeField] private bool showEnemyWaypoint = true;
     [SerializeField] private string playerActionMap = "Player";
 
     [Header("Tutorial")]
@@ -80,6 +83,7 @@ public class GameUI : MonoBehaviour
     private SettingsScreen settings;
     private ModeSelectScreen modeSelect;
     private GoalIndicator goalIndicator;
+    private EnemyGroupWaypoint enemyWaypoint;
     private ResultScreen result;
 
     private InputActionMap playerMap;
@@ -692,6 +696,7 @@ public class GameUI : MonoBehaviour
         goalIndicator.ShowMarker = showGoalIndicator;
         goalIndicator.SetVisible(inGame && !announcing && state == RunState.RoundCleared &&
                                  runManager != null && runManager.Mode == GameMode.Dungeon);
+        enemyWaypoint.SetVisible(showEnemyWaypoint && inGame && !announcing && state == RunState.Battle);
 
         if (!inGame || ended)
             gateModal.Hide();
@@ -770,6 +775,7 @@ public class GameUI : MonoBehaviour
         reticle = CreateScreen<LockOnReticle>("LockOnReticle", false);
         damageFeedback = CreateScreen<DamageFeedback>("DamageFeedback", false);
         goalIndicator = CreateScreen<GoalIndicator>("GoalIndicator", false);
+        enemyWaypoint = CreateScreen<EnemyGroupWaypoint>("EnemyGroupWaypoint", false);
         hud = CreateScreen<HudPanel>("HUD", false);
         enemyPreview = CreateScreen<EnemyPreviewPanel>("EnemyPreview", false);
         gateModal = CreateScreen<GateInfoModal>("GateInfoModal", false);

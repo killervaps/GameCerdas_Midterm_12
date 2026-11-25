@@ -17,8 +17,8 @@ MonoBehaviour:
   weightTime: 0.25
   nearDeathPenalty: 0.15
   nearDeathThreshold: 0.15
-  damageRatioForZero: 0.6
-  targetSecondsPerEnemy: 8
+  damageRatioForZero: 1.2
+  targetSecondsPerEnemy: 20
   emaAlpha: 0.6
   targetScore: 0.55
   deadzone: 0.08

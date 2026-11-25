@@ -52,6 +52,12 @@ public class DifficultyProfile : ScriptableObject
     // Faktor di bawah Low Threshold memakai Tokens Low, di atas High Threshold memakai Tokens High.
     public float lowThreshold = 0.9f;
     public float highThreshold = 1.1f;
+    // Lama tanpa pertempuran (detik) sebelum waypoint grup musuh muncul, di faktor minimum dan maksimum.
+    // Pemain yang kesulitan dibantu lebih cepat.
+    [Min(0f)] public float waypointDelayAtMin = 10f;
+    [Min(0f)] public float waypointDelayAtMax = 30f;
+    // Dipakai saat mode DDA Off.
+    [Min(0f)] public float waypointDelayOff = 20f;
 
     private void OnValidate()
     {
