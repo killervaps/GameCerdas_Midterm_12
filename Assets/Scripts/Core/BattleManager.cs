@@ -19,6 +19,9 @@ public class BattleManager : MonoBehaviour
 
     public int AliveCount => alive.Count;
 
+    // Musuh ronde ini yang masih hidup.
+    public IReadOnlyList<EnemyHealth> Alive => alive;
+
     public int TotalCount => tracked.Count;
 
     public float BattleStartTime { get; private set; }

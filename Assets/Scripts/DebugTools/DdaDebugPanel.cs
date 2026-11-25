@@ -137,12 +137,25 @@ public class DdaDebugPanel : MonoBehaviour
             builder.Append("Knob  musuh x").Append(model.EnemyMultiplier.ToString("0.00"))
                 .Append(", item ").Append(bonus >= 0 ? "+" : string.Empty).Append(bonus)
                 .Append(", heal ").Append(Mathf.RoundToInt(model.HealRatio * 100f)).Append('%')
-                .Append(", token ").Append(model.MaxTokens).Append('\n');
+                .Append(", token ").Append(model.MaxTokens)
+                .Append(", waypoint ").Append(model.WaypointDelay.ToString("0")).Append(" s\n");
         }
         else
         {
-            builder.Append("Knob  <color=#aaaaaa>default (DDA mati)</color>\n");
+            builder.Append("Knob  <color=#aaaaaa>default (DDA mati), waypoint ").Append(model.WaypointDelay.ToString("0")).Append(" s</color>\n");
         }
+
+        lines++;
+
+        EnemyGroupWaypoint waypoint = EnemyGroupWaypoint.Current;
+        GoalIndicator goal = GoalIndicator.Current;
+
+        if (waypoint != null && waypoint.IsTracking)
+            builder.Append("Waypoint  ").Append(waypoint.DebugStatus).Append('\n');
+        else if (goal != null && goal.IsTracking)
+            builder.Append("Waypoint  ").Append(goal.DebugStatus).Append('\n');
+        else
+            builder.Append("Waypoint  <color=#aaaaaa>tidak aktif</color>\n");
 
         lines++;
 

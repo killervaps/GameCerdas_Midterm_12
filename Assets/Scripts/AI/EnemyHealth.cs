@@ -13,6 +13,9 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     // Untuk sistem yang mendengar semua musuh sekaligus (BattleManager, TacticalCoordinator).
     public static event Action<EnemyHealth> AnyDied;
 
+    // Musuh mana pun menerima damage, mis. untuk mendeteksi bahwa MC sedang bertarung.
+    public static event Action<EnemyHealth, float> AnyDamaged;
+
     [SerializeField] private float maxHealth = 100f;
     // Musuh boleh punya Defense, rumusnya sama dengan MC.
     [SerializeField] private float defense = 0f;
@@ -110,6 +113,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         }
 
         Damaged?.Invoke(finalDamage, info);
+        AnyDamaged?.Invoke(this, finalDamage);
 
         if (CurrentHealth <= 0f)
             Die();
